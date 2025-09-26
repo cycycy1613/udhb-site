@@ -177,7 +177,8 @@
     .btn {
         padding: 0.8rem 1.8rem;
         border: none;
-        border-radius: 50px;
+        /* Updated: Changed from 50px to 8px for a rectangular shape */
+        border-radius: 8px;
         font-size: 1rem;
         font-weight: 600;
         cursor: pointer;
@@ -198,15 +199,27 @@
     }
     
     .btn-secondary {
-        background-color: var(--white);
-        color: var(--secondary-color);
-        border: 2px solid var(--secondary-color);
+        padding: 0.8rem 1.8rem;
+    background-color: transparent;
+    /* Updated: Changed from 50px to 8px for a rectangular shape */
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    display: inline-block;
+    
+    /* White Outline Specifics */
+    border: 2px solid var(--white);
+    color: var(--white);
     }
     
     .btn-secondary:hover {
-        background-color: var(--light-gray);
-        transform: translateY(-5px);
-        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+        background-color: var(--white);
+    color: var(--primary-color); /* The dark color (#2C3E50) for contrast */
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(255, 255, 255, 0.4);
     }
     
     /* Section Styles */
@@ -828,7 +841,7 @@
             <h1>Urban Deca Homes Batangas</h1>
             <p>a residential community located in Barangay Balagtas, Batangas City. It is designed to offer affordable, comfortable, and modern living spaces for families, professionals, and first-time homebuyers.</p>
             <div class="hero-buttons">
-                <a href="m.me/fb.urbandecahomesbatangas" class="btn btn-primary">Inquire Now</a>
+                <a href="https://m.me/fb.urbandecahomesbatangas" class="btn btn-primary">Inquire Now</a>
                 <a href="https://urbandecahomesbatangas.com/members" class="btn btn-secondary">Sellers Portal</a>
             </div>
         </div>
