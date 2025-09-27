@@ -1,0 +1,1230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BTB Information Portal</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #1a365d;
+            --secondary: #2d6c8a;
+            --accent: #e9b949;
+            --light: #f8f9fa;
+            --dark: #2d3748;
+            --gray: #a0aec0;
+            --success: #38a169;
+            --danger: #e53e3e;
+            --dark-bg: #121212;
+            --dark-surface: #1e1e1e;
+            --dark-text: #e0e0e0;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f5f7f9;
+            color: var(--dark);
+            line-height: 1.6;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        /* Header Styles */
+        header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            padding: 20px 0;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            position: relative;
+            z-index: 10;
+        }
+        
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+        }
+        
+        .logo img {
+            height: 50px;
+            margin-right: 15px;
+        }
+        
+        .logo h1 {
+            font-size: 24px;
+            font-weight: 600;
+        }
+        
+        /* Mobile menu button */
+        .menu-toggle {
+            display: none;
+            flex-direction: column;
+            justify-content: space-around;
+            width: 30px;
+            height: 25px;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            padding: 0;
+        }
+        
+        .menu-toggle span {
+            width: 100%;
+            height: 3px;
+            background-color: white;
+            border-radius: 5px;
+            transition: all 0.3s linear;
+            transform-origin: center;
+        }
+        
+        /* Navigation Tabs */
+        .tabs-container {
+            background-color: white;
+            border-radius: 12px;
+            padding: 10px;
+            margin: 30px 0;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            animation: fadeIn 0.8s ease-out;
+        }
+        
+        .tabs {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+        
+        .tab {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-width: 120px;
+            width: 100%;
+            max-width: 150px;
+            height: 120px;
+            background: white;
+            border: 2px solid var(--primary);
+            border-radius: 12px;
+            color: var(--primary);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            animation: slideUp 0.5s ease-out;
+        }
+        
+        .tab:hover {
+            background: var(--primary);
+            color: white;
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+        
+        .tab i {
+            font-size: 32px;
+            margin-bottom: 10px;
+            transition: transform 0.3s ease;
+        }
+        
+        .tab:hover i {
+            transform: scale(1.2);
+        }
+        
+        .tab span {
+            font-weight: 600;
+            font-size: 14px;
+            text-align: center;
+        }
+        
+        /* Announcement Section */
+        .announcement-section {
+            margin: 40px 0;
+            animation: fadeIn 1s ease-out;
+        }
+        
+        .section-title {
+            text-align: center;
+            margin-bottom: 30px;
+            color: var(--primary);
+            font-size: 28px;
+            font-weight: 700;
+            position: relative;
+            padding-bottom: 10px;
+        }
+        
+        .section-title:after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 4px;
+            background: var(--accent);
+            border-radius: 2px;
+        }
+        
+        .announcement-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+        
+        .announcement-item {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+            aspect-ratio: 1/1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            position: relative;
+            animation: fadeIn 0.8s ease-out;
+        }
+        
+        .announcement-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 20px rgba(0, 0, 0, 0.15);
+        }
+        
+        .announcement-item.empty {
+            background: #edf2f7;
+            color: var(--gray);
+            font-weight: 600;
+            font-size: 18px;
+            flex-direction: column;
+        }
+        
+        .announcement-item.empty i {
+            font-size: 32px;
+            margin-bottom: 10px;
+            color: var(--gray);
+        }
+        
+        .announcement-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s ease;
+        }
+        
+        .announcement-item:hover img {
+            transform: scale(1.05);
+        }
+        
+        /* Full-screen Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.95);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .modal.active {
+            opacity: 1;
+        }
+        
+        .modal-content {
+            position: relative;
+            max-width: 90vw;
+            max-height: 90vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            animation: zoomIn 0.3s ease-out;
+        }
+        
+        .modal-content img {
+            max-width: 100%;
+            max-height: 80vh;
+            border-radius: 8px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+        }
+        
+        .modal-actions {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            gap: 15px;
+            z-index: 1001;
+            flex-direction: column;
+        }
+        
+        .modal-btn {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.9);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s ease;
+            font-size: 20px;
+            animation: pulse 2s infinite;
+        }
+        
+        .modal-btn:hover {
+            transform: scale(1.1);
+            background: white;
+            animation: none;
+        }
+        
+        .modal-btn.exit {
+            color: var(--danger);
+        }
+        
+        .modal-btn.upload {
+            color: var(--primary);
+        }
+        
+        /* Upload Modal */
+        .upload-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            z-index: 1010;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .upload-modal.active {
+            opacity: 1;
+        }
+        
+        .upload-content {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+            transform: translateY(20px);
+            transition: transform 0.3s ease;
+            animation: modalSlideIn 0.3s ease-out;
+        }
+        
+        .upload-modal.active .upload-content {
+            transform: translateY(0);
+        }
+        
+        .upload-content h3 {
+            margin-bottom: 20px;
+            color: var(--primary);
+            text-align: center;
+            font-size: 24px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--dark);
+        }
+        
+        .form-group input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid var(--gray);
+            border-radius: 6px;
+            font-size: 16px;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .form-group input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(26, 54, 93, 0.2);
+            outline: none;
+        }
+        
+        .form-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 25px;
+        }
+        
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: var(--secondary);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .btn-secondary {
+            background: var(--gray);
+            color: white;
+        }
+        
+        .btn-secondary:hover {
+            background: #718096;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        /* Footer Styles */
+        footer {
+            background: var(--primary);
+            color: white;
+            padding: 30px 0;
+            margin-top: auto;
+        }
+        
+        .footer-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        
+        .footer-logo {
+            font-size: 20px;
+            font-weight: 700;
+        }
+        
+        .footer-links {
+            display: flex;
+            flex-wrap: wrap;
+        }
+        
+        .footer-links a {
+            color: white;
+            margin-left: 20px;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+        
+        .footer-links a:hover {
+            color: var(--accent);
+        }
+        
+        .copyright {
+            text-align: center;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            width: 100%;
+        }
+        
+        /* Toast Notification */
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 15px 25px;
+            background: var(--success);
+            color: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            display: none;
+            z-index: 1000;
+            animation: slideIn 0.3s ease;
+        }
+        
+        /* Login Modal */
+        .login-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            z-index: 1020;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .login-modal.active {
+            opacity: 1;
+        }
+        
+        .login-content {
+            background: var(--dark-surface);
+            padding: 40px;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 450px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+            transform: scale(0.9);
+            transition: transform 0.3s ease;
+        }
+        
+        .login-modal.active .login-content {
+            transform: scale(1);
+        }
+        
+        .login-content h3 {
+            color: var(--dark-text);
+            text-align: center;
+            margin-bottom: 25px;
+            font-size: 28px;
+        }
+        
+        .login-content .form-group label {
+            color: var(--gray);
+        }
+        
+        .login-content .form-group input {
+            background: var(--dark-bg);
+            border: 1px solid var(--gray);
+            color: var(--dark-text);
+        }
+        
+        .login-content .form-group input:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(233, 185, 73, 0.2);
+            outline: none;
+        }
+        
+        .login-content .form-actions {
+            justify-content: center;
+        }
+        
+        .login-content .btn-primary {
+            background: var(--accent);
+            color: var(--dark-bg);
+        }
+        
+        .login-content .btn-primary:hover {
+            background: #d4a742;
+        }
+        
+        /* Animations */
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        @keyframes slideUp {
+            from { 
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to { 
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        @keyframes zoomIn {
+            from { 
+                opacity: 0;
+                transform: scale(0.9);
+            }
+            to { 
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        
+        @keyframes modalSlideIn {
+            from { 
+                opacity: 0;
+                transform: translateY(-50px);
+            }
+            to { 
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        @keyframes slideIn {
+            from {
+                transform: translateX(100px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+        
+        /* Responsive Design */
+        @media (max-width: 992px) {
+            .announcement-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .logo {
+                margin-bottom: 15px;
+                justify-content: center;
+            }
+            
+            .header-info {
+                width: 100%;
+            }
+            
+            .tabs {
+                flex-direction: row;
+                justify-content: center;
+            }
+            
+            .tab {
+                max-width: 130px;
+                height: 100px;
+            }
+            
+            .tab i {
+                font-size: 28px;
+            }
+            
+            .modal-actions {
+                top: 10px;
+                right: 10px;
+            }
+            
+            .modal-btn {
+                width: 40px;
+                height: 40px;
+                font-size: 16px;
+            }
+            
+            .footer-content {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .footer-links {
+                margin-top: 15px;
+                justify-content: center;
+            }
+            
+            .footer-links a {
+                margin: 0 10px;
+            }
+        }
+        
+        @media (max-width: 576px) {
+            .container {
+                padding: 0 15px;
+            }
+            
+            .logo h1 {
+                font-size: 20px;
+            }
+            
+            .tabs {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .tab {
+                max-width: 100%;
+                height: 80px;
+                flex-direction: row;
+                justify-content: flex-start;
+                padding: 0 20px;
+            }
+            
+            .tab i {
+                margin-right: 15px;
+                margin-bottom: 0;
+                font-size: 24px;
+            }
+            
+            .announcement-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .section-title {
+                font-size: 24px;
+            }
+            
+            .upload-content {
+                padding: 20px;
+            }
+            
+            .upload-content h3 {
+                font-size: 20px;
+            }
+            
+            .form-actions {
+                flex-direction: column;
+            }
+            
+            .btn {
+                width: 100%;
+            }
+        }
+        
+        @media (max-width: 400px) {
+            .logo h1 {
+                font-size: 18px;
+            }
+            
+            .tab {
+                height: 70px;
+            }
+            
+            .tab i {
+                font-size: 20px;
+            }
+            
+            .tab span {
+                font-size: 13px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <h1>BTB Information Portal</h1>
+                </div>
+                <div class="header-info">
+                    <p>Dashboard</p>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="tabs-container">
+            <div class="tabs">
+                <a href="https://bayanihantownbatangas.info/files" class="tab">
+                    <i class="fas fa-folder"></i>
+                    <span>Files</span>
+                </a>
+                <a href="https://bayanihantownbatangas.info/inventory" class="tab">
+                    <i class="fas fa-warehouse"></i>
+                    <span>Inventory</span>
+                </a>
+                <a href="https://bayanihantownbatangas.info/computations" class="tab">
+                    <i class="fas fa-calculator"></i>
+                    <span>Computations</span>
+                </a>
+                <a href="https://bayanihantownbatangas.info/contact" class="tab">
+                    <i class="fas fa-address-book"></i>
+                    <span>Contact Person</span>
+                </a>
+            </div>
+        </div>
+
+        <section class="announcement-section">
+            <h2 class="section-title">Bulletin Board</h2>
+            <div class="announcement-grid" id="announcementGrid">
+                </div>
+        </section>
+    </div>
+
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-logo">Bayanihan Town Batangas</div>
+                <div class="footer-links">
+                    <a href="#">Privacy Policy</a>
+                    <a href="e-cal">E-Calculator</a>
+                    <a href="#" id="loginLink" onclick="openLoginModal(event)">Login</a>
+                </div>
+            </div>
+            <div class="copyright">
+                &copy; 2025 BTB Information Portal. All rights reserved.
+            </div>
+        </div>
+    </footer>
+
+    <div class="modal" id="imageModal">
+        <div class="modal-content">
+            <img id="modalImage" src="" alt="Announcement">
+            <div class="modal-actions">
+                <div class="modal-btn upload" onclick="openUploadModal()">
+                    <i class="fas fa-upload"></i>
+                </div>
+                <div class="modal-btn exit" onclick="closeModal()">
+                    <i class="fas fa-times"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="upload-modal" id="uploadModal">
+        <div class="upload-content">
+            <h3>Upload New Poster</h3>
+            <div class="form-group">
+                <label for="adminCode">Admin Code</label>
+                <input type="password" id="adminCode" placeholder="Enter admin code">
+            </div>
+            <div class="form-group">
+                <label for="posterImage">Select Poster Image</label>
+                <input type="file" id="posterImage" accept="image/*">
+            </div>
+            <div class="form-actions">
+                <button class="btn btn-secondary" onclick="closeUploadModal()">Cancel</button>
+                <button class="btn btn-primary" onclick="uploadPoster()">Upload</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="login-modal" id="loginModal">
+        <div class="login-content">
+            <h3>Admin Login</h3>
+            <div class="form-group">
+                <label for="loginEmail">Email</label>
+                <input type="email" id="loginEmail" placeholder="Enter your email">
+            </div>
+            <div class="form-group">
+                <label for="loginPassword">Password</label>
+                <input type="password" id="loginPassword" placeholder="Enter your password">
+            </div>
+            <div class="form-actions">
+                <button class="btn btn-primary" onclick="handleLogin()">Login</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="toast" id="toast"></div>
+
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-storage.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+
+    <script>
+        // Firebase configuration with your new API key
+        const firebaseConfig = {
+            apiKey: "AIzaSyBdNGSSfPLBORjVvnJM3IVqxFZByw3iJWM",
+            authDomain: "btb-announcement.firebaseapp.com",
+            projectId: "btb-announcement",
+            storageBucket: "btb-announcement.firebasestorage.app",
+            messagingSenderId: "1047737510079",
+            appId: "1:1047737510079:web:9add56a0c7375fa0f4be0a",
+            measurementId: "G-T9EQGE2TWG",
+            databaseURL: "https://btb-announcement-default-rtdb.firebaseio.com"
+        };
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const storage = firebase.storage();
+        const storageRef = storage.ref();
+        const database = firebase.database();
+
+        // Default image as base64 data
+        const DEFAULT_IMAGE = "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjQwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICA8cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZWRmMmY3Ii8+CiAgPHRleHQgeD0iNTAlIiB5PSI0NSUiIGZvbnQtZmFtaWx5PSJBcmlhbCwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIyNCIgZmlsbD0iIzY2NjY2NiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPkJheWFuaWhhbiBUb3duPC90ZXh0PgogIDx0ZXh0IHg9IjUwJSIgeT0iNTUlIiBmb250LWZhbWlseT0iQXJpYWwsIHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMTgiIGZpbGw9IiM2NjY2NjYiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGR5PSIuM2VtIj5Qcm9qZWN0IFVwZGF0ZXM8L3RleHQ+CiAgPHRleHQgeD0iNTAlIiB5PSI2NSUiIGZvbnQtZmFtaWx5PSJBcmlhbCwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxNCIgZmlsbD0iIzk5OTk5OSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPkNsaWNrIHRvIHVwbG9hZCBpbWFnZTwvdGV4dD4KPC9zdmc+";
+
+        // Global variables
+        let currentImageIndex = null;
+        let announcementItems = [];
+        let dataLoaded = false;
+
+        // Function to show popup for tabs
+        function showPopup(tabName) {
+            alert(`${tabName} feature is available soon.`);
+        }
+
+        // Function to open modal with image
+        function openModal(imageData, index) {
+            currentImageIndex = index;
+            const modal = document.getElementById('imageModal');
+            const modalImage = document.getElementById('modalImage');
+            
+            if (imageData) {
+                modalImage.src = imageData;
+            } else {
+                modalImage.src = '';
+            }
+            
+            modal.style.display = 'flex';
+            setTimeout(() => {
+                modal.classList.add('active');
+            }, 10);
+            
+            // Prevent body from scrolling when modal is open
+            document.body.style.overflow = 'hidden';
+            
+            // Show or hide the upload button based on login status
+            const uploadBtn = document.querySelector('.modal-btn.upload');
+            if (auth.currentUser) {
+                uploadBtn.style.display = 'flex';
+            } else {
+                uploadBtn.style.display = 'none';
+            }
+        }
+
+        // Function to close modal
+        function closeModal() {
+            const modal = document.getElementById('imageModal');
+            modal.classList.remove('active');
+            
+            setTimeout(() => {
+                modal.style.display = 'none';
+                // Re-enable body scrolling
+                document.body.style.overflow = 'auto';
+            }, 300);
+        }
+
+        // Function to open upload modal
+        function openUploadModal() {
+            if (!auth.currentUser) {
+                showToast('You must be logged in to upload posters.', false);
+                return;
+            }
+            const uploadModal = document.getElementById('uploadModal');
+            uploadModal.style.display = 'flex';
+            
+            setTimeout(() => {
+                uploadModal.classList.add('active');
+            }, 10);
+            
+            // Close the image modal
+            closeModal();
+        }
+
+        // Function to close upload modal
+        function closeUploadModal() {
+            const uploadModal = document.getElementById('uploadModal');
+            uploadModal.classList.remove('active');
+            
+            setTimeout(() => {
+                uploadModal.style.display = 'none';
+                // Clear the form
+                document.getElementById('adminCode').value = '';
+                document.getElementById('posterImage').value = '';
+            }, 300);
+        }
+
+        // Function to open login modal
+        function openLoginModal(event) {
+            event.preventDefault();
+            const loginModal = document.getElementById('loginModal');
+            loginModal.style.display = 'flex';
+            
+            setTimeout(() => {
+                loginModal.classList.add('active');
+            }, 10);
+        }
+
+        // Function to close login modal
+        function closeLoginModal() {
+            const loginModal = document.getElementById('loginModal');
+            loginModal.classList.remove('active');
+            
+            setTimeout(() => {
+                loginModal.style.display = 'none';
+                // Clear the form
+                document.getElementById('loginEmail').value = '';
+                document.getElementById('loginPassword').value = '';
+            }, 300);
+        }
+
+        // Function to handle login
+        function handleLogin() {
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+            
+            if (!email || !password) {
+                showToast('Please enter both email and password.', false);
+                return;
+            }
+
+            auth.signInWithEmailAndPassword(email, password)
+                .then((userCredential) => {
+                    // Signed in
+                    showToast('Login successful!', true);
+                    closeLoginModal();
+                })
+                .catch((error) => {
+                    const errorCode = error.code;
+                    const errorMessage = error.message;
+                    console.error("Login error: ", errorCode, errorMessage);
+                    showToast(`Login failed: ${errorMessage}`, false);
+                });
+        }
+        
+        // Function to show toast notification
+        function showToast(message, isSuccess = true) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.style.backgroundColor = isSuccess ? '#38a169' : '#e53e3e';
+            toast.style.display = 'block';
+            
+            setTimeout(() => {
+                toast.style.display = 'none';
+            }, 3000);
+        }
+
+        // Function to convert image file to base64
+        function convertImageToBase64(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onload = () => resolve(reader.result);
+                reader.onerror = error => reject(error);
+            });
+        }
+
+        // Function to save image data to Realtime Database
+        function saveImageDataToDatabase(index, imageData) {
+            const updates = {};
+            updates[`/poster_${index}`] = imageData;
+            
+            return database.ref('/announcements').update(updates)
+                .then(() => {
+                    console.log('Image data saved to database successfully');
+                    return true;
+                })
+                .catch((error) => {
+                    console.error('Error saving to database:', error);
+                    showToast('Error saving to database', false);
+                    return false;
+                });
+        }
+
+        // Function to update an announcement item in the grid
+        function updateAnnouncementItem(index, imageData) {
+            const item = announcementItems[index];
+            item.innerHTML = `<img src="${imageData}" alt="Announcement ${index + 1}">`;
+            item.onclick = () => openModal(imageData, index);
+            item.classList.remove('empty');
+        }
+
+        // Function to upload poster
+        async function uploadPoster() {
+            const adminCode = document.getElementById('adminCode').value;
+            const fileInput = document.getElementById('posterImage');
+            const file = fileInput.files[0];
+            
+            // Admin code check remains as a secondary layer of protection
+            if (adminCode !== '001122') {
+                showToast('Invalid admin code!', false);
+                return;
+            }
+            
+            if (!file) {
+                showToast('Please select an image to upload!', false);
+                return;
+            }
+            
+            // Check if file is an image
+            if (!file.type.match('image.*')) {
+                showToast('Please select an image file!', false);
+                return;
+            }
+            
+            // Show loading state
+            showToast('Uploading image...', true);
+            
+            try {
+                // Convert image to base64
+                const imageData = await convertImageToBase64(file);
+                
+                // Save the image data to the Realtime Database
+                const success = await saveImageDataToDatabase(currentImageIndex, imageData);
+                
+                if (success) {
+                    showToast('Poster uploaded successfully!');
+                    closeUploadModal();
+                    
+                    // Update the image in the grid
+                    updateAnnouncementItem(currentImageIndex, imageData);
+                }
+            } catch (error) {
+                console.error('Error uploading image:', error);
+                showToast('Upload failed: ' + error.message, false);
+            }
+        }
+
+        // Initialize announcement grid with timeout
+        function initAnnouncementGrid() {
+            const grid = document.getElementById('announcementGrid');
+            grid.innerHTML = '';
+            announcementItems = [];
+            
+            // Create empty items first for immediate display
+            for (let i = 0; i < 4; i++) {
+                const item = document.createElement('div');
+                item.className = 'announcement-item empty';
+                item.innerHTML = `
+                    <div class="spinner"></div>
+                    <span>Loading...</span>
+                `;
+                announcementItems.push(item);
+                grid.appendChild(item);
+            }
+            
+            // Set timeout to show default images if Firebase doesn't respond in 3 seconds
+            const timeout = setTimeout(() => {
+                if (!dataLoaded) {
+                    console.log("Firebase response timed out, using default images");
+                    for (let i = 0; i < 4; i++) {
+                        updateAnnouncementItem(i, DEFAULT_IMAGE);
+                    }
+                    showToast("Using default content", false);
+                }
+            }, 3000);
+            
+            // Get image data from Realtime Database
+            database.ref('/announcements').once('value')
+                .then((snapshot) => {
+                    clearTimeout(timeout);
+                    dataLoaded = true;
+                    const data = snapshot.val();
+                    
+                    for (let i = 0; i < 4; i++) {
+                        // Check if we have image data for this slot
+                        const imageData = data ? data[`poster_${i}`] : null;
+                        
+                        if (imageData && imageData !== DEFAULT_IMAGE) {
+                            // Use the image from database
+                            updateAnnouncementItem(i, imageData);
+                        } else {
+                            // Use default image
+                            updateAnnouncementItem(i, DEFAULT_IMAGE);
+                            
+                            // Also save the default image to database for future reference
+                            if (!data || !data[`poster_${i}`]) {
+                                saveImageDataToDatabase(i, DEFAULT_IMAGE);
+                            }
+                        }
+                    }
+                })
+                .catch((error) => {
+                    clearTimeout(timeout);
+                    console.error('Error loading images from database:', error);
+                    
+                    // If database fails, use default images
+                    for (let i = 0; i < 4; i++) {
+                        updateAnnouncementItem(i, DEFAULT_IMAGE);
+                    }
+                });
+        }
+        
+        // Listen for authentication state changes
+        auth.onAuthStateChanged(user => {
+            const loginLink = document.getElementById('loginLink');
+            if (user) {
+                // User is signed in
+                loginLink.textContent = 'Logout';
+                loginLink.onclick = handleLogout;
+                showToast('Welcome back!', true);
+            } else {
+                // User is signed out
+                loginLink.textContent = 'Login';
+                loginLink.onclick = openLoginModal;
+            }
+        });
+        
+        function handleLogout(event) {
+            event.preventDefault();
+            auth.signOut().then(() => {
+                showToast('Logged out successfully.', true);
+            }).catch((error) => {
+                console.error("Logout error:", error);
+                showToast('Logout failed.', false);
+            });
+        }
+
+        // Initialize the page
+        window.onload = function() {
+            initAnnouncementGrid();
+            
+            // Close modals when clicking outside
+            window.onclick = function(event) {
+                const imageModal = document.getElementById('imageModal');
+                const uploadModal = document.getElementById('uploadModal');
+                const loginModal = document.getElementById('loginModal');
+                
+                if (event.target === imageModal) {
+                    closeModal();
+                }
+                
+                if (event.target === uploadModal) {
+                    closeUploadModal();
+                }
+                
+                if (event.target === loginModal) {
+                    closeLoginModal();
+                }
+            };
+            
+            // Close modals with Escape key
+            document.addEventListener('keydown', function(event) {
+                if (event.key === 'Escape') {
+                    closeModal();
+                    closeUploadModal();
+                    closeLoginModal();
+                }
+            });
+        };
+    </script>
+</body>
+</html>
