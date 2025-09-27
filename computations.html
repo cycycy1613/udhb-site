@@ -1,0 +1,1481 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UDHB Information Portal</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-storage-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4edf5 100%);
+            color: #333;
+            line-height: 1.6;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            flex: 1;
+        }
+
+        header {
+            background: linear-gradient(to right, #2C3E50, #E74C3C);
+            color: white;
+            padding: 25px 0;
+            text-align: center;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.15);
+            animation: slideDown 0.5s ease-out;
+        }
+
+        header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.2);
+        }
+
+        header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .sections-container {
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+            margin-bottom: 40px;
+            animation: fadeIn 0.8s ease-out;
+        }
+
+        .section {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .section:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #eaeaea;
+        }
+
+        .section-title {
+            font-size: 1.8rem;
+            color: #2a5298;
+            font-weight: 600;
+        }
+
+        .upload-icon {
+            width: 50px;
+            height: 50px;
+            background: #2a5298;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.15);
+        }
+
+        .upload-icon:hover {
+            background: #1a3a6c;
+            transform: scale(1.05) rotate(5deg);
+        }
+
+        /* Gallery Styles */
+        .gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+            gap: 15px;
+        }
+
+        .gallery-item {
+            position: relative;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 3px 12px rgba(0, 0, 0, 0.1);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        .gallery-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.15);
+        }
+
+        .gallery-item img {
+            width: 100%;
+            height: 130px;
+            object-fit: cover;
+            display: block;
+            transition: transform 0.5s ease;
+        }
+
+        .gallery-item:hover img {
+            transform: scale(1.05);
+        }
+
+        .gallery-item p {
+            padding: 10px;
+            font-size: 0.85rem;
+            background: white;
+            text-align: center;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            font-weight: 500;
+        }
+
+        /* Folder System Styles */
+        .folders-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 20px;
+        }
+
+        .folder-item {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .folder-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+        }
+
+        .folder-icon {
+            font-size: 3.5rem;
+            color: #ffa726;
+            margin-bottom: 15px;
+        }
+
+        .folder-name {
+            font-weight: 600;
+            color: #2a5298;
+            margin-bottom: 5px;
+            word-break: break-word;
+        }
+
+        .folder-count {
+            font-size: 0.85rem;
+            color: #888;
+        }
+
+        .folder-actions {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            display: flex;
+            gap: 8px;
+        }
+
+        .folder-action {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            opacity: 0;
+        }
+
+        .folder-item:hover .folder-action {
+            opacity: 1;
+        }
+
+        .folder-action:hover {
+            transform: scale(1.1);
+            background: rgba(0, 0, 0, 0.9);
+        }
+
+        .folder-delete {
+            background: rgba(244, 67, 54, 0.8);
+        }
+
+        .folder-delete:hover {
+            background: rgba(211, 47, 47, 0.9);
+        }
+
+        .folder-view-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: #f5f7fa;
+            border-radius: 10px;
+        }
+
+        .folder-view-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.5rem;
+            color: #2a5298;
+            font-weight: 600;
+        }
+
+        .back-button {
+            padding: 8px 16px;
+            background: #2a5298;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .back-button:hover {
+            background: #1a3a6c;
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.95);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .modal.active {
+            opacity: 1;
+        }
+
+        .modal-content {
+            position: relative;
+            max-width: 90vw;
+            max-height: 90vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            animation: zoomIn 0.3s ease-out;
+            overflow: hidden; /* To keep images within bounds */
+        }
+
+        .modal-content img {
+            max-width: 100%;
+            max-height: 80vh;
+            border-radius: 8px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        }
+
+        .modal-controls {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            gap: 15px;
+            z-index: 1001;
+        }
+
+        .modal-control {
+            width: 50px;
+            height: 50px;
+            background: rgba(0, 0, 0, 0.7);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            font-size: 1.3rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+            border: 2px solid white;
+        }
+
+        .modal-control:hover {
+            transform: scale(1.1);
+            background: rgba(0, 0, 0, 0.9);
+        }
+
+        /* Swipe navigation buttons */
+        /* These are hidden as per the request, but the logic remains */
+        .modal-nav {
+            display: none; 
+        }
+
+        .upload-modal, .delete-modal, .folder-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .upload-modal.active, .delete-modal.active, .folder-modal.active {
+            opacity: 1;
+        }
+
+        .modal-box {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.25);
+            transform: translateY(20px);
+            transition: transform 0.3s ease;
+            animation: modalSlideIn 0.3s ease-out;
+        }
+
+        .upload-modal.active .modal-box, .delete-modal.active .modal-box {
+            transform: translateY(0);
+        }
+
+        .modal-box h2 {
+            margin-bottom: 20px;
+            color: #2a5298;
+            text-align: center;
+            font-size: 1.8rem;
+            font-weight: 600;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .password-toggle {
+            position: absolute;
+            right: 10px;
+            top: 38px;
+            cursor: pointer;
+            color: #777;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #444;
+        }
+
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 14px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .form-group input:focus, .form-group select:focus {
+            border-color: #2a5298;
+            box-shadow: 0 0 0 3px rgba(42, 82, 152, 0.2);
+            outline: none;
+        }
+
+        .form-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+            margin-top: 25px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 14px 26px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1rem;
+            min-width: 120px;
+        }
+
+        .btn-primary {
+            background: #2a5298;
+            color: white;
+            box-shadow: 0 4px 10px rgba(42, 82, 152, 0.25);
+        }
+
+        .btn-primary:hover {
+            background: #1a3a6c;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(42, 82, 152, 0.3);
+        }
+
+        .btn-secondary {
+            background: #eaeaea;
+            color: #555;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-secondary:hover {
+            background: #d4d4d4;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
+        }
+
+        footer {
+            text-align: center;
+            padding: 25px;
+            color: #666;
+            font-size: 0.9rem;
+            background: white;
+            margin-top: 40px;
+            border-top: 1px solid #eee;
+        }
+
+        .empty-gallery, .empty-folders {
+            text-align: center;
+            padding: 40px 20px;
+            color: #888;
+            font-style: italic;
+            grid-column: 1 / -1;
+        }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 25px;
+            border-radius: 10px;
+            background: #4caf50;
+            color: white;
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
+            transform: translateX(100%);
+            transition: transform 0.3s ease;
+            z-index: 1100;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .notification.show {
+            transform: translateX(0);
+        }
+
+        .notification.error {
+            background: #f44336;
+        }
+
+        .progress-bar {
+            height: 6px;
+            background: #ddd;
+            border-radius: 10px;
+            margin-top: 10px;
+            overflow: hidden;
+            display: none;
+        }
+
+        .progress {
+            height: 100%;
+            background: linear-gradient(to right, #2a5298, #3a6cc8);
+            width: 0%;
+            transition: width 0.3s ease;
+            border-radius: 10px;
+        }
+
+        .spinner {
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            border-left: 4px solid #2a5298;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 15px auto;
+        }
+
+        /* Animations */
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes zoomIn {
+            from {
+                opacity: 0;
+                transform: scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        @keyframes modalSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 992px) {
+            .gallery {
+                grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 15px;
+            }
+
+            header {
+                padding: 20px 0;
+                border-radius: 10px;
+            }
+
+            header h1 {
+                font-size: 2rem;
+            }
+
+            .sections-container {
+                gap: 20px;
+            }
+
+            .section {
+                min-width: 100%;
+            }
+
+            .section-title {
+                font-size: 1.6rem;
+            }
+
+            .gallery {
+                grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+                gap: 12px;
+            }
+
+            .gallery-item img {
+                height: 110px;
+            }
+
+            .modal-controls {
+                top: 15px;
+                right: 15px;
+            }
+
+            .modal-control {
+                width: 45px;
+                height: 45px;
+                font-size: 1.2rem;
+            }
+
+            .modal-box {
+                padding: 25px 20px;
+            }
+
+            .form-actions {
+                flex-direction: column;
+            }
+
+            .btn {
+                width: 100%;
+            }
+        }
+
+        @media (max-width: 480px) {
+            header h1 {
+                font-size: 1.7rem;
+            }
+
+            header p {
+                font-size: 1rem;
+            }
+
+            .section-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+
+            .upload-icon {
+                align-self: flex-end;
+            }
+
+            .gallery {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .gallery-item img {
+                height: 100px;
+            }
+
+            .modal-content img {
+                max-height: 70vh;
+            }
+
+            .modal-controls {
+                top: 10px;
+                right: 10px;
+                flex-direction: column;
+            }
+
+            .modal-control {
+                width: 40px;
+                height: 40px;
+                font-size: 1.1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Computations</h1>
+            <p>Your One-Stop Hub for Sample Computations</p>
+        </header>
+
+        <div class="sections-container">
+            <div class="section" id="gallery-section">
+                <div class="section-header">
+                    <h2 class="section-title">Folders</h2>
+                    
+                </div>
+                <div id="gallery-folders" class="folders-container">
+                    <div class="empty-folders">
+                        <div class="spinner"></div>
+                        <div>Loading folders...</div>
+                    </div>
+                </div>
+                <div id="gallery-view" class="gallery" style="display: none;">
+                    </div>
+            </div>
+        </div>
+
+        <footer>
+            <p>UDHB Information Portal <a href="https://bayanihantownbatangas.info/computations-admin">login</a></p>
+        </footer>
+    </div>
+
+    <div id="uploadModal" class="upload-modal">
+        <div class="modal-box">
+            <h2 id="uploadModalTitle">Upload Image</h2>
+            <div class="form-group">
+                <label for="fileName">Image Name</label>
+                <input type="text" id="fileName" placeholder="Enter image name">
+            </div>
+            <div class="form-group">
+                <label for="fileInput">Select Image</label>
+                <input type="file" id="fileInput" accept="image/*">
+            </div>
+            <div class="form-group" id="folderNameGroup" style="display: none;">
+                <label for="folderName">Folder Name</label>
+                <input type="text" id="folderName" placeholder="Enter folder name">
+            </div>
+            <div class="form-group">
+                <label for="adminCode">Admin Code</label>
+                <input type="password" id="adminCode" placeholder="Enter admin code">
+                <span class="password-toggle" onclick="togglePassword('adminCode')">
+                    <i class="fas fa-eye"></i>
+                </span>
+            </div>
+            <div class="progress-bar">
+                <div class="progress" id="uploadProgress"></div>
+            </div>
+            <div class="form-actions">
+                <button class="btn btn-secondary" onclick="closeUploadModal()">Cancel</button>
+                <button class="btn btn-primary" id="uploadButton" onclick="uploadFile()">Upload</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="deleteModal" class="delete-modal">
+        <div class="modal-box">
+            <h2>Confirm Deletion</h2>
+            <div class="form-group">
+                <label for="deleteAdminCode">Admin Code</label>
+                <input type="password" id="deleteAdminCode" placeholder="Enter admin code to confirm">
+                <span class="password-toggle" onclick="togglePassword('deleteAdminCode')">
+                    <i class="fas fa-eye"></i>
+                </span>
+            </div>
+            <div class="form-actions">
+                <button class="btn btn-secondary" onclick="closeDeleteModal()">Cancel</button>
+                <button class="btn btn-primary" onclick="confirmDelete()">Delete</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="folderModal" class="folder-modal">
+        <div class="modal-box">
+            <h2>Create New Folder</h2>
+            <div class="form-group">
+                <label for="newFolderName">Folder Name</label>
+                <input type="text" id="newFolderName" placeholder="Enter new folder name">
+            </div>
+            <div class="form-group">
+                <label for="folderAdminCode">Admin Code</label>
+                <input type="password" id="folderAdminCode" placeholder="Enter admin code">
+                <span class="password-toggle" onclick="togglePassword('folderAdminCode')">
+                    <i class="fas fa-eye"></i>
+                </span>
+            </div>
+            <div class="form-actions">
+                <button class="btn btn-secondary" onclick="closeFolderModal()">Cancel</button>
+                <button class="btn btn-primary" onclick="createFolder()">Create Folder</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="imageModal" class="modal">
+        <div class="modal-content">
+            <img id="modalImage" src="" alt="">
+            <div class="modal-controls">
+                
+                <div class="modal-control" onclick="closeModal()">
+                    <i class="fas fa-times"></i>
+                </div>
+            </div>
+            <button class="modal-nav modal-nav-prev" onclick="prevImage()">
+                <i class="fas fa-chevron-left"></i>
+            </button>
+            <button class="modal-nav modal-nav-next" onclick="nextImage()">
+                <i class="fas fa-chevron-right"></i>
+            </button>
+        </div>
+    </div>
+
+    <div id="notification" class="notification"></div>
+
+    <script>
+        // Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyAno9NDbUgrgBi7NrC4krNXQg4dMXzN-7g",
+            authDomain: "udhb-site.firebaseapp.com",
+            databaseURL: "https://udhb-site-default-rtdb.firebaseio.com",
+            projectId: "udhb-site",
+            storageBucket: "udhb-site.firebasestorage.app",
+            messagingSenderId: "214765051025",
+            appId: "1:214765051025:web:5e72b00e570919bf3c7330"
+        };
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const storage = firebase.storage();
+        const database = firebase.database();
+
+        // Global variables
+        let currentSection = 'gallery';
+        let currentFolderId = '';
+        let currentFolderName = '';
+        let currentFolderView = false;
+        let currentImageKey = '';
+        let currentImageUrl = '';
+        let currentImageStoragePath = ''; // Added to store the storage path
+        let uploadTask = null;
+        let dataLoaded = false;
+        let itemToDelete = null;
+        let imagesInFolder = [];
+        let currentImageIndex = 0;
+
+        // Swipe variables
+        let touchstartX = 0;
+        let touchendX = 0;
+
+        // Toggle password visibility
+        function togglePassword(inputId) {
+            const input = document.getElementById(inputId);
+            const icon = input.nextElementSibling.querySelector('i');
+
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+            } else {
+                input.type = 'password';
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
+            }
+        }
+
+        // Show notification
+        function showNotification(message, isError = false) {
+            const notification = document.getElementById('notification');
+            notification.innerHTML = `<i class="fas ${isError ? 'fa-exclamation-circle' : 'fa-check-circle'}"></i> ${message}`;
+            notification.classList.remove('error');
+
+            if (isError) {
+                notification.classList.add('error');
+            }
+
+            notification.classList.add('show');
+
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
+        }
+
+        // Modal functions
+        function openUploadModal() {
+            const modal = document.getElementById('uploadModal');
+            const folderNameGroup = document.getElementById('folderNameGroup');
+
+            // Show folder name input only when not in a folder view
+            if (currentFolderView) {
+                folderNameGroup.style.display = 'none';
+            } else {
+                folderNameGroup.style.display = 'block';
+            }
+
+            modal.style.display = 'flex';
+
+            setTimeout(() => {
+                modal.classList.add('active');
+            }, 10);
+        }
+
+        function closeUploadModal() {
+            // Cancel any ongoing upload
+            if (uploadTask) {
+                uploadTask.cancel();
+                uploadTask = null;
+            }
+
+            const modal = document.getElementById('uploadModal');
+            modal.classList.remove('active');
+
+            setTimeout(() => {
+                modal.style.display = 'none';
+                document.getElementById('fileName').value = '';
+                document.getElementById('fileInput').value = '';
+                document.getElementById('adminCode').value = '';
+                document.getElementById('folderName').value = '';
+                document.querySelector('.progress-bar').style.display = 'none';
+                document.getElementById('uploadProgress').style.width = '0%';
+
+                // Re-enable upload button
+                document.getElementById('uploadButton').disabled = false;
+                document.getElementById('uploadButton').textContent = 'Upload';
+            }, 300);
+        }
+
+        function openFolderModal() {
+            const modal = document.getElementById('folderModal');
+            modal.style.display = 'flex';
+
+            setTimeout(() => {
+                modal.classList.add('active');
+            }, 10);
+        }
+
+        function closeFolderModal() {
+            const modal = document.getElementById('folderModal');
+            modal.classList.remove('active');
+
+            setTimeout(() => {
+                modal.style.display = 'none';
+                document.getElementById('newFolderName').value = '';
+                document.getElementById('folderAdminCode').value = '';
+            }, 300);
+        }
+
+        function openDeleteModal() {
+            const modal = document.getElementById('deleteModal');
+            modal.style.display = 'flex';
+
+            setTimeout(() => {
+                modal.classList.add('active');
+            }, 10);
+        }
+
+        function closeDeleteModal() {
+            const modal = document.getElementById('deleteModal');
+            modal.classList.remove('active');
+
+            setTimeout(() => {
+                modal.style.display = 'none';
+                document.getElementById('deleteAdminCode').value = '';
+            }, 300);
+        }
+
+        function openModal(imageIndex) {
+            if (!imagesInFolder || imagesInFolder.length === 0) {
+                return;
+            }
+
+            const modal = document.getElementById('imageModal');
+            currentImageIndex = imageIndex;
+            showImage(currentImageIndex);
+
+            modal.style.display = 'flex';
+
+            setTimeout(() => {
+                modal.classList.add('active');
+            }, 10);
+
+            // Prevent body from scrolling when modal is open
+            document.body.style.overflow = 'hidden';
+            
+            // Add swipe event listeners
+            const modalImage = document.getElementById('modalImage');
+            modalImage.addEventListener('touchstart', handleTouchStart, false);
+            modalImage.addEventListener('touchmove', handleTouchMove, false);
+            modalImage.addEventListener('touchend', handleTouchEnd, false);
+
+            // Add keyboard event listener for desktop
+            document.addEventListener('keydown', handleKeyDown);
+        }
+        
+        function showImage(index) {
+            const modalImage = document.getElementById('modalImage');
+            const image = imagesInFolder[index];
+            modalImage.src = image.data;
+            currentImageKey = image.key;
+            currentImageStoragePath = image.storagePath; // Store storage path
+        }
+        
+        function nextImage() {
+            currentImageIndex = (currentImageIndex + 1) % imagesInFolder.length;
+            showImage(currentImageIndex);
+        }
+        
+        function prevImage() {
+            currentImageIndex = (currentImageIndex - 1 + imagesInFolder.length) % imagesInFolder.length;
+            showImage(currentImageIndex);
+        }
+
+        function closeModal() {
+            const modal = document.getElementById('imageModal');
+            modal.classList.remove('active');
+
+            setTimeout(() => {
+                modal.style.display = 'none';
+                // Re-enable body scrolling
+                document.body.style.overflow = 'auto';
+            }, 300);
+            
+            const modalImage = document.getElementById('modalImage');
+            modalImage.removeEventListener('touchstart', handleTouchStart, false);
+            modalImage.removeEventListener('touchmove', handleTouchMove, false);
+            modalImage.removeEventListener('touchend', handleTouchEnd, false);
+            document.removeEventListener('keydown', handleKeyDown);
+        }
+
+        // Swipe gesture handlers
+        function handleTouchStart(e) {
+            touchstartX = e.changedTouches[0].screenX;
+        }
+
+        function handleTouchMove(e) {
+            // No action needed for touchmove, we only care about the end position
+        }
+
+        function handleTouchEnd(e) {
+            touchendX = e.changedTouches[0].screenX;
+            handleGesture();
+        }
+
+        function handleGesture() {
+            const swipeThreshold = 50; // Minimum distance for a swipe
+
+            if (touchendX < touchstartX - swipeThreshold) {
+                // Swiped left
+                nextImage();
+            }
+
+            if (touchendX > touchstartX + swipeThreshold) {
+                // Swiped right
+                prevImage();
+            }
+        }
+        
+        // Keyboard navigation for desktop
+        function handleKeyDown(e) {
+            if (e.key === 'ArrowRight') {
+                nextImage();
+            } else if (e.key === 'ArrowLeft') {
+                prevImage();
+            }
+        }
+
+
+        // Convert file to Base64 (for gallery images)
+        function convertFileToBase64(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onload = () => resolve(reader.result);
+                reader.onerror = error => reject(error);
+            });
+        }
+
+        // Delete image from modal
+        function deleteImage() {
+            if (!currentImageKey || !currentImageStoragePath) {
+                showNotification('No image selected for deletion', true);
+                return;
+            }
+
+            // Set the item to delete as an image
+            itemToDelete = { type: 'image', key: currentImageKey, storagePath: currentImageStoragePath };
+            closeModal();
+            openDeleteModal();
+        }
+
+        // Create folder function
+        async function createFolder() {
+            const folderName = document.getElementById('newFolderName').value.trim();
+            const adminCode = document.getElementById('folderAdminCode').value.trim();
+
+            if (!folderName) {
+                showNotification('Please enter a folder name', true);
+                return;
+            }
+
+            if (adminCode !== '001122') {
+                showNotification('Invalid admin code', true);
+                return;
+            }
+
+            try {
+                const newFolderRef = database.ref('folders01').push();
+                await newFolderRef.set({
+                    name: folderName,
+                    timestamp: Date.now()
+                });
+                showNotification('Folder created successfully!');
+                closeFolderModal();
+                loadFolders(); // Reload to show new folder
+            } catch (error) {
+                console.error('Error creating folder:', error);
+                showNotification('Failed to create folder. Please try again.', true);
+            }
+        }
+
+        // View folder contents
+        function viewFolder(folderId, folderName) {
+            currentFolderId = folderId;
+            currentFolderName = folderName;
+            currentFolderView = true;
+
+            document.getElementById('gallery-folders').style.display = 'none';
+            document.getElementById('gallery-view').style.display = 'grid';
+
+            // Update header for folder view
+            const gallerySectionHeader = document.querySelector('#gallery-section .section-header');
+            gallerySectionHeader.innerHTML = `
+                <div class="folder-view-title">
+                    <i class="fas fa-folder-open"></i>
+                    <span>${folderName}</span>
+                </div>
+                <div style="display: flex; gap: 10px;">
+                    
+                    <button class="back-button" onclick="backToFolders()">
+                        <i class="fas fa-arrow-left"></i>
+                        Back
+                    </button>
+                </div>
+            `;
+
+            loadFolderImages(folderId);
+        }
+
+        // Load images for a specific folder
+        async function loadFolderImages(folderId) {
+            try {
+                const filesRef = database.ref('files01').orderByChild('folderId').equalTo(folderId);
+                const snapshot = await filesRef.once('value');
+                const filesData = snapshot.val();
+
+                const galleryView = document.getElementById('gallery-view');
+                galleryView.innerHTML = '';
+                imagesInFolder = [];
+
+                if (!filesData) {
+                    galleryView.innerHTML = '<div class="empty-gallery">No images in this folder</div>';
+                    return;
+                }
+
+                const images = [];
+                Object.keys(filesData).forEach(key => {
+                    const file = filesData[key];
+                    if (file.section === 'gallery') {
+                        file.key = key;
+                        images.push(file);
+                    }
+                });
+
+                // Sort images by timestamp (newest first)
+                images.sort((a, b) => b.timestamp - a.timestamp);
+                imagesInFolder = images; // Store for modal navigation
+
+                images.forEach((image, index) => {
+                    const galleryItem = document.createElement('div');
+                    galleryItem.className = 'gallery-item';
+                    galleryItem.innerHTML = `
+                        <img src="${image.data}" alt="${image.name}">
+                        <p>${image.name}</p>
+                    `;
+                    galleryItem.addEventListener('click', () => openModal(index));
+                    galleryView.appendChild(galleryItem);
+                });
+
+            } catch (error) {
+                console.error('Error loading folder images:', error);
+                showNotification('Error loading images. Please try again.', true);
+            }
+        }
+
+        // Back to folders view
+        function backToFolders() {
+            currentFolderId = '';
+            currentFolderName = '';
+            currentFolderView = false;
+
+            document.getElementById('gallery-view').style.display = 'none';
+            document.getElementById('gallery-folders').style.display = 'grid';
+
+            // Restore original header
+            const gallerySectionHeader = document.querySelector('#gallery-section .section-header');
+            gallerySectionHeader.innerHTML = `
+                <h2 class="section-title">Folders</h2>
+                
+            `;
+            loadFolders();
+        }
+
+        // Request delete confirmation for folder
+        function requestDeleteFolder(key) {
+            itemToDelete = { type: 'folder', key };
+            openDeleteModal();
+        }
+
+        // Confirm delete from Firebase
+        async function confirmDelete() {
+            const adminCode = document.getElementById('deleteAdminCode').value;
+
+            if (adminCode !== '001122') {
+                showNotification('Invalid admin code', true);
+                return;
+            }
+
+            if (!itemToDelete) {
+                showNotification('No item selected for deletion', true);
+                return;
+            }
+
+            try {
+                if (itemToDelete.type === 'folder') {
+                    // Delete folder and all its contents
+                    const folderRef = database.ref(`folders01/${itemToDelete.key}`);
+                    await folderRef.remove();
+
+                    // Delete all images within that folder and from storage
+                    const imagesInFolderRef = database.ref('files01').orderByChild('folderId').equalTo(itemToDelete.key);
+                    const snapshot = await imagesInFolderRef.once('value');
+                    const updates = {};
+                    const storageDeletions = [];
+                    snapshot.forEach(childSnapshot => {
+                        updates[childSnapshot.key] = null; // Set to null to delete from Realtime DB
+                        const storagePath = childSnapshot.val().storagePath;
+                        if (storagePath) {
+                            storageDeletions.push(storage.ref(storagePath).delete());
+                        }
+                    });
+                    
+                    if (Object.keys(updates).length > 0) {
+                        await database.ref('files01').update(updates);
+                    }
+                    
+                    await Promise.all(storageDeletions);
+
+                    showNotification('Folder and its contents deleted successfully');
+                } else if (itemToDelete.type === 'image') {
+                    // Delete image from Realtime DB and Storage
+                    const fileRef = database.ref(`files01/${itemToDelete.key}`);
+                    await fileRef.remove();
+                    
+                    // Delete from storage
+                    if (itemToDelete.storagePath) {
+                        const imageRef = storage.ref(itemToDelete.storagePath);
+                        await imageRef.delete();
+                    }
+                    
+                    showNotification('Image deleted successfully');
+                }
+
+                closeDeleteModal();
+                itemToDelete = null;
+
+                // Refresh the view
+                if (currentFolderView) {
+                    loadFolderImages(currentFolderId);
+                } else {
+                    loadFolders();
+                }
+            } catch (error) {
+                console.error('Error deleting item:', error);
+                showNotification('Failed to delete item. Please try again.', true);
+            }
+        }
+
+        // Load folders from Firebase
+        async function loadFolders() {
+            try {
+                const foldersRef = database.ref('folders01');
+                const snapshot = await foldersRef.once('value');
+                const foldersData = snapshot.val();
+
+                const foldersContainer = document.getElementById('gallery-folders');
+                foldersContainer.innerHTML = '';
+
+                if (!foldersData) {
+                    foldersContainer.innerHTML = '<div class="empty-folders">No folders created yet</div>';
+                    return;
+                }
+
+                const folders = [];
+                Object.keys(foldersData).forEach(key => {
+                    const folder = foldersData[key];
+                    folder.key = key;
+                    folders.push(folder);
+                });
+
+                // Sort folders by timestamp (newest first)
+                folders.sort((a, b) => b.timestamp - a.timestamp);
+
+                // Count images in each folder
+                for (const folder of folders) {
+                    const filesRef = database.ref('files01').orderByChild('folderId').equalTo(folder.key);
+                    const filesSnapshot = await filesRef.once('value');
+                    folder.imageCount = filesSnapshot.exists() ? filesSnapshot.numChildren() : 0;
+                }
+
+                folders.forEach(folder => {
+                    const folderItem = document.createElement('div');
+                    folderItem.className = 'folder-item';
+                    folderItem.innerHTML = `
+                        
+                        <div class="folder-icon">
+                            <i class="fas fa-folder"></i>
+                        </div>
+                        <div class="folder-name">${folder.name}</div>
+                        <div class="folder-count">${folder.imageCount} image(s)</div>
+                    `;
+                    folderItem.addEventListener('click', () => viewFolder(folder.key, folder.name));
+                    foldersContainer.appendChild(folderItem);
+                });
+
+            } catch (error) {
+                console.error('Error loading folders:', error);
+                showNotification('Error loading folders. Please try again.', true);
+            }
+        }
+
+        // Upload file to Firebase
+        async function uploadFile() {
+            const fileName = document.getElementById('fileName').value.trim();
+            const fileInput = document.getElementById('fileInput');
+            const adminCode = document.getElementById('adminCode').value.trim();
+            const folderName = document.getElementById('folderName').value.trim();
+            const uploadButton = document.getElementById('uploadButton');
+
+            if (!fileName) {
+                showNotification('Please enter a file name', true);
+                return;
+            }
+
+            if (!fileInput.files[0]) {
+                showNotification('Please select a file to upload', true);
+                return;
+            }
+
+            if (adminCode !== '001122') {
+                showNotification('Invalid admin code', true);
+                return;
+            }
+
+            // Determine the target folder ID
+            let targetFolderId = currentFolderView ? currentFolderId : '';
+
+            // If not in a folder view, check if a folder name was provided
+            if (!currentFolderView && folderName) {
+                try {
+                    const foldersRef = database.ref('folders01');
+                    const snapshot = await foldersRef.orderByChild('name').equalTo(folderName).once('value');
+
+                    if (snapshot.exists()) {
+                        // Use existing folder
+                        const folderData = snapshot.val();
+                        targetFolderId = Object.keys(folderData)[0];
+                    } else {
+                        // Create new folder
+                        const newFolderRef = foldersRef.push();
+                        targetFolderId = newFolderRef.key;
+                        await newFolderRef.set({
+                            name: folderName,
+                            timestamp: Date.now()
+                        });
+                    }
+                } catch (error) {
+                    console.error('Error finding or creating folder:', error);
+                    showNotification('Failed to process folder. Please try again.', true);
+                    return;
+                }
+            } else if (!currentFolderView && !folderName) {
+                showNotification('Please enter a folder name to upload an image outside of a folder.', true);
+                return;
+            }
+
+            // Disable upload button to prevent multiple clicks
+            uploadButton.disabled = true;
+            uploadButton.textContent = 'Uploading...';
+
+            const file = fileInput.files[0];
+            const fileExtension = file.name.split('.').pop();
+            const timestamp = Date.now();
+            const storagePath = `images/${fileName}_${timestamp}.${fileExtension}`;
+            const storageRef = storage.ref().child(storagePath);
+
+            try {
+                // Show progress bar
+                const progressBar = document.querySelector('.progress-bar');
+                const progressElement = document.getElementById('uploadProgress');
+                progressBar.style.display = 'block';
+
+                // Upload to Firebase Storage
+                uploadTask = storageRef.put(file);
+
+                // Monitor upload progress
+                uploadTask.on('state_changed',
+                    (snapshot) => {
+                        const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+                        progressElement.style.width = progress + '%';
+                    },
+                    (error) => {
+                        console.error('Upload error:', error);
+                        showNotification('Upload failed. Please try again.', true);
+                        progressBar.style.display = 'none';
+                        uploadButton.disabled = false;
+                        uploadButton.textContent = 'Upload';
+                    },
+                    async () => {
+                        try {
+                            // Get download URL
+                            const downloadURL = await uploadTask.snapshot.ref.getDownloadURL();
+
+                            // Save to Realtime Database
+                            const fileData = {
+                                name: fileName,
+                                data: downloadURL,
+                                storagePath: storagePath, // Save the storage path
+                                timestamp: timestamp,
+                                section: currentSection,
+                                folderId: targetFolderId
+                            };
+
+                            await database.ref('files01').push(fileData);
+
+                            showNotification('File uploaded successfully!');
+                            closeUploadModal();
+
+                            // Refresh the view
+                            if (currentFolderView) {
+                                loadFolderImages(currentFolderId);
+                            } else {
+                                loadFolders();
+                            }
+                        } catch (error) {
+                            console.error('Error saving file data:', error);
+                            showNotification('Upload completed but failed to save metadata. Please try again.', true);
+                        }
+                    }
+                );
+            } catch (error) {
+                console.error('Upload error:', error);
+                showNotification('Upload failed. Please try again.', true);
+                uploadButton.disabled = false;
+                uploadButton.textContent = 'Upload';
+            }
+        }
+
+        // Initialize the app
+        window.onload = function() {
+            loadFolders();
+        };
+    </script>
+</body>
+</html>
