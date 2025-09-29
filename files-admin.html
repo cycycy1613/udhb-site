@@ -1144,8 +1144,8 @@
 
             <footer>
                 <div class="footer-content">
-                    <p>BTB Information Portal</p>
-                    <a href="#" class="footer-logout-link" onclick="handleLogout()">Logout</a>
+                    <p>UDHB Information Portal</p>
+                    <a href="https://urbandecahomesbatangas.com/files" class="footer-logout-link" onclick="handleLogout()">Logout</a>
                 </div>
             </footer>
         </div>
@@ -1408,8 +1408,7 @@
             currentImageIndex = startIndex;
             const modal = document.getElementById('imageModal');
             const modalImage = document.getElementById('modalImage');
-            // The 'data' field is now populated with downloadURL in loadFolderImages
-            modalImage.src = currentModalImages[currentImageIndex].data; 
+            modalImage.src = currentModalImages[currentImageIndex].data;
             currentImageKey = currentModalImages[currentImageIndex].key;
             modal.style.display = 'flex';
             setTimeout(() => {
@@ -1430,8 +1429,7 @@
             }
             currentImageIndex = newIndex;
             const modalImage = document.getElementById('modalImage');
-            // The 'data' field is now populated with downloadURL in loadFolderImages
-            modalImage.src = currentModalImages[currentImageIndex].data; 
+            modalImage.src = currentModalImages[currentImageIndex].data;
             currentImageKey = currentModalImages[currentImageIndex].key;
         }
     
@@ -1487,16 +1485,11 @@
             return date.toLocaleDateString() + ' ' + date.toLocaleTimeString();
         }
     
-        /**
-         * FIX: Unified file upload logic to always use Firebase Storage for both 
-         * 'files' and 'gallery' sections to prevent large Base64 data in RTDB.
-         */
         async function uploadFile() {
             const fileName = document.getElementById('fileName').value.trim();
             const fileInput = document.getElementById('fileInput');
             const adminCode = document.getElementById('adminCode').value.trim();
             const uploadButton = document.getElementById('uploadButton');
-
             if (!fileName) {
                 showNotification('Please enter a file name', true);
                 return;
@@ -1509,83 +1502,81 @@
                 showNotification('Invalid admin code', true);
                 return;
             }
-            if (currentSection === 'gallery' && !currentFolderId) {
-                showNotification('A folder must be selected to upload an image', true);
-                return;
-            }
-
             uploadButton.disabled = true;
             uploadButton.textContent = 'Uploading...';
             const progressBar = document.querySelector('.progress-bar');
             progressBar.style.display = 'block';
-
             try {
-                const file = fileInput.files[0];
                 const timestamp = Date.now();
-                const storageRef = storage.ref();
-
-                // Unified storage path based on section
-                const storagePath = currentSection === 'files'
-                    ? `files/${timestamp}_${file.name}`
-                    : `gallery/${currentFolderId}/${timestamp}_${file.name}`;
-
-                const fileRefStorage = storageRef.child(storagePath);
-                const metadata = {
-                    contentType: file.type,
-                    // Only set contentDisposition to 'attachment' for general files
-                    ...(currentSection === 'files' && { contentDisposition: 'attachment' })
+                let fileRef = {
+                    name: fileName,
+                    filename: fileInput.files[0].name,
+                    type: fileInput.files[0].type,
+                    size: fileInput.files[0].size,
+                    timestamp: timestamp,
+                    section: currentSection
                 };
-
-                uploadTask = fileRefStorage.put(file, metadata);
-
-                uploadTask.on('state_changed',
-                    (snapshot) => {
-                        const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-                        document.getElementById('uploadProgress').style.width = progress + '%';
-                    },
-                    (error) => {
-                        console.error('Upload failed:', error);
-                        showNotification('Upload failed. Please try again.', true);
-                        progressBar.style.display = 'none';
-                        uploadButton.disabled = false;
-                        uploadButton.textContent = 'Upload';
-                    },
-                    async () => {
-                        try {
-                            const downloadURL = await uploadTask.snapshot.ref.getDownloadURL();
-                            let fileRef = {
-                                name: fileName,
-                                filename: file.name,
-                                type: file.type,
-                                size: file.size,
-                                timestamp: timestamp,
-                                section: currentSection,
-                                downloadURL: downloadURL // Store the URL instead of Base64 data
-                            };
-
-                            if (currentSection === 'gallery') {
-                                fileRef.folderId = currentFolderId;
-                            }
-
-                            const newFileRef = database.ref('files').push();
-                            await newFileRef.set(fileRef);
-
-                            showNotification(`${currentSection === 'files' ? 'File' : 'Image'} uploaded successfully!`);
-                            closeUploadModal();
-                            if (currentFolderView) {
-                                loadFolderImages(currentFolderId);
-                            } else {
-                                loadFiles();
-                            }
-                        } catch (error) {
-                            console.error('Error handling upload completion:', error);
+                if (currentSection === 'files') {
+                    const storageRef = storage.ref();
+                    const fileRefStorage = storageRef.child(`files/${timestamp}_${fileInput.files[0].name}`);
+                    const metadata = {
+                        contentType: fileInput.files[0].type,
+                        contentDisposition: 'attachment'
+                    };
+                    uploadTask = fileRefStorage.put(fileInput.files[0], metadata);
+                    uploadTask.on('state_changed',
+                        (snapshot) => {
+                            const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+                            document.getElementById('uploadProgress').style.width = progress + '%';
+                        },
+                        (error) => {
+                            console.error('Upload failed:', error);
                             showNotification('Upload failed. Please try again.', true);
                             progressBar.style.display = 'none';
                             uploadButton.disabled = false;
                             uploadButton.textContent = 'Upload';
+                        },
+                        async () => {
+                            try {
+                                const downloadURL = await uploadTask.snapshot.ref.getDownloadURL();
+                                fileRef.downloadURL = downloadURL;
+                                const newFileRef = database.ref('files').push();
+                                await newFileRef.set(fileRef);
+                                showNotification('File uploaded successfully!');
+                                closeUploadModal();
+                                loadFiles();
+                            } catch (error) {
+                                console.error('Error getting download URL:', error);
+                                showNotification('Upload failed. Please try again.', true);
+                                progressBar.style.display = 'none';
+                                uploadButton.disabled = false;
+                                uploadButton.textContent = 'Upload';
+                            }
                         }
+                    );
+                } else if (currentSection === 'gallery') {
+                    if (!currentFolderId) {
+                        showNotification('A folder must be selected to upload an image', true);
+                        uploadButton.disabled = false;
+                        uploadButton.textContent = 'Upload';
+                        progressBar.style.display = 'none';
+                        return;
                     }
-                );
+                    fileRef.folderId = currentFolderId;
+                    if (fileInput.files[0].type.startsWith('image/')) {
+                        const fileData = await convertFileToBase64(fileInput.files[0]);
+                        fileRef.data = fileData;
+                    }
+                    const newFileRef = database.ref('files').push();
+                    await newFileRef.set(fileRef);
+                    showNotification('Image uploaded successfully!');
+                    closeUploadModal();
+                    if (currentFolderView) {
+                        loadFolderImages(currentFolderId);
+                    } else {
+                        loadFiles();
+                    }
+                }
             } catch (error) {
                 console.error('Upload failed:', error);
                 showNotification('Upload failed. Please try again.', true);
@@ -1595,17 +1586,20 @@
             }
         }
     
-        // REMOVED: function convertFileToBase64(file) is no longer needed
-
+        function convertFileToBase64(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onload = () => resolve(reader.result);
+                reader.onerror = error => reject(error);
+            });
+        }
+    
         function requestDeletion(type, key) {
             itemToDelete = { type: type, key: key };
             openDeleteModal();
         }
     
-        /**
-         * FIX: Updated deletion logic to also delete the file from Firebase Storage
-         * when an image or a folder (with images) is deleted.
-         */
         async function confirmDelete() {
             const adminCode = document.getElementById('deleteAdminCode').value;
             if (!adminCode) {
@@ -1624,48 +1618,31 @@
                 if (itemToDelete.type === 'folder') {
                     const folderRef = database.ref(`folders/${itemToDelete.key}`);
                     await folderRef.remove();
-                    
-                    // Delete all files in the folder from RTDB and Storage
                     const imagesInFolderRef = database.ref('files').orderByChild('folderId').equalTo(itemToDelete.key);
                     const snapshot = await imagesInFolderRef.once('value');
                     const updates = {};
-                    const storageDeletes = [];
-
                     snapshot.forEach(childSnapshot => {
-                        const fileData = childSnapshot.val();
-                        if (fileData.downloadURL) {
-                            // Delete file from Firebase Storage
-                            storageDeletes.push(storage.refFromURL(fileData.downloadURL).delete());
-                        }
-                        updates[childSnapshot.key] = null; // Prepare for RTDB deletion
+                        updates[childSnapshot.key] = null;
                     });
-
-                    await Promise.all(storageDeletes).catch(err => {
-                         // Log storage deletion errors but continue with RTDB cleanup
-                         console.warn('One or more storage file deletions failed:', err); 
-                    });
-                    
                     if (Object.keys(updates).length > 0) {
-                        await database.ref('files').update(updates); // Delete all entries from RTDB
+                        await database.ref('files').update(updates);
                     }
                     showNotification('Folder and its contents deleted successfully!');
-                
-                } else if (itemToDelete.type === 'image' || itemToDelete.type === 'file') {
+                } else if (itemToDelete.type === 'image') {
+                    const imageRef = database.ref(`files/${itemToDelete.key}`);
+                    await imageRef.remove();
+                    showNotification('Image deleted successfully!');
+                } else if (itemToDelete.type === 'file') {
                     const fileRef = database.ref(`files/${itemToDelete.key}`);
                     const snapshot = await fileRef.once('value');
                     const fileData = snapshot.val();
-                    
-                    // Check for downloadURL and delete from Storage
                     if (fileData && fileData.downloadURL) {
                         const storageRef = storage.refFromURL(fileData.downloadURL);
                         await storageRef.delete();
                     }
-                    
-                    // Delete record from Realtime Database
                     await fileRef.remove();
-                    showNotification(`${itemToDelete.type === 'file' ? 'File' : 'Image'} deleted successfully!`);
+                    showNotification('File deleted successfully!');
                 }
-                
                 itemToDelete = null;
                 closeDeleteModal();
                 if (currentFolderView) {
@@ -1673,7 +1650,6 @@
                 } else {
                     loadFiles();
                 }
-                closeModal(); // Ensure image modal is closed if an image was deleted from it
             } catch (error) {
                 console.error('Delete failed:', error);
                 showNotification('Delete failed. Please try again.', true);
@@ -1850,10 +1826,6 @@
             loadFolderImages(folderId);
         }
     
-        /**
-         * FIX: Updated to use the 'downloadURL' from the RTDB entry as the image source (src).
-         * It also populates the 'data' field with downloadURL for modal compatibility.
-         */
         async function loadFolderImages(folderId) {
             try {
                 const filesRef = database.ref('files').orderByChild('folderId').equalTo(folderId);
@@ -1870,8 +1842,6 @@
                     const file = filesData[key];
                     if (file.section === 'gallery') {
                         file.key = key;
-                        // Use the downloadURL as the source for the image
-                        file.data = file.downloadURL; 
                         images.push(file);
                     }
                 });
@@ -1909,7 +1879,17 @@
             loadFiles();
         }
     
-        // REMOVED DUPLICATE: function downloadFile(url, filename) was here.
+        function downloadFile(url, filename) {
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename || 'download';
+            a.style.display = 'none';
+            document.body.appendChild(a);
+            a.click();
+            setTimeout(() => {
+                document.body.removeChild(a);
+            }, 100);
+        }
     
         async function handleLogin() {
             const email = document.getElementById('loginEmail').value;
