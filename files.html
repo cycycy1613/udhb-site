@@ -1031,24 +1031,23 @@
         
         // Global variables
         let currentSection = '';
-        let currentFolder = ''; // New: To keep track of the currently viewed folder
+        let currentFolder = ''; 
         let currentImageKey = '';
-        let currentImageUrl = '';
-        let currentImagePath = '';
-        let currentFileKey = '';
-        let currentFileData = null;
         let uploadTask = null;
-        let uploadTimeout = null;
-        let dataLoaded = false;
+        let itemToDelete = null; // Item to be deleted globally
         let currentFolderId = '';
         let currentFolderName = '';
         let currentFolderView = false;
-        let currentModalImages = []; // Array to hold images in the current folder
-        let currentImageIndex = 0; // Index of the currently viewed image in the array
+        let currentModalImages = []; 
+        let currentImageIndex = 0; 
         let touchstartX = 0;
         let touchendX = 0;
         
-        const swipeThreshold = 50; // Minimum distance in pixels for a swipe gesture
+        // Data caches to prevent unnecessary re-rendering
+        let filesDataCache = null;
+        let foldersDataCache = null;
+        
+        const swipeThreshold = 50; 
         
         // File type icons mapping
         const fileIcons = {
@@ -1068,6 +1067,8 @@
             'gif': 'fa-file-image',
             'default': 'fa-file'
         };
+        
+        // --- Utility Functions ---
         
         // Toggle password visibility
         function togglePassword(inputId) {
@@ -1111,7 +1112,40 @@
             return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
         }
         
-        // Modal functions
+        // Get file icon based on extension
+        function getFileIcon(filename) {
+            const extension = filename.split('.').pop().toLowerCase();
+            return fileIcons[extension] || fileIcons['default'];
+        }
+        
+        // Format date
+        function formatDate(timestamp) {
+            const date = new Date(timestamp);
+            return date.toLocaleDateString() + ' ' + date.toLocaleTimeString();
+        }
+
+        // Convert file to Base64 (for gallery images)
+        function convertFileToBase64(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onload = () => resolve(reader.result);
+                reader.onerror = error => reject(error);
+            });
+        }
+        
+        function downloadFile(url, filename) {
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename || 'download';
+            a.style.display = 'none';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        }
+
+        // --- Modal Functions ---
+        
         function openUploadModal(section) {
             if (section === 'gallery' && !currentFolderView) {
                 showNotification('Please select a folder first before uploading an image.', true);
@@ -1121,32 +1155,17 @@
             const modal = document.getElementById('uploadModal');
             const title = document.getElementById('uploadModalTitle');
             
-            if (section === 'files') {
-                title.textContent = 'Upload File';
-            } else {
-                title.textContent = 'Upload Image';
-            }
+            title.textContent = section === 'files' ? 'Upload File' : 'Upload Image';
             
             modal.style.display = 'flex';
-            
-            setTimeout(() => {
-                modal.classList.add('active');
-            }, 10);
+            setTimeout(() => modal.classList.add('active'), 10);
         }
         
         function closeUploadModal() {
-            // Cancel any ongoing upload
             if (uploadTask) {
                 uploadTask.cancel();
                 uploadTask = null;
             }
-            
-            // Clear any timeout
-            if (uploadTimeout) {
-                clearTimeout(uploadTimeout);
-                uploadTimeout = null;
-            }
-            
             const modal = document.getElementById('uploadModal');
             modal.classList.remove('active');
             
@@ -1157,8 +1176,6 @@
                 document.getElementById('adminCode').value = '';
                 document.querySelector('.progress-bar').style.display = 'none';
                 document.getElementById('uploadProgress').style.width = '0%';
-                
-                // Re-enable upload button
                 document.getElementById('uploadButton').disabled = false;
                 document.getElementById('uploadButton').textContent = 'Upload';
             }, 300);
@@ -1167,10 +1184,7 @@
         function openFolderModal() {
             const modal = document.getElementById('folderModal');
             modal.style.display = 'flex';
-            
-            setTimeout(() => {
-                modal.classList.add('active');
-            }, 10);
+            setTimeout(() => modal.classList.add('active'), 10);
         }
         
         function closeFolderModal() {
@@ -1187,10 +1201,7 @@
         function openDeleteModal() {
             const modal = document.getElementById('deleteModal');
             modal.style.display = 'flex';
-            
-            setTimeout(() => {
-                modal.classList.add('active');
-            }, 10);
+            setTimeout(() => modal.classList.add('active'), 10);
         }
         
         function closeDeleteModal() {
@@ -1200,10 +1211,10 @@
             setTimeout(() => {
                 modal.style.display = 'none';
                 document.getElementById('deleteAdminCode').value = '';
+                itemToDelete = null; // Clear item to delete
             }, 300);
         }
         
-        // Modified openModal function
         function openModal(images, startIndex) {
             currentModalImages = images;
             currentImageIndex = startIndex;
@@ -1215,11 +1226,7 @@
             currentImageKey = currentModalImages[currentImageIndex].key;
             
             modal.style.display = 'flex';
-            
-            setTimeout(() => {
-                modal.classList.add('active');
-            }, 10);
-            
+            setTimeout(() => modal.classList.add('active'), 10);
             document.body.style.overflow = 'hidden';
             
             // Add event listeners for swiping
@@ -1228,7 +1235,6 @@
             modal.addEventListener('touchend', handleTouchEnd, false);
         }
         
-        // Navigate between images in the modal
         function navigateImage(direction) {
             let newIndex = currentImageIndex + direction;
             
@@ -1241,12 +1247,10 @@
             currentImageIndex = newIndex;
             const modalImage = document.getElementById('modalImage');
             
-            // Update image source and key
             modalImage.src = currentModalImages[currentImageIndex].data;
             currentImageKey = currentModalImages[currentImageIndex].key;
         }
 
-        // Handle keydown for navigation
         document.addEventListener('keydown', function(e) {
             const modal = document.getElementById('imageModal');
             if (modal.classList.contains('active')) {
@@ -1258,27 +1262,17 @@
             }
         });
         
-        // Handle touch events for swiping
-        function handleTouchStart(e) {
-            touchstartX = e.touches[0].clientX;
-        }
-        
-        function handleTouchMove(e) {
-            touchendX = e.touches[0].clientX;
-        }
-        
+        function handleTouchStart(e) { touchstartX = e.touches[0].clientX; }
+        function handleTouchMove(e) { touchendX = e.touches[0].clientX; }
         function handleTouchEnd() {
             const diff = touchendX - touchstartX;
             
             if (diff > swipeThreshold) {
-                // Swipe right
                 navigateImage(-1);
             } else if (diff < -swipeThreshold) {
-                // Swipe left
                 navigateImage(1);
             }
             
-            // Reset touch coordinates
             touchstartX = 0;
             touchendX = 0;
         }
@@ -1287,7 +1281,6 @@
             const modal = document.getElementById('imageModal');
             modal.classList.remove('active');
             
-            // Remove event listeners
             modal.removeEventListener('touchstart', handleTouchStart, false);
             modal.removeEventListener('touchmove', handleTouchMove, false);
             modal.removeEventListener('touchend', handleTouchEnd, false);
@@ -1298,75 +1291,46 @@
             }, 300);
         }
         
-        // Get file icon based on extension
-        function getFileIcon(filename) {
-            const extension = filename.split('.').pop().toLowerCase();
-            return fileIcons[extension] || fileIcons['default'];
-        }
+        // --- Data Operations (Upload/Delete) ---
         
-        // Format date
-        function formatDate(timestamp) {
-            const date = new Date(timestamp);
-            return date.toLocaleDateString() + ' ' + date.toLocaleTimeString();
-        }
-        
-        // Upload file to Firebase
         async function uploadFile() {
             const fileName = document.getElementById('fileName').value.trim();
             const fileInput = document.getElementById('fileInput');
             const adminCode = document.getElementById('adminCode').value.trim();
             const uploadButton = document.getElementById('uploadButton');
             
-            // Validate inputs
-            if (!fileName) {
-                showNotification('Please enter a file name', true);
+            if (!fileName || !fileInput.files || fileInput.files.length === 0 || adminCode !== '001122') {
+                if (adminCode !== '001122') showNotification('Invalid admin code', true);
+                else if (!fileName) showNotification('Please enter a file name', true);
+                else showNotification('Please select a file to upload', true);
                 return;
             }
             
-            if (!fileInput.files || fileInput.files.length === 0) {
-                showNotification('Please select a file to upload', true);
-                return;
-            }
-            
-            if (adminCode !== '001122') {
-                showNotification('Invalid admin code', true);
-                return;
-            }
-            
-            // Disable upload button to prevent multiple clicks
             uploadButton.disabled = true;
             uploadButton.textContent = 'Uploading...';
-            
-            // Show progress bar
             const progressBar = document.querySelector('.progress-bar');
             progressBar.style.display = 'block';
             
             try {
                 const timestamp = Date.now();
+                const file = fileInput.files[0];
                 let fileRef = {
                     name: fileName,
-                    filename: fileInput.files[0].name,
-                    type: fileInput.files[0].type,
-                    size: fileInput.files[0].size,
+                    filename: file.name,
+                    type: file.type,
+                    size: file.size,
                     timestamp: timestamp,
                     section: currentSection
                 };
                 
                 if (currentSection === 'files') {
-                    // For files section: Upload to Firebase Storage
+                    // Files: Upload to Storage (for external access)
                     const storageRef = storage.ref();
-                    const fileRefStorage = storageRef.child(`files/${timestamp}_${fileInput.files[0].name}`);
+                    const fileRefStorage = storageRef.child(`files/${timestamp}_${file.name}`);
+                    const metadata = { contentType: file.type, contentDisposition: 'attachment' };
                     
-                    // Add metadata to force download
-                    const metadata = {
-                        contentType: fileInput.files[0].type,
-                        contentDisposition: 'attachment'
-                    };
+                    uploadTask = fileRefStorage.put(file, metadata);
                     
-                    // Upload to storage with progress monitoring
-                    uploadTask = fileRefStorage.put(fileInput.files[0], metadata);
-                    
-                    // Monitor upload progress
                     uploadTask.on('state_changed',
                         (snapshot) => {
                             const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
@@ -1380,26 +1344,18 @@
                             uploadButton.textContent = 'Upload';
                         },
                         async () => {
-                            try {
-                                const downloadURL = await uploadTask.snapshot.ref.getDownloadURL();
-                                fileRef.downloadURL = downloadURL;
-                                
-                                const newFileRef = database.ref('files').push();
-                                await newFileRef.set(fileRef);
-                                
-                                showNotification('File uploaded successfully!');
-                                closeUploadModal();
-                                loadFiles();
-                            } catch (error) {
-                                console.error('Error getting download URL:', error);
-                                showNotification('Upload failed. Please try again.', true);
-                                progressBar.style.display = 'none';
-                                uploadButton.disabled = false;
-                                uploadButton.textContent = 'Upload';
-                            }
+                            const downloadURL = await uploadTask.snapshot.ref.getDownloadURL();
+                            fileRef.downloadURL = downloadURL;
+                            fileRef.storagePath = uploadTask.snapshot.ref.fullPath; // Store path for deletion
+                            
+                            await database.ref('files').push().set(fileRef);
+                            showNotification('File uploaded successfully!');
+                            closeUploadModal();
+                            // Realtime listeners will handle the refresh
                         }
                     );
                 } else if (currentSection === 'gallery') {
+                    // Gallery: Upload to Database (Base64 for inline display)
                     if (!currentFolderId) {
                         showNotification('A folder must be selected to upload an image', true);
                         uploadButton.disabled = false;
@@ -1409,24 +1365,14 @@
                     }
                     
                     fileRef.folderId = currentFolderId;
+                    fileRef.data = await convertFileToBase64(file);
                     
-                    // For gallery sections: Convert to base64
-                    if (fileInput.files[0].type.startsWith('image/')) {
-                        const fileData = await convertFileToBase64(fileInput.files[0]);
-                        fileRef.data = fileData;
-                    }
-                    
-                    // Push data to database
-                    const newFileRef = database.ref('files').push();
-                    await newFileRef.set(fileRef);
-                    
+                    await database.ref('files').push().set(fileRef);
                     showNotification('Image uploaded successfully!');
                     closeUploadModal();
                     
                     if (currentFolderView) {
-                        loadFolderImages(currentFolderId);
-                    } else {
-                        loadFiles();
+                        loadFolderImages(currentFolderId); // Manually refresh folder view
                     }
                 }
                 
@@ -1439,47 +1385,17 @@
             }
         }
         
-        // Convert file to Base64 (for gallery images)
-        function convertFileToBase64(file) {
-            return new Promise((resolve, reject) => {
-                const reader = new FileReader();
-                reader.readAsDataURL(file);
-                reader.onload = () => resolve(reader.result);
-                reader.onerror = error => reject(error);
-            });
-        }
-        
-        // Delete image from modal
-        function deleteImage() {
-            closeModal();
-            // Store the item to be deleted before opening the modal
-            itemToDelete = { type: 'image', key: currentImageKey };
-            openDeleteModal();
-        }
-        
         async function confirmDelete() {
             const adminCode = document.getElementById('deleteAdminCode').value;
             
-            if (!adminCode) {
-                showNotification('Please enter admin code', true);
-                return;
-            }
-            
-            if (adminCode !== '001122') {
-                showNotification('Invalid admin code', true);
-                return;
-            }
-            
-            if (!itemToDelete) {
-                showNotification('No item selected for deletion', true);
+            if (adminCode !== '001122' || !itemToDelete) {
+                showNotification(adminCode !== '001122' ? 'Invalid admin code' : 'No item selected for deletion', true);
                 return;
             }
             
             try {
                 if (itemToDelete.type === 'folder') {
-                    const folderRef = database.ref(`folders/${itemToDelete.key}`);
-                    await folderRef.remove();
-                    
+                    // 1. Delete all images in the folder from 'files' node
                     const imagesInFolderRef = database.ref('files').orderByChild('folderId').equalTo(itemToDelete.key);
                     const snapshot = await imagesInFolderRef.once('value');
                     const updates = {};
@@ -1490,182 +1406,187 @@
                         await database.ref('files').update(updates);
                     }
                     
+                    // 2. Delete the folder entry
+                    await database.ref(`folders/${itemToDelete.key}`).remove();
                     showNotification('Folder and its contents deleted successfully!');
-                } else if (itemToDelete.type === 'image') {
-                    const imageRef = database.ref(`files/${itemToDelete.key}`);
-                    await imageRef.remove();
-                    showNotification('Image deleted successfully!');
-                } else if (itemToDelete.type === 'file') {
+                } else if (itemToDelete.type === 'image' || itemToDelete.type === 'file') {
+                    // 1. Fetch file data to check for storage path
                     const fileRef = database.ref(`files/${itemToDelete.key}`);
                     const snapshot = await fileRef.once('value');
                     const fileData = snapshot.val();
                     
-                    if (fileData && fileData.downloadURL) {
-                        const storageRef = storage.refFromURL(fileData.downloadURL);
+                    // 2. Delete file from Firebase Storage if it exists (for 'files' section items)
+                    if (fileData && fileData.storagePath) {
+                        const storageRef = storage.ref(fileData.storagePath);
                         await storageRef.delete();
                     }
+                    
+                    // 3. Delete file entry from Realtime Database
                     await fileRef.remove();
-                    showNotification('File deleted successfully!');
+                    
+                    showNotification(itemToDelete.type === 'file' ? 'File deleted successfully!' : 'Image deleted successfully!');
                 }
                 
-                itemToDelete = null;
                 closeDeleteModal();
                 
-                if (currentFolderView) {
+                // If in folder view, manually refresh
+                if (currentFolderView && itemToDelete.type === 'image') {
                     loadFolderImages(currentFolderId);
-                } else {
-                    loadFiles();
                 }
+                
+                // Realtime listeners handle other UI updates automatically
+                
             } catch (error) {
                 console.error('Delete failed:', error);
                 showNotification('Delete failed. Please try again.', true);
             }
         }
         
-        function requestDeleteFile(key, filename) {
-            itemToDelete = { type: 'file', key: key };
+        // Request delete confirmation functions
+        function requestDelete(type, key) {
+            itemToDelete = { type, key };
             openDeleteModal();
         }
         
-        function downloadFile(url, filename) {
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = filename || 'download';
-            
-            a.style.display = 'none';
-            document.body.appendChild(a);
-            
-            a.click();
-            
-            setTimeout(() => {
-                document.body.removeChild(a);
-            }, 100);
+        function deleteImage() {
+            closeModal();
+            // Store the item to be deleted before opening the modal
+            itemToDelete = { type: 'image', key: currentImageKey };
+            openDeleteModal();
         }
+
+        // --- Core Data Loading Functions (Realtime Listeners) ---
         
-        // Load files from Firebase
-        async function loadFiles() {
-            try {
-                const filesRef = database.ref('files');
-                const foldersRef = database.ref('folders');
+        function loadFiles() {
+            // 1. Realtime Listener for All Files (for files section and image counts)
+            database.ref('files').on('value', filesSnapshot => {
+                filesDataCache = filesSnapshot.val();
                 
-                const [filesSnapshot, foldersSnapshot] = await Promise.all([
-                    filesRef.once('value'),
-                    foldersRef.once('value')
-                ]);
+                const filesList = document.getElementById('files-list');
+                filesList.innerHTML = ''; // Clear content
                 
-                const filesData = filesSnapshot.val();
-                const foldersData = foldersSnapshot.val();
-                
-                document.getElementById('files-list').innerHTML = '';
-                document.getElementById('gallery-folders').innerHTML = '';
-                
-                if (!filesData) {
-                    document.getElementById('files-list').innerHTML = '<div class="empty-files">No files found</div>';
+                if (!filesDataCache) {
+                    filesList.innerHTML = '<div class="empty-files">No files found</div>';
+                    return;
                 }
                 
-                if (!foldersData) {
-                    document.getElementById('gallery-folders').innerHTML = '<div class="empty-folders">No folders found</div>';
-                } else {
-                    const folders = [];
-                    Object.keys(foldersData).forEach(key => {
-                        const folder = foldersData[key];
-                        folder.key = key;
-                        folders.push(folder);
-                    });
-                    
-                    folders.sort((a, b) => b.timestamp - a.timestamp);
-                    
-                    const folderImageCounts = {};
-                    if (filesData) {
-                        Object.keys(filesData).forEach(key => {
-                            const file = filesData[key];
-                            if (file.section === 'gallery' && file.folderId) {
-                                folderImageCounts[file.folderId] = (folderImageCounts[file.folderId] || 0) + 1;
-                            }
-                        });
+                const files = [];
+                Object.keys(filesDataCache).forEach(key => {
+                    const file = filesDataCache[key];
+                    file.key = key;
+                    if (file.section === 'files') {
+                        files.push(file);
                     }
-                    
-                    folders.forEach(folder => {
-                        const imageCount = folderImageCounts[folder.key] || 0;
-                        const folderItem = document.createElement('div');
-                        folderItem.className = 'folder-item';
-                        folderItem.innerHTML = `
-                            <div class="folder-actions" style="display: none;">
-                                <div class="folder-action folder-delete" onclick="event.stopPropagation(); requestDelete('folder', '${folder.key}')">
+                });
+                
+                files.sort((a, b) => b.timestamp - a.timestamp);
+                
+                if (files.length === 0) {
+                    filesList.innerHTML = '<div class="empty-files">No files found</div>';
+                } else {
+                    files.forEach(file => {
+                        const fileItem = document.createElement('div');
+                        fileItem.className = 'file-item';
+                        const fileIconClass = getFileIcon(file.filename);
+                        
+                        fileItem.innerHTML = `
+                            <div class="file-info-container">
+                                <div class="file-icon">
+                                    <i class="fas ${fileIconClass}"></i>
+                                </div>
+                                <div class="file-info">
+                                    <div class="file-name">${file.name}</div>
+                                    <div class="file-details">
+                                        <span class="file-date">${formatDate(file.timestamp)}</span>
+                                        <span class="file-size">${formatFileSize(file.size)}</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="file-actions">
+                                <div class="action-icon download-icon" onclick="event.stopPropagation(); downloadFile('${file.downloadURL}', '${file.filename}')">
+                                    <i class="fas fa-download"></i>
+                                </div>
+                                <div class="action-icon delete-icon" onclick="event.stopPropagation(); requestDelete('file', '${file.key}')" style="display: none;">
                                     <i class="fas fa-trash"></i>
                                 </div>
                             </div>
-                            <div class="folder-icon">
-                                <i class="fas fa-folder"></i>
-                            </div>
-                            <div class="folder-name">${folder.name}</div>
-                            <div class="folder-count">${imageCount} images</div>
                         `;
-                        folderItem.onclick = () => viewFolder(folder.key, folder.name);
-                        document.getElementById('gallery-folders').appendChild(folderItem);
+                        filesList.appendChild(fileItem);
                     });
                 }
                 
-                if (filesData) {
-                    const files = [];
-                    
-                    Object.keys(filesData).forEach(key => {
-                        const file = filesData[key];
-                        file.key = key;
-                        
-                        if (file.section === 'files') {
-                            files.push(file);
-                        }
-                    });
-                    
-                    files.sort((a, b) => b.timestamp - a.timestamp);
-                    
-                    if (files.length === 0) {
-                        document.getElementById('files-list').innerHTML = '<div class="empty-files">No files found</div>';
-                    } else {
-                        files.forEach(file => {
-                            const fileItem = document.createElement('div');
-                            fileItem.className = 'file-item';
-                            
-                            const fileExtension = file.filename.split('.').pop().toLowerCase();
-                            const fileIconClass = getFileIcon(file.filename);
-                            
-                            fileItem.innerHTML = `
-                                <div class="file-info-container">
-                                    <div class="file-icon">
-                                        <i class="fas ${fileIconClass}"></i>
-                                    </div>
-                                    <div class="file-info">
-                                        <div class="file-name">${file.name}</div>
-                                        <div class="file-details">
-                                            <span class="file-date">${formatDate(file.timestamp)}</span>
-                                            <span class="file-size">${formatFileSize(file.size)}</span>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="file-actions">
-                                    <div class="action-icon download-icon" onclick="event.stopPropagation(); downloadFile('${file.downloadURL}', '${file.filename}')">
-                                        <i class="fas fa-download"></i>
-                                    </div>
-                                    <div class="action-icon delete-icon" onclick="event.stopPropagation(); requestDeleteFile('${file.key}', '${file.filename}')" style="display: none;">
-                                        <i class="fas fa-trash"></i>
-                                    </div>
-                                </div>
-                            `;
-                            
-                            document.getElementById('files-list').appendChild(fileItem);
-                        });
-                    }
+                // Trigger folder re-render to update image counts
+                if (foldersDataCache) {
+                    renderFolders(foldersDataCache);
                 }
-                
-                dataLoaded = true;
-            } catch (error) {
+
+            }, error => {
                 console.error('Error loading files:', error);
-                showNotification('Error loading files. Please refresh the page.', true);
-            }
+                document.getElementById('files-list').innerHTML = '<div class="empty-files">Error loading files.</div>';
+            });
+            
+            // 2. Realtime Listener for Folders
+            database.ref('folders').on('value', foldersSnapshot => {
+                foldersDataCache = foldersSnapshot.val();
+                renderFolders(foldersDataCache);
+            }, error => {
+                console.error('Error loading folders:', error);
+                document.getElementById('gallery-folders').innerHTML = '<div class="empty-folders">Error loading folders.</div>';
+            });
         }
         
-        // Create folder function
+        function renderFolders(foldersData) {
+            const galleryFolders = document.getElementById('gallery-folders');
+            galleryFolders.innerHTML = ''; // Clear content
+
+            if (!foldersData) {
+                galleryFolders.innerHTML = '<div class="empty-folders">No folders found</div>';
+                return;
+            }
+
+            const folders = [];
+            Object.keys(foldersData).forEach(key => {
+                const folder = foldersData[key];
+                folder.key = key;
+                folders.push(folder);
+            });
+            
+            folders.sort((a, b) => b.timestamp - a.timestamp);
+            
+            // Calculate image counts using the filesDataCache
+            const folderImageCounts = {};
+            if (filesDataCache) {
+                Object.keys(filesDataCache).forEach(key => {
+                    const file = filesDataCache[key];
+                    if (file.section === 'gallery' && file.folderId) {
+                        folderImageCounts[file.folderId] = (folderImageCounts[file.folderId] || 0) + 1;
+                    }
+                });
+            }
+
+            folders.forEach(folder => {
+                const imageCount = folderImageCounts[folder.key] || 0;
+                const folderItem = document.createElement('div');
+                folderItem.className = 'folder-item';
+                folderItem.innerHTML = `
+                    <div class="folder-actions" style="display: none;">
+                        <div class="folder-action folder-delete" onclick="event.stopPropagation(); requestDelete('folder', '${folder.key}')">
+                            <i class="fas fa-trash"></i>
+                        </div>
+                    </div>
+                    <div class="folder-icon">
+                        <i class="fas fa-folder"></i>
+                    </div>
+                    <div class="folder-name">${folder.name}</div>
+                    <div class="folder-count">${imageCount} images</div>
+                `;
+                folderItem.onclick = () => viewFolder(folder.key, folder.name);
+                galleryFolders.appendChild(folderItem);
+            });
+        }
+        
+        // --- Folder/Gallery View Functions ---
+
         async function createFolder() {
             const folderName = document.getElementById('newFolderName').value.trim();
             const adminCode = document.getElementById('folderAdminCode').value.trim();
@@ -1681,14 +1602,12 @@
             }
 
             try {
-                const newFolderRef = database.ref('folders').push();
-                await newFolderRef.set({
+                await database.ref('folders').push().set({
                     name: folderName,
                     timestamp: Date.now()
                 });
                 showNotification('Folder created successfully!');
                 closeFolderModal();
-                loadFiles();
             } catch (error) {
                 console.error('Error creating folder:', error);
                 showNotification('Failed to create folder. Please try again.', true);
@@ -1725,15 +1644,18 @@
 
         async function loadFolderImages(folderId) {
             try {
+                const galleryView = document.getElementById('gallery-view');
+                galleryView.innerHTML = '<div class="empty-gallery"><div class="spinner"></div><div>Loading images...</div></div>';
+
                 const filesRef = database.ref('files').orderByChild('folderId').equalTo(folderId);
                 const snapshot = await filesRef.once('value');
                 const filesData = snapshot.val();
 
-                const galleryView = document.getElementById('gallery-view');
                 galleryView.innerHTML = '';
 
                 if (!filesData) {
                     galleryView.innerHTML = '<div class="empty-gallery">No images in this folder</div>';
+                    currentModalImages = [];
                     return;
                 }
 
@@ -1748,7 +1670,6 @@
 
                 images.sort((a, b) => b.timestamp - a.timestamp);
                 
-                // Store the loaded images for modal navigation
                 currentModalImages = images;
 
                 images.forEach((image, index) => {
@@ -1784,44 +1705,14 @@
                 </div>
             `;
             
-            loadFiles();
+            // Realtime listeners ensure the folder list is already up-to-date
         }
         
-        // Request delete confirmation
-        let itemToDelete = null;
-        function requestDelete(type, key, path = '') {
-            itemToDelete = { type, key, path };
-            openDeleteModal();
-        }
-        
-        function requestDeleteFile(key, filename) {
-            itemToDelete = { type: 'file', key: key };
-            openDeleteModal();
-        }
-        
-        function downloadFile(url, filename) {
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = filename || 'download';
-            
-            a.style.display = 'none';
-            document.body.appendChild(a);
-            
-            a.click();
-            
-            setTimeout(() => {
-                document.body.removeChild(a);
-            }, 100);
-        }
+        // --- Initialization ---
         
         document.addEventListener('DOMContentLoaded', function() {
+            // Initiate realtime listeners for simultaneous data loading
             loadFiles();
-            
-            database.ref('files').on('value', function(snapshot) {
-                if (dataLoaded) {
-                    loadFiles();
-                }
-            });
         });
     </script>
 </body>
