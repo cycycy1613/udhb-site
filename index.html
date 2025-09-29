@@ -726,6 +726,149 @@
     .social-icons a:hover {
         color: var(--secondary-color);
     }
+
+    /* **NEW CSS FOR SELLERS PORTAL DIALOG BOX** */
+    .seller-modal-backdrop {
+        display: none; /* Hidden by default */
+        position: fixed;
+        z-index: 3000; /* Higher than other modals/header */
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        overflow: auto;
+        background-color: rgba(44, 62, 80, 0.85); /* Dark Slate Gray with opacity */
+        backdrop-filter: blur(5px);
+        transition: opacity 0.3s ease;
+        opacity: 0;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .seller-modal-backdrop.show {
+        display: flex;
+        opacity: 1;
+    }
+
+    .seller-modal-content {
+        background-color: var(--white);
+        padding: 30px;
+        border-radius: 15px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+        width: 90%;
+        max-width: 450px;
+        text-align: center;
+        position: relative;
+        animation: modalSlideIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    @keyframes modalSlideIn {
+        from {
+            transform: translateY(-50px) scale(0.9);
+            opacity: 0;
+        }
+        to {
+            transform: translateY(0) scale(1);
+            opacity: 1;
+        }
+    }
+
+    .seller-close-btn {
+        color: var(--light-gray);
+        position: absolute;
+        top: 15px;
+        right: 25px;
+        font-size: 30px;
+        font-weight: bold;
+        transition: color 0.3s;
+        cursor: pointer;
+    }
+
+    .seller-close-btn:hover {
+        color: var(--secondary-color);
+    }
+
+    .modal-header {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 20px;
+        color: var(--primary-color);
+    }
+
+    .modal-header i {
+        font-size: 2.2rem;
+        color: var(--secondary-color);
+        margin-right: 15px;
+    }
+
+    .modal-header h2 {
+        font-size: 1.8rem;
+        margin: 0;
+    }
+
+    .modal-hint {
+        margin-top: 15px;
+        color: var(--text-color);
+    }
+
+    .hint-text {
+        font-weight: 600;
+        color: var(--primary-color);
+        letter-spacing: 2px;
+    }
+
+    .code-input {
+        width: 100%;
+        padding: 12px;
+        margin: 20px 0;
+        border: 2px solid var(--light-gray);
+        border-radius: 8px;
+        font-size: 1.5rem;
+        text-align: center;
+        letter-spacing: 8px;
+        font-weight: 700;
+        color: var(--primary-color);
+        transition: border-color 0.3s;
+    }
+
+    .code-input:focus {
+        border-color: var(--secondary-color);
+        outline: none;
+        box-shadow: 0 0 0 3px rgba(231, 76, 60, 0.3);
+    }
+
+    .modal-btn {
+        width: 100%;
+        padding: 12px 1.8rem;
+        font-size: 1.1rem;
+    }
+
+    /* Toast Notification Styles */
+    .toast-error {
+        visibility: hidden;
+        min-width: 250px;
+        background-color: var(--secondary-color);
+        color: var(--white);
+        text-align: center;
+        border-radius: 6px;
+        padding: 16px;
+        position: absolute;
+        z-index: 4000;
+        bottom: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        opacity: 0;
+        transition: opacity 0.5s, bottom 0.5s;
+    }
+
+    .toast-error.show {
+        visibility: visible;
+        opacity: 1;
+        bottom: 40px;
+    }
+    /* **END NEW CSS** */
     
     /* Responsive Styles - MOBILE MENU & FULL WIDTH ADJUSTMENTS */
     @media (max-width: 768px) {
@@ -1115,6 +1258,20 @@
         <img class="modal-content" id="modalImage">
     </div>
 
+    <div id="codeModal" class="seller-modal-backdrop">
+        <div class="seller-modal-content">
+            <span class="seller-close-btn">&times;</span>
+            <div class="modal-header">
+                <i class="fas fa-lock"></i>
+                <h2>Sellers Portal</h2>
+            </div>
+            <p>Please enter the **4-digit access code** to proceed.</p>
+            <p class="modal-hint">Hint: <span class="hint-text">_ _ _ _ Holdings Inc.</span></p>
+            <input type="text" id="codeInput" maxlength="4" placeholder="Enter Code" class="code-input">
+            <button id="submitCodeBtn" class="btn btn-primary modal-btn">Enter</button>
+            <div id="toastNotification" class="toast-error"></div>
+        </div>
+    </div>
     <script>
         // Mobile Navigation Toggle (Dropdown/Animation)
         document.querySelector('.sidebar-toggle').addEventListener('click', function() {
@@ -1131,7 +1288,7 @@
             });
         });
 
-        // Image Modal Functionality (No change needed)
+        // Image Modal Functionality
         const modal = document.getElementById('imageModal');
         const modalImg = document.getElementById('modalImage');
         const closeModal = document.querySelector('.close');
@@ -1156,7 +1313,7 @@
             }
         });
 
-        // Carousel Functionality (No change needed)
+        // Carousel Functionality
         const carouselInner = document.querySelector('.carousel-inner');
         const carouselItems = document.querySelectorAll('.carousel-item');
         const prevButton = document.querySelector('.carousel-control.prev');
@@ -1183,7 +1340,7 @@
             updateCarousel();
         }, 5000);
 
-        // Smooth scrolling for navigation links (Modified to match new IDs)
+        // Smooth scrolling for navigation links
         document.querySelectorAll('.nav-menu a[href^="#"]').forEach(anchor => {
             anchor.addEventListener('click', function(e) {
                 e.preventDefault();
@@ -1200,7 +1357,80 @@
             });
         });
 
-        // REMOVED Form submission SCRIPT
+
+        // **********************************************
+        // ** NEW JAVASCRIPT FOR SELLERS PORTAL MODAL **
+        // **********************************************
+
+        const sellersPortalLink = document.querySelector('.btn-secondary[href="https://urbandecahomesbatangas.com/members"]');
+        const codeModal = document.getElementById('codeModal');
+        const closeModalBtn = codeModal.querySelector('.seller-close-btn');
+        const submitCodeBtn = document.getElementById('submitCodeBtn');
+        const codeInput = document.getElementById('codeInput');
+        const toastNotification = document.getElementById('toastNotification');
+        const CORRECT_CODE = '8990';
+        const DESTINATION_URL = 'https://urbandecahomesbatangas.com/members';
+
+        // 1. Intercept the Sellers Portal click
+        sellersPortalLink.addEventListener('click', function(e) {
+            e.preventDefault(); // Prevent default navigation
+            codeModal.classList.add('show');
+            codeInput.value = ''; // Clear any previous input
+            codeInput.focus();
+        });
+
+        // 2. Close Modal functionality
+        function closeModalHandler() {
+            codeModal.classList.remove('show');
+        }
+        closeModalBtn.addEventListener('click', closeModalHandler);
+
+        // Close modal when clicking outside
+        window.addEventListener('click', function(event) {
+            if (event.target === codeModal) {
+                closeModalHandler();
+            }
+        });
+
+        // 3. Toast Error Handler
+        function showToast(message) {
+            toastNotification.textContent = message;
+            toastNotification.classList.add('show');
+            
+            // Hide toast after 3 seconds
+            setTimeout(() => {
+                toastNotification.classList.remove('show');
+            }, 3000);
+        }
+
+        // 4. Code Submission Logic
+        function handleCodeSubmission() {
+            // Ensure the input is treated as a string for comparison
+            const enteredCode = codeInput.value.trim();
+
+            if (enteredCode === CORRECT_CODE) {
+                // Success: Navigate to the portal
+                showToast('Success! Redirecting...');
+                setTimeout(() => {
+                    window.location.href = DESTINATION_URL;
+                }, 1000);
+            } else {
+                // Error: Show toast and clear input
+                showToast('Invalid Code. Please try again.');
+                codeInput.value = '';
+                codeInput.focus();
+            }
+        }
+
+        // Event listeners for submission
+        submitCodeBtn.addEventListener('click', handleCodeSubmission);
+        codeInput.addEventListener('keypress', function(e) {
+            // Submit on 'Enter' key press
+            if (e.key === 'Enter') {
+                handleCodeSubmission();
+            }
+        });
+
     </script>
 </body>
 </html>
