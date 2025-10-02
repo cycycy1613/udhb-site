@@ -8,6 +8,7 @@
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-storage-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
     <style>
         * {
             margin: 0;
@@ -884,13 +885,16 @@
         <header>
             <h1>Files Folder</h1>
             <p>Everything in its place, easy to find.</p>
+            <button id="admin-logout-btn" class="btn btn-secondary" onclick="adminLogout()" style="display: none; margin-top: 10px;">
+                <i class="fas fa-sign-out-alt"></i> Logout
+            </button>
         </header>
         
         <div class="sections-container">
             <div class="section">
                 <div class="section-header">
                     <h2 class="section-title">Files</h2>
-                    <div class="upload-icon" onclick="openUploadModal('files')" style="display: none;">
+                    <div class="upload-icon" onclick="openUploadModal('files')">
                         <i class="fas fa-upload"></i>
                     </div>
                 </div>
@@ -905,7 +909,7 @@
             <div class="section" id="gallery-section">
                 <div class="section-header">
                     <h2 class="section-title">Folders</h2>
-                    <div class="upload-icon" onclick="openFolderModal()" style="display: none;">
+                    <div class="upload-icon" onclick="openFolderModal()">
                         <i class="fas fa-folder-plus"></i>
                     </div>
                 </div>
@@ -924,8 +928,29 @@
         </div>
         
         <footer>
-            <p>BTB Information Portal <a href="https://urbandecahomesbatangas.com/files-admin">login</a></p>
+            <p>BTB Information Portal <a href="#" onclick="openLoginModal(event)" id="admin-login-link">Admin Login</a></p>
         </footer>
+    </div>
+    
+    <div id="loginModal" class="upload-modal" style="display: none;">
+        <div class="modal-box">
+            <h2>Admin Login</h2>
+            <div class="form-group">
+                <label for="adminEmail">Email</label>
+                <input type="email" id="adminEmail" placeholder="Enter admin email">
+            </div>
+            <div class="form-group">
+                <label for="adminPassword">Password</label>
+                <input type="password" id="adminPassword" placeholder="Enter password">
+                <span class="password-toggle" onclick="togglePassword('adminPassword')">
+                    <i class="fas fa-eye"></i>
+                </span>
+            </div>
+            <div class="form-actions">
+                <button class="btn btn-secondary" onclick="closeLoginModal()">Cancel</button>
+                <button class="btn btn-primary" onclick="adminLogin()">Login</button>
+            </div>
+        </div>
     </div>
     
     <div id="uploadModal" class="upload-modal" style="display: none;">
@@ -938,13 +963,6 @@
             <div class="form-group">
                 <label for="fileInput">Select File</label>
                 <input type="file" id="fileInput">
-            </div>
-            <div class="form-group">
-                <label for="adminCode">Admin Code</label>
-                <input type="password" id="adminCode" placeholder="Enter admin code">
-                <span class="password-toggle" onclick="togglePassword('adminCode')">
-                    <i class="fas fa-eye"></i>
-                </span>
             </div>
             <div class="progress-bar">
                 <div class="progress" id="uploadProgress"></div>
@@ -959,13 +977,7 @@
     <div id="deleteModal" class="delete-modal" style="display: none;">
         <div class="modal-box">
             <h2>Confirm Deletion</h2>
-            <div class="form-group">
-                <label for="deleteAdminCode">Admin Code</label>
-                <input type="password" id="deleteAdminCode" placeholder="Enter admin code to confirm">
-                <span class="password-toggle" onclick="togglePassword('deleteAdminCode')">
-                    <i class="fas fa-eye"></i>
-                </span>
-            </div>
+            <p style="text-align: center; margin-bottom: 20px;">Confirm deletion of the selected item.</p>
             <div class="form-actions">
                 <button class="btn btn-secondary" onclick="closeDeleteModal()">Cancel</button>
                 <button class="btn btn-primary" onclick="confirmDelete()">Delete</button>
@@ -980,13 +992,6 @@
                 <label for="newFolderName">Folder Name</label>
                 <input type="text" id="newFolderName" placeholder="Enter new folder name">
             </div>
-            <div class="form-group">
-                <label for="folderAdminCode">Admin Code</label>
-                <input type="password" id="folderAdminCode" placeholder="Enter admin code">
-                <span class="password-toggle" onclick="togglePassword('folderAdminCode')">
-                    <i class="fas fa-eye"></i>
-                </span>
-            </div>
             <div class="form-actions">
                 <button class="btn btn-secondary" onclick="closeFolderModal()">Cancel</button>
                 <button class="btn btn-primary" onclick="createFolder()">Create Folder</button>
@@ -1000,7 +1005,7 @@
             <div class="modal-nav">
             </div>
             <div class="modal-controls">
-                <div class="modal-control" onclick="deleteImage()" style="display: none;">
+                <div class="modal-control delete-icon-modal" onclick="deleteImage()">
                     <i class="fas fa-trash"></i>
                 </div>
                 <div class="modal-control" onclick="closeModal()">
@@ -1028,10 +1033,11 @@
         firebase.initializeApp(firebaseConfig);
         const storage = firebase.storage();
         const database = firebase.database();
+        const auth = firebase.auth(); // NEW: Initialize Firebase Auth
         
         // Global variables
         let currentSection = '';
-        let currentFolder = ''; // New: To keep track of the currently viewed folder
+        let currentFolder = ''; 
         let currentImageKey = '';
         let currentImageUrl = '';
         let currentImagePath = '';
@@ -1043,12 +1049,13 @@
         let currentFolderId = '';
         let currentFolderName = '';
         let currentFolderView = false;
-        let currentModalImages = []; // Array to hold images in the current folder
-        let currentImageIndex = 0; // Index of the currently viewed image in the array
+        let currentModalImages = []; 
+        let currentImageIndex = 0; 
         let touchstartX = 0;
         let touchendX = 0;
+        let isAdmin = false; // NEW: Track Admin status
         
-        const swipeThreshold = 50; // Minimum distance in pixels for a swipe gesture
+        const swipeThreshold = 50; 
         
         // File type icons mapping
         const fileIcons = {
@@ -1110,9 +1117,52 @@
             const i = Math.floor(Math.log(bytes) / Math.log(k));
             return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
         }
+
+        // NEW: Admin Feature Toggle
+        function toggleAdminFeatures(isLoggedIn) {
+            isAdmin = isLoggedIn;
+            // Select all elements that are admin controls
+            const adminUploadIcons = document.querySelectorAll('.section-header .upload-icon');
+            const deleteIcons = document.querySelectorAll('.delete-icon');
+            const folderActions = document.querySelectorAll('.folder-actions');
+            const adminLoginLink = document.getElementById('admin-login-link');
+            const adminLogoutBtn = document.getElementById('admin-logout-btn');
+            const modalDeleteIcon = document.querySelector('#imageModal .delete-icon-modal');
+
+            // Toggle Upload/Create Icons
+            adminUploadIcons.forEach(icon => {
+                icon.style.display = isLoggedIn ? 'flex' : 'none';
+            });
+
+            // Toggle Delete Icon in modal
+            if (modalDeleteIcon) {
+                modalDeleteIcon.style.display = isLoggedIn ? 'flex' : 'none';
+            }
+
+            // Toggle Login/Logout Link/Button
+            if (isLoggedIn) {
+                adminLoginLink.style.display = 'none'; 
+                adminLogoutBtn.style.display = 'block'; 
+            } else {
+                adminLoginLink.style.display = 'inline'; 
+                adminLogoutBtn.style.display = 'none'; 
+            }
+            
+            // Re-render sections to update inline delete icons (file items and folder items)
+            if (dataLoaded) {
+                loadFiles();
+                if (currentFolderView) {
+                    loadFolderImages(currentFolderId);
+                }
+            }
+        }
         
         // Modal functions
         function openUploadModal(section) {
+            if (!isAdmin) {
+                showNotification('Please login as admin to upload files.', true);
+                return;
+            }
             if (section === 'gallery' && !currentFolderView) {
                 showNotification('Please select a folder first before uploading an image.', true);
                 return;
@@ -1154,7 +1204,6 @@
                 modal.style.display = 'none';
                 document.getElementById('fileName').value = '';
                 document.getElementById('fileInput').value = '';
-                document.getElementById('adminCode').value = '';
                 document.querySelector('.progress-bar').style.display = 'none';
                 document.getElementById('uploadProgress').style.width = '0%';
                 
@@ -1165,6 +1214,10 @@
         }
         
         function openFolderModal() {
+            if (!isAdmin) {
+                showNotification('Please login as admin to create folders.', true);
+                return;
+            }
             const modal = document.getElementById('folderModal');
             modal.style.display = 'flex';
             
@@ -1180,7 +1233,6 @@
             setTimeout(() => {
                 modal.style.display = 'none';
                 document.getElementById('newFolderName').value = '';
-                document.getElementById('folderAdminCode').value = '';
             }, 300);
         }
         
@@ -1199,7 +1251,26 @@
             
             setTimeout(() => {
                 modal.style.display = 'none';
-                document.getElementById('deleteAdminCode').value = '';
+            }, 300);
+        }
+        
+        // NEW: Login Modal Functions
+        function openLoginModal(e) {
+            if (e) e.preventDefault();
+            const modal = document.getElementById('loginModal');
+            modal.style.display = 'flex';
+            setTimeout(() => {
+                modal.classList.add('active');
+            }, 10);
+        }
+
+        function closeLoginModal() {
+            const modal = document.getElementById('loginModal');
+            modal.classList.remove('active');
+            setTimeout(() => {
+                modal.style.display = 'none';
+                document.getElementById('adminEmail').value = '';
+                document.getElementById('adminPassword').value = '';
             }, 300);
         }
         
@@ -1213,6 +1284,12 @@
             
             modalImage.src = currentModalImages[currentImageIndex].data;
             currentImageKey = currentModalImages[currentImageIndex].key;
+
+            // Update modal delete icon visibility
+            const modalDeleteIcon = document.querySelector('#imageModal .delete-icon-modal');
+            if (modalDeleteIcon) {
+                modalDeleteIcon.style.display = isAdmin ? 'flex' : 'none';
+            }
             
             modal.style.display = 'flex';
             
@@ -1309,12 +1386,46 @@
             const date = new Date(timestamp);
             return date.toLocaleDateString() + ' ' + date.toLocaleTimeString();
         }
+
+        // NEW: Admin Login/Logout
+        async function adminLogin() {
+            const email = document.getElementById('adminEmail').value.trim();
+            const password = document.getElementById('adminPassword').value.trim();
+
+            if (!email || !password) {
+                showNotification('Please enter both email and password', true);
+                return;
+            }
+
+            try {
+                await auth.signInWithEmailAndPassword(email, password);
+                showNotification('Admin login successful!');
+                closeLoginModal();
+            } catch (error) {
+                console.error('Login failed:', error);
+                showNotification('Login failed: ' + error.message, true);
+            }
+        }
+
+        async function adminLogout() {
+            try {
+                await auth.signOut();
+                showNotification('Logged out successfully!');
+            } catch (error) {
+                console.error('Logout failed:', error);
+                showNotification('Logout failed. Please try again.', true);
+            }
+        }
         
         // Upload file to Firebase
         async function uploadFile() {
+            if (!isAdmin) {
+                showNotification('You must be logged in as an admin to upload files', true);
+                return;
+            }
+            
             const fileName = document.getElementById('fileName').value.trim();
             const fileInput = document.getElementById('fileInput');
-            const adminCode = document.getElementById('adminCode').value.trim();
             const uploadButton = document.getElementById('uploadButton');
             
             // Validate inputs
@@ -1325,11 +1436,6 @@
             
             if (!fileInput.files || fileInput.files.length === 0) {
                 showNotification('Please select a file to upload', true);
-                return;
-            }
-            
-            if (adminCode !== '001122') {
-                showNotification('Invalid admin code', true);
                 return;
             }
             
@@ -1451,6 +1557,10 @@
         
         // Delete image from modal
         function deleteImage() {
+            if (!isAdmin) {
+                showNotification('You must be logged in as an admin to delete images', true);
+                return;
+            }
             closeModal();
             // Store the item to be deleted before opening the modal
             itemToDelete = { type: 'image', key: currentImageKey };
@@ -1458,15 +1568,8 @@
         }
         
         async function confirmDelete() {
-            const adminCode = document.getElementById('deleteAdminCode').value;
-            
-            if (!adminCode) {
-                showNotification('Please enter admin code', true);
-                return;
-            }
-            
-            if (adminCode !== '001122') {
-                showNotification('Invalid admin code', true);
+            if (!isAdmin) {
+                showNotification('You must be logged in as an admin to delete files', true);
                 return;
             }
             
@@ -1523,6 +1626,10 @@
         }
         
         function requestDeleteFile(key, filename) {
+            if (!isAdmin) {
+                showNotification('You must be logged in as an admin to delete files', true);
+                return;
+            }
             itemToDelete = { type: 'file', key: key };
             openDeleteModal();
         }
@@ -1590,7 +1697,7 @@
                         const folderItem = document.createElement('div');
                         folderItem.className = 'folder-item';
                         folderItem.innerHTML = `
-                            <div class="folder-actions" style="display: none;">
+                            <div class="folder-actions" style="display: ${isAdmin ? 'flex' : 'none'};">
                                 <div class="folder-action folder-delete" onclick="event.stopPropagation(); requestDelete('folder', '${folder.key}')">
                                     <i class="fas fa-trash"></i>
                                 </div>
@@ -1647,7 +1754,7 @@
                                     <div class="action-icon download-icon" onclick="event.stopPropagation(); downloadFile('${file.downloadURL}', '${file.filename}')">
                                         <i class="fas fa-download"></i>
                                     </div>
-                                    <div class="action-icon delete-icon" onclick="event.stopPropagation(); requestDeleteFile('${file.key}', '${file.filename}')" style="display: none;">
+                                    <div class="action-icon delete-icon" onclick="event.stopPropagation(); requestDeleteFile('${file.key}', '${file.filename}')" style="display: ${isAdmin ? 'flex' : 'none'};">
                                         <i class="fas fa-trash"></i>
                                     </div>
                                 </div>
@@ -1667,16 +1774,15 @@
         
         // Create folder function
         async function createFolder() {
+            if (!isAdmin) {
+                showNotification('You must be logged in as an admin to create folders', true);
+                return;
+            }
+            
             const folderName = document.getElementById('newFolderName').value.trim();
-            const adminCode = document.getElementById('folderAdminCode').value.trim();
 
             if (!folderName) {
                 showNotification('Please enter a folder name', true);
-                return;
-            }
-
-            if (adminCode !== '001122') {
-                showNotification('Invalid admin code', true);
                 return;
             }
 
@@ -1710,7 +1816,7 @@
                     <span>${folderName}</span>
                 </div>
                 <div style="display: flex; gap: 10px;">
-                    <div class="upload-icon" onclick="openUploadModal('gallery')" title="Upload Image" style="display: none;">
+                    <div class="upload-icon" onclick="openUploadModal('gallery')" title="Upload Image" style="display: ${isAdmin ? 'flex' : 'none'};">
                         <i class="fas fa-upload"></i>
                     </div>
                     <button class="back-button" onclick="backToFolders()">
@@ -1779,7 +1885,7 @@
             const gallerySectionHeader = document.querySelector('#gallery-section .section-header');
             gallerySectionHeader.innerHTML = `
                 <h2 class="section-title">Folders</h2>
-                <div class="upload-icon" onclick="openFolderModal()" style="display: none;">
+                <div class="upload-icon" onclick="openFolderModal()" style="display: ${isAdmin ? 'flex' : 'none'};">
                     <i class="fas fa-folder-plus"></i>
                 </div>
             `;
@@ -1790,35 +1896,31 @@
         // Request delete confirmation
         let itemToDelete = null;
         function requestDelete(type, key, path = '') {
+            if (!isAdmin) {
+                showNotification('You must be logged in as an admin to delete folders', true);
+                return;
+            }
             itemToDelete = { type, key, path };
             openDeleteModal();
         }
         
-        function requestDeleteFile(key, filename) {
-            itemToDelete = { type: 'file', key: key };
-            openDeleteModal();
-        }
-        
-        function downloadFile(url, filename) {
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = filename || 'download';
-            
-            a.style.display = 'none';
-            document.body.appendChild(a);
-            
-            a.click();
-            
-            setTimeout(() => {
-                document.body.removeChild(a);
-            }, 100);
-        }
-        
         document.addEventListener('DOMContentLoaded', function() {
+            // NEW: Firebase Authentication State Listener
+            auth.onAuthStateChanged(user => {
+                if (user) {
+                    // User is signed in. Assume any logged-in user is an admin for this basic portal.
+                    toggleAdminFeatures(true);
+                    showNotification(`Welcome, Admin: ${user.email}`);
+                } else {
+                    // User is signed out.
+                    toggleAdminFeatures(false);
+                }
+            });
+            
             loadFiles();
             
             database.ref('files').on('value', function(snapshot) {
-                if (dataLoaded) {
+                if (dataLoaded && !currentFolderView) {
                     loadFiles();
                 }
             });
