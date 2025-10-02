@@ -885,9 +885,6 @@
         <header>
             <h1>Files Folder</h1>
             <p>Everything in its place, easy to find.</p>
-            <button id="admin-logout-btn" class="btn btn-secondary" onclick="adminLogout()" style="display: none; margin-top: 10px;">
-                <i class="fas fa-sign-out-alt"></i> Logout
-            </button>
         </header>
         
         <div class="sections-container">
@@ -928,7 +925,12 @@
         </div>
         
         <footer>
-            <p>BTB Information Portal <a href="#" onclick="openLoginModal(event)" id="admin-login-link">Admin Login</a></p>
+            <p>BTB Information Portal 
+                <a href="#" onclick="openLoginModal(event)" id="admin-login-link">Admin Login</a>
+                <a href="#" id="admin-logout-btn" onclick="event.preventDefault(); adminLogout();" style="display: none;">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </a>
+            </p>
         </footer>
     </div>
     
@@ -1127,6 +1129,7 @@
             const folderActions = document.querySelectorAll('.folder-actions');
             const adminLoginLink = document.getElementById('admin-login-link');
             const adminLogoutBtn = document.getElementById('admin-logout-btn');
+
             const modalDeleteIcon = document.querySelector('#imageModal .delete-icon-modal');
 
             // Toggle Upload/Create Icons
@@ -1142,7 +1145,7 @@
             // Toggle Login/Logout Link/Button
             if (isLoggedIn) {
                 adminLoginLink.style.display = 'none'; 
-                adminLogoutBtn.style.display = 'block'; 
+                adminLogoutBtn.style.display = 'inline'; // MODIFIED: Changed 'block' to 'inline'
             } else {
                 adminLoginLink.style.display = 'inline'; 
                 adminLogoutBtn.style.display = 'none'; 
