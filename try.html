@@ -13,7 +13,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
-            --primary: #920102;
+            --primary: #2A2828;
             --secondary: #3498db;
             --accent: #e74c3c;
             --light: #f8f9fa;
@@ -52,7 +52,7 @@
 
         /* Header Styles */
         header {
-            background: linear-gradient(135deg, var(--primary) 0%, #1a2530 100%);
+            background: linear-gradient(135deg, var(--primary) 0%, #920102 100%);
             color: white;
             padding: 1rem 0;
             box-shadow: var(--shadow);
@@ -864,16 +864,11 @@
                 <i class="fas fa-warehouse"></i>
                 <span>Inventory</span>
             </div>
-            <span class="admin-status logged-out" id="admin-status">Logged Out</span>
-        </div>
+            </div>
     </header>
 
     <main class="container">
         <div id="gallery-view">
-            <div class="landing-header">
-                <h1 class="section-title">UDHB</h1>
-                <p class="section-subtitle">Realtime Availability Updates</p>
-            </div>
             <div class="gallery-wrapper">
                 <div class="gallery" id="maps-container">
                     </div>
@@ -1100,7 +1095,7 @@
         const saveAsPdfBtn = document.getElementById('save-as-pdf');
         
         // NEW: Admin UI Elements
-        const adminStatus = document.getElementById('admin-status');
+        // const adminStatus = document.getElementById('admin-status'); // REMOVED from header HTML
         const adminLoginLink = document.getElementById('admin-login-link');
         const adminLogoutLink = document.getElementById('admin-logout-link');
         const tableActionsTh = document.getElementById('table-actions-th');
@@ -1366,9 +1361,9 @@
         function updateAdminUI(loggedIn) {
             isAdmin = loggedIn;
 
-            // Header UI
-            adminStatus.textContent = loggedIn ? 'Logged In' : 'Logged Out';
-            adminStatus.className = loggedIn ? 'admin-status logged-in' : 'admin-status logged-out';
+            // Header UI - LOGGED OUT STATUS REMOVED FROM HTML AND JS
+            // adminStatus.textContent = loggedIn ? 'Logged In' : 'Logged Out';
+            // adminStatus.className = loggedIn ? 'admin-status logged-in' : 'admin-status logged-out';
             
             // Footer UI
             adminLoginLink.classList.toggle('hidden', loggedIn);
