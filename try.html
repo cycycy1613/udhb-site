@@ -1,0 +1,1923 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, maximum-scale=1.0">
+    <title>UDHB Information Portal</title>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-storage-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #2c3e50;
+            --secondary: #3498db;
+            --accent: #e74c3c;
+            --light: #f8f9fa;
+            --dark: #2c3e50;
+            --success: #2ecc71;
+            --warning: #f39c12;
+            --danger: #e74c3c;
+            --gray: #95a5a6;
+            --light-gray: #e9ecef;
+            --border: #dee2e6;
+            --text: #333;
+            --text-light: #6c757d;
+            --shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            --shadow-hover: 0 8px 24px rgba(0, 0, 0, 0.12);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--light);
+            color: var(--text);
+            line-height: 1.6;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1rem;
+        }
+
+        /* Header Styles */
+        header {
+            background: linear-gradient(135deg, var(--primary) 0%, #1a2530 100%);
+            color: white;
+            padding: 1rem 0;
+            box-shadow: var(--shadow);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo i {
+            color: var(--secondary);
+        }
+
+        /* Main Content */
+        main {
+            padding: 2rem 0;
+            min-height: calc(100vh - 150px);
+        }
+
+        /* Loading Animation */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(255, 255, 255, 0.9);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .spinner {
+            width: 60px;
+            height: 60px;
+            border: 5px solid var(--light-gray);
+            border-top: 5px solid var(--secondary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Map Gallery */
+        .gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 25px;
+            margin-top: 30px;
+        }
+
+        .map-card {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .map-card:hover {
+            transform: translateY(-8px);
+            box-shadow: var(--shadow-hover);
+        }
+
+        .map-card-header {
+            height: 180px;
+            background-color: var(--light-gray);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--gray);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .map-card-header img {
+            transition: transform 0.5s ease;
+        }
+
+        .map-card:hover .map-card-header img {
+            transform: scale(1.05);
+        }
+        
+        /* NEW: Admin Specific Styles */
+        .admin-status {
+            font-weight: 500;
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-size: 0.9rem;
+        }
+
+        .admin-status.logged-in {
+            color: white;
+            background-color: var(--success);
+        }
+
+        .admin-status.logged-out {
+            color: white;
+            background-color: var(--danger);
+        }
+        
+        .map-card-admin-actions {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            display: none; /* Controlled by JS based on login */
+            gap: 8px;
+            z-index: 5;
+        }
+        
+        .map-card.admin-mode .map-card-admin-actions {
+            display: flex;
+        }
+
+        .map-action-btn {
+            background-color: rgba(255, 255, 255, 0.9);
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+            color: var(--danger);
+            font-size: 0.8rem;
+        }
+
+        .map-action-btn:hover {
+            transform: scale(1.1);
+        }
+
+        .map-action-btn.delete:hover {
+            background-color: var(--danger);
+            color: white;
+        }
+        /* END NEW: Admin Specific Styles */
+
+        .map-card-body {
+            padding: 20px;
+        }
+
+        .map-card h3 {
+            margin-bottom: 10px;
+            color: var(--dark);
+            font-size: 1.2rem;
+        }
+
+        .map-card-actions {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 15px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        /* Buttons */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 18px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            font-size: 0.95rem;
+            text-decoration: none;
+            text-align: center;
+        }
+        
+        .btn-sm {
+            padding: 6px 10px;
+            font-size: 0.8rem;
+        }
+
+        .btn i {
+            font-size: 0.9rem;
+        }
+
+        .btn-primary {
+            background-color: var(--secondary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: #2980b9;
+            transform: translateY(-2px);
+        }
+        
+        .btn-warning {
+            background-color: var(--warning);
+            color: white;
+        }
+
+        .btn-warning:hover {
+            background-color: #e67e22;
+            transform: translateY(-2px);
+        }
+
+        .btn-danger {
+            background-color: var(--danger);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background-color: #c0392b;
+            transform: translateY(-2px);
+        }
+
+        .btn-success {
+            background-color: var(--success);
+            color: white;
+        }
+
+        .btn-success:hover {
+            background-color: #27ae60;
+            transform: translateY(-2px);
+        }
+
+        .btn-outline {
+            background-color: transparent;
+            border: 1px solid var(--secondary);
+            color: var(--secondary);
+        }
+
+        .btn-outline:hover {
+            background-color: var(--secondary);
+            color: white;
+        }
+
+        .add-map-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            height: 100%;
+            color: var(--gray);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            /* Allow hover effect to apply to the card */
+            height: 100%;
+            background-color: var(--light-gray); 
+        }
+
+        .add-map-btn:hover {
+            color: var(--secondary);
+        }
+
+        .add-map-btn i {
+            font-size: 3rem;
+            margin-bottom: 15px;
+        }
+
+        /* Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            display: none;
+            backdrop-filter: blur(4px);
+        }
+
+        .modal {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            transform: translateY(20px);
+            opacity: 0;
+            transition: all 0.3s ease;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .modal-header h2 {
+            color: var(--dark);
+            font-size: 1.5rem;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 1.8rem;
+            cursor: pointer;
+            color: var(--gray);
+            transition: color 0.3s ease;
+        }
+
+        .close-btn:hover {
+            color: var(--dark);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: var(--dark);
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--secondary);
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+        }
+
+        /* Map View */
+        #map-view {
+            display: none;
+            margin-top: 20px;
+        }
+
+        .map-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        
+        /* NEW: Map View Admin Controls */
+        .map-view-admin-controls {
+            display: none; /* Hide by default, shown by JS on login */
+            margin-bottom: 20px;
+            border-bottom: 1px dashed var(--border);
+            padding-bottom: 15px;
+        }
+
+        .map-container {
+            position: relative;
+            background-color: var(--light-gray);
+            height: 450px;
+            border-radius: 12px;
+            overflow: hidden;
+            margin-bottom: 25px;
+            box-shadow: var(--shadow);
+            cursor: grab;
+        }
+        
+        .map-container.dragging {
+            cursor: grabbing;
+        }
+
+        .map-image {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            transition: transform 0.3s ease;
+            transform-origin: 0 0;
+        }
+
+        .map-controls {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            z-index: 10;
+        }
+
+        .map-control-btn {
+            background-color: white;
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.15);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .map-control-btn:hover {
+            transform: scale(1.1);
+            background-color: var(--secondary);
+            color: white;
+        }
+
+        .replace-map-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background-color: white;
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.15);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            z-index: 10;
+            display: none; /* Hidden by default, shown on admin login */
+        }
+
+        .replace-map-btn:hover {
+            transform: scale(1.1);
+            background-color: var(--secondary);
+            color: white;
+        }
+
+        /* Inventory Table */
+        .inventory-table-container {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: var(--shadow);
+            overflow: hidden;
+        }
+
+        .table-header {
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        
+        .table-actions {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .table-header h3 {
+            color: var(--dark);
+            font-size: 1.4rem;
+        }
+
+        .table-container {
+            max-height: 400px;
+            overflow-x: auto; /* Added for horizontal scrolling */
+            overflow-y: auto;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+        }
+        
+        .table-container.no-scroll {
+            max-height: none;
+            overflow-y: visible;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 700px; /* Ensure table is readable on small screens */
+        }
+
+        th, td {
+            padding: 14px 16px;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        td {
+            white-space: nowrap;
+        }
+        
+        .action-cell button {
+            margin-right: 5px;
+        }
+
+        th {
+            background-color: var(--light);
+            font-weight: 600;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        tr:hover {
+            background-color: #f8f9fa;
+        }
+
+        .action-cell {
+            white-space: nowrap;
+        }
+
+        .add-row-btn {
+            margin-top: 15px;
+        }
+
+        .save-section {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 25px;
+            padding-top: 20px;
+            border-top: 1px solid var(--border);
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .last-updated {
+            color: var(--text-light);
+            font-style: italic;
+        }
+        
+        /* Sliding Switch */
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 60px;
+            height: 34px;
+        }
+
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 34px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 26px;
+            width: 26px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        input:checked + .slider {
+            background-color: var(--secondary);
+        }
+
+        input:focus + .slider {
+            box-shadow: 0 0 1px var(--secondary);
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(26px);
+        }
+        
+        .switch-label {
+            font-size: 0.9rem;
+            color: var(--dark);
+            font-weight: 500;
+            margin-right: 10px;
+        }
+
+        /* Footer */
+        footer {
+            background: linear-gradient(135deg, var(--primary) 0%, #1a2530 100%);
+            color: white;
+            text-align: center;
+            padding: 1.5rem 0;
+            margin-top: 3rem;
+        }
+        
+        /* NEW: Footer Layout for Login/Logout */
+        footer .container {
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center;
+        }
+        
+        footer a {
+            color: white; 
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        footer a:hover {
+            color: var(--secondary);
+        }
+        
+        footer #admin-logout-link {
+            color: var(--warning);
+        }
+        /* END NEW: Footer Layout */
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .gallery {
+                grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            }
+
+            .map-container {
+                height: 350px;
+            }
+
+            .table-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
+            }
+            
+            .table-actions {
+                width: 100%;
+                justify-content: flex-start;
+            }
+
+            .save-section {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
+            }
+            
+            .btn {
+                padding: 10px 14px;
+                font-size: 0.85rem;
+                flex-grow: 1;
+            }
+
+            .map-card-actions .btn {
+                flex-grow: 1;
+                justify-content: center;
+            }
+            
+            .map-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+        }
+
+        /* Utility Classes */
+        .text-center {
+            text-align: center;
+        }
+
+        .mt-20 {
+            margin-top: 20px;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .section-title {
+            font-size: 2rem;
+            color: var(--dark);
+            margin-bottom: 15px;
+            font-weight: 700;
+        }
+
+        .section-subtitle {
+            color: var(--text-light);
+            margin-bottom: 30px;
+            font-size: 1.1rem;
+        }
+
+        /* Toast Notification */
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: var(--success);
+            color: white;
+            padding: 15px 25px;
+            border-radius: 8px;
+            box-shadow: var(--shadow);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            z-index: 1000;
+            transform: translateY(100px);
+            opacity: 0;
+            transition: all 0.3s ease;
+        }
+
+        .toast.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        .toast.error {
+            background-color: var(--danger);
+        }
+
+        /* Empty state */
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--text-light);
+        }
+
+        .empty-state i {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            color: var(--gray);
+        }
+
+        /* New Landing Page Styles */
+        #gallery-view {
+            padding-top: 5rem;
+            padding-bottom: 3rem;
+        }
+
+        .landing-header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .landing-header .section-title {
+            font-size: 3.5rem;
+            font-weight: 800;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .landing-header .section-subtitle {
+            font-size: 1.5rem;
+            color: var(--secondary);
+            font-weight: 500;
+            letter-spacing: 1px;
+        }
+
+        .gallery-wrapper {
+            background-color: white;
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: var(--shadow-hover);
+            min-height: 400px;
+        }
+    </style>
+</head>
+<body>
+    <div class="loading-overlay" id="loading-overlay">
+        <div class="spinner"></div>
+        <p>Loading data, please wait...</p>
+    </div>
+
+    <header>
+        <div class="container header-content">
+            <div class="logo">
+                <i class="fas fa-warehouse"></i>
+                <span>Inventory</span>
+            </div>
+            <span class="admin-status logged-out" id="admin-status">Logged Out</span>
+        </div>
+    </header>
+
+    <main class="container">
+        <div id="gallery-view">
+            <div class="landing-header">
+                <h1 class="section-title">UDHB</h1>
+                <p class="section-subtitle">Realtime Availability Updates</p>
+            </div>
+            <div class="gallery-wrapper">
+                <div class="gallery" id="maps-container">
+                    </div>
+            </div>
+        </div>
+
+        <div id="map-view">
+            <div class="map-header">
+                <h2 id="map-title" class="section-title">Building Title</h2>
+                <button id="back-to-gallery" class="btn btn-primary hidden">
+                    <i class="fas fa-arrow-left"></i>
+                    Back
+                </button>
+            </div>
+            
+            <div class="map-view-admin-controls" id="map-view-admin-controls">
+                <div style="display: flex; gap: 15px; flex-wrap: wrap;">
+                    <button id="add-inventory-row" class="btn btn-success">
+                        <i class="fas fa-plus"></i>
+                        Add Unit
+                    </button>
+                    <button id="delete-map-view-btn" class="btn btn-danger">
+                        <i class="fas fa-trash"></i>
+                        Delete Building
+                    </button>
+                </div>
+            </div>
+            <div class="map-container">
+                <img id="map-image" class="map-image" src="" alt="Property Map">
+                <div class="replace-map-btn" id="replace-map-btn" title="Replace Map Image">
+                    <i class="fas fa-image"></i>
+                    <input type="file" id="replace-map-file-input" accept="image/*" style="display: none;">
+                </div>
+                <div class="map-controls">
+                    <div class="map-control-btn" id="zoom-in" title="Zoom In">
+                        <i class="fas fa-plus"></i>
+                    </div>
+                    <div class="map-control-btn" id="zoom-out" title="Zoom Out">
+                        <i class="fas fa-minus"></i>
+                    </div>
+                    <div class="map-control-btn" id="reset-view" title="Reset View">
+                        <i class="fas fa-sync"></i>
+                    </div>
+                </div>
+            </div>
+
+            <div class="inventory-table-container" id="inventory-table-container">
+                <div class="table-header">
+                    <h3>Available Slot</h3>
+                    <div class="table-actions">
+                        <span class="switch-label">Disable Scroll</span>
+                        <label class="switch">
+                            <input type="checkbox" id="scroll-switch">
+                            <span class="slider"></span>
+                        </label>
+                        <button id="save-as-pdf" class="btn btn-success hidden">
+                            <i class="fas fa-file-pdf"></i>
+                            Save as PDF
+                        </button>
+                    </div>
+                </div>
+
+                <div class="table-container" id="table-to-capture">
+                    <table id="inventory-table">
+                        <thead>
+                            <tr>
+                                <th>No.</th>
+                                <th>Building</th>
+                                <th>Floor#</th>
+                                <th>Unit#</th>
+                                <th>Size</th>
+                                <th>Type</th>
+                                <th>Status</th>
+                                <th id="table-actions-th" class="hidden">Actions</th>
+                                </tr>
+                        </thead>
+                        <tbody>
+                            </tbody>
+                    </table>
+                </div>
+
+                <div class="save-section">
+                    <div class="last-updated" id="last-updated">Last updated: Never</div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <div class="modal-overlay" id="login-modal-overlay">
+        <div class="modal" id="login-modal">
+            <div class="modal-header">
+                <h2>Admin Login</h2>
+                <button class="close-btn" id="close-login-modal">&times;</button>
+            </div>
+            <form id="login-form">
+                <div class="form-group">
+                    <label for="admin-email">Email</label>
+                    <input type="email" id="admin-email" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label for="admin-password">Password</label>
+                    <input type="password" id="admin-password" class="form-control" required>
+                </div>
+                <button type="submit" class="btn btn-primary" style="width: 100%;">
+                    <i class="fas fa-sign-in-alt"></i>
+                    Login
+                </button>
+            </form>
+            <p id="login-error-message" style="color: var(--danger); margin-top: 15px; text-align: center; display: none;"></p>
+        </div>
+    </div>
+    <div class="modal-overlay" id="add-map-modal-overlay">
+        <div class="modal" id="add-map-modal">
+            <div class="modal-header">
+                <h2>Add New Building</h2>
+                <button class="close-btn" id="close-add-map-modal">&times;</button>
+            </div>
+            <form id="add-map-form">
+                <div class="form-group">
+                    <label for="new-map-name">Building Name</label>
+                    <input type="text" id="new-map-name" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label for="map-image-upload">Map Image (Optional)</label>
+                    <input type="file" id="map-image-upload" class="form-control" accept="image/*">
+                </div>
+                <button type="submit" class="btn btn-success" style="width: 100%;">
+                    <i class="fas fa-plus"></i>
+                    Add Building
+                </button>
+            </form>
+        </div>
+    </div>
+    <div class="modal-overlay" id="unit-modal-overlay">
+        <div class="modal" id="unit-modal">
+            <div class="modal-header">
+                <h2 id="unit-modal-title">Add/Edit Unit</h2>
+                <button class="close-btn" id="close-unit-modal">&times;</button>
+            </div>
+            <form id="unit-form">
+                <div class="form-group">
+                    <label for="unit-phase">Building (Auto-filled)</label>
+                    <input type="text" id="unit-phase" class="form-control" disabled>
+                </div>
+                <div class="form-group">
+                    <label for="unit-bik">Floor#</label>
+                    <input type="text" id="unit-bik" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label for="unit-lot">Unit#</label>
+                    <input type="text" id="unit-lot" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label for="unit-lotArea">Size</label>
+                    <input type="text" id="unit-lotArea" class="form-control">
+                </div>
+                <div class="form-group">
+                    <label for="unit-floorArea">Type</label>
+                    <input type="text" id="unit-floorArea" class="form-control">
+                </div>
+                <div class="form-group">
+                    <label for="unit-type">Status</label>
+                    <input type="text" id="unit-type" class="form-control">
+                </div>
+                <input type="hidden" id="unit-id-hidden">
+                <button type="submit" class="btn btn-primary" id="unit-submit-btn" style="width: 100%;">
+                    <i class="fas fa-save"></i>
+                    Save Unit
+                </button>
+            </form>
+        </div>
+    </div>
+    <footer>
+        <div class="container">
+            <p>UDHB Information Portal</p>
+            <div>
+                <a href="#" id="admin-login-link">Login</a>
+                <a href="#" id="admin-logout-link" class="hidden">Logout</a>
+            </div>
+            </div>
+    </footer>
+
+    <div class="toast" id="toast">
+        <i class="fas fa-check-circle"></i>
+        <span id="toast-message">Operation completed successfully</span>
+    </div>
+
+    <script>
+        // Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyAno9NDbUgrgBi7NrC4krNXQg4dMXzN-7g",
+            authDomain: "udhb-site.firebaseapp.com",
+            databaseURL: "https://udhb-site-default-rtdb.firebaseio.com",
+            projectId: "udhb-site",
+            storageBucket: "udhb-site.firebasestorage.app",
+            messagingSenderId: "214765051025",
+            appId: "1:214765051025:web:5e72b00e570919bf3c7330"
+        };
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+        const storage = firebase.storage();
+        const auth = firebase.auth(); // NEW: Initialize Firebase Auth
+
+        // DOM Elements
+        const loadingOverlay = document.getElementById('loading-overlay');
+        const galleryView = document.getElementById('gallery-view');
+        const mapView = document.getElementById('map-view');
+        const mapsContainer = document.getElementById('maps-container');
+        const backToGalleryBtn = document.getElementById('back-to-gallery');
+        const mapTitle = document.getElementById('map-title');
+        const mapImage = document.getElementById('map-image');
+        const inventoryTable = document.getElementById('inventory-table');
+        const lastUpdated = document.getElementById('last-updated');
+        const zoomInBtn = document.getElementById('zoom-in');
+        const zoomOutBtn = document.getElementById('zoom-out');
+        const resetViewBtn = document.getElementById('reset-view');
+        const toast = document.getElementById('toast');
+        const toastMessage = document.getElementById('toast-message');
+        const tableContainer = document.getElementById('table-to-capture');
+        const scrollSwitch = document.getElementById('scroll-switch');
+        const mapContainer = document.querySelector('.map-container');
+        const saveAsPdfBtn = document.getElementById('save-as-pdf');
+        
+        // NEW: Admin UI Elements
+        const adminStatus = document.getElementById('admin-status');
+        const adminLoginLink = document.getElementById('admin-login-link');
+        const adminLogoutLink = document.getElementById('admin-logout-link');
+        const tableActionsTh = document.getElementById('table-actions-th');
+        const mapViewAdminControls = document.getElementById('map-view-admin-controls');
+        const deleteMapViewBtn = document.getElementById('delete-map-view-btn');
+        const addInventoryRowBtn = document.getElementById('add-inventory-row');
+        const replaceMapBtn = document.getElementById('replace-map-btn');
+        const replaceMapFileInput = document.getElementById('replace-map-file-input');
+
+        // NEW: Login Modal Elements
+        const loginModalOverlay = document.getElementById('login-modal-overlay');
+        const loginForm = document.getElementById('login-form');
+        const closeLoginModal = document.getElementById('close-login-modal');
+        const loginErrorMessage = document.getElementById('login-error-message');
+        
+        // NEW: Add Map Modal Elements
+        const addMapModalOverlay = document.getElementById('add-map-modal-overlay');
+        const closeAddMapModal = document.getElementById('close-add-map-modal');
+        const addMapForm = document.getElementById('add-map-form');
+        const addMapImageUpload = document.getElementById('map-image-upload');
+        const newMapNameInput = document.getElementById('new-map-name');
+        
+        // NEW: Unit Modal Elements
+        const unitModalOverlay = document.getElementById('unit-modal-overlay');
+        const closeUnitModal = document.getElementById('close-unit-modal');
+        const unitForm = document.getElementById('unit-form');
+        const unitModalTitle = document.getElementById('unit-modal-title');
+        const unitIdHidden = document.getElementById('unit-id-hidden');
+        const unitPhase = document.getElementById('unit-phase');
+        const unitBik = document.getElementById('unit-bik');
+        const unitLot = document.getElementById('unit-lot');
+        const unitLotArea = document.getElementById('unit-lotArea');
+        const unitFloorArea = document.getElementById('unit-floorArea');
+        const unitType = document.getElementById('unit-type');
+        const unitSubmitBtn = document.getElementById('unit-submit-btn');
+
+
+        // Global Variables
+        let currentMapId = null;
+        let currentMapName = null; // NEW: Store current map name
+        let currentZoom = 1;
+        let maps = [];
+        let lastUpdatedTimestamp = '';
+        let isAdmin = false; // NEW: Admin state
+        
+        let isDragging = false;
+        let initialX;
+        let initialY;
+        let currentX = 0;
+        let currentY = 0;
+        let xOffset = 0;
+        let yOffset = 0;
+        
+        
+        // --- EVENT LISTENERS ---
+        
+        // Existing Event Listeners
+        backToGalleryBtn.addEventListener('click', showGallery);
+        
+        zoomInBtn.addEventListener('click', () => {
+            currentZoom += 0.2;
+            updateImageTransform();
+        });
+
+        zoomOutBtn.addEventListener('click', () => {
+            currentZoom -= 0.2;
+            if (currentZoom < 0.2) currentZoom = 0.2;
+            updateImageTransform();
+        });
+
+        resetViewBtn.addEventListener('click', () => {
+            currentZoom = 1;
+            currentX = 0;
+            currentY = 0;
+            xOffset = 0;
+            yOffset = 0;
+            updateImageTransform();
+        });
+        
+        scrollSwitch.addEventListener('change', (e) => {
+            if (e.target.checked) {
+                tableContainer.classList.add('no-scroll');
+                saveAsPdfBtn.classList.remove('hidden');
+            } else {
+                tableContainer.classList.remove('no-scroll');
+                saveAsPdfBtn.classList.add('hidden');
+            }
+        });
+        
+        saveAsPdfBtn.addEventListener('click', async () => {
+            await saveAsPdf();
+        });
+
+        // Map drag event listeners
+        mapContainer.addEventListener('mousedown', dragStart);
+        mapContainer.addEventListener('mouseup', dragEnd);
+        mapContainer.addEventListener('mouseleave', dragEnd);
+        mapContainer.addEventListener('mousemove', drag);
+        
+        // Map drag touch event listeners
+        mapContainer.addEventListener('touchstart', dragStart);
+        mapContainer.addEventListener('touchend', dragEnd);
+        mapContainer.addEventListener('touchcancel', dragEnd);
+        mapContainer.addEventListener('touchmove', drag);
+        
+        // NEW: Admin Login/Logout Handlers
+        adminLoginLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            if (!isAdmin) {
+                loginModalOverlay.style.display = 'flex';
+                setTimeout(() => loginModalOverlay.querySelector('.modal').classList.add('show'), 10);
+            }
+        });
+        adminLogoutLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            auth.signOut().then(() => {
+                showToast('Logged out successfully.');
+            }).catch((error) => {
+                showToast('Logout error: ' + error.message, true);
+            });
+        });
+        closeLoginModal.addEventListener('click', () => {
+            loginModalOverlay.querySelector('.modal').classList.remove('show');
+            setTimeout(() => loginModalOverlay.style.display = 'none', 300);
+            loginErrorMessage.style.display = 'none';
+            loginForm.reset();
+        });
+
+        // NEW: Admin Login Submission
+        loginForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const email = document.getElementById('admin-email').value;
+            const password = document.getElementById('admin-password').value;
+
+            auth.signInWithEmailAndPassword(email, password)
+            .then(() => {
+                showToast('Admin logged in successfully!');
+                closeLoginModal.click();
+            })
+            .catch((error) => {
+                loginErrorMessage.textContent = 'Login failed: ' + error.message;
+                loginErrorMessage.style.display = 'block';
+            });
+        });
+
+        // NEW: Add Map Modal Handlers
+        closeAddMapModal.addEventListener('click', () => {
+            addMapModalOverlay.querySelector('.modal').classList.remove('show');
+            setTimeout(() => addMapModalOverlay.style.display = 'none', 300);
+            addMapForm.reset();
+        });
+
+        addMapForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const mapName = newMapNameInput.value;
+            const file = addMapImageUpload.files[0];
+            addMap(mapName, file);
+        });
+        
+        // NEW: Unit Modal Handlers
+        closeUnitModal.addEventListener('click', () => {
+            unitModalOverlay.querySelector('.modal').classList.remove('show');
+            setTimeout(() => unitModalOverlay.style.display = 'none', 300);
+            unitForm.reset();
+        });
+        
+        unitForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const unitData = {
+                id: unitIdHidden.value,
+                phase: unitPhase.value,
+                bik: unitBik.value,
+                lot: unitLot.value,
+                lotArea: unitLotArea.value,
+                floorArea: unitFloorArea.value,
+                unitType: unitType.value,
+                mapId: currentMapId // Essential for linking
+            };
+            saveUnit(unitData);
+        });
+
+        // NEW: Admin actions in Map View
+        deleteMapViewBtn.addEventListener('click', () => {
+            if (confirm(`Are you sure you want to delete the entire phase "${currentMapName}" and all its inventory data? This action is permanent.`)) {
+                deleteMap(currentMapId);
+            }
+        });
+        
+        addInventoryRowBtn.addEventListener('click', () => {
+            openUnitModal('Add');
+        });
+        
+        replaceMapBtn.addEventListener('click', () => {
+            replaceMapFileInput.click();
+        });
+        
+        replaceMapFileInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                if (confirm('Are you sure you want to replace the map image?')) {
+                    replaceMapImage(currentMapId, file);
+                }
+            }
+        });
+
+
+        // --- FUNCTIONS ---
+        
+        function updateImageTransform() {
+            mapImage.style.transform = `translate(${currentX}px, ${currentY}px) scale(${currentZoom})`;
+        }
+        
+        function dragStart(e) {
+            // ... (keep existing dragStart logic)
+            if (e.type === "touchstart") {
+                initialX = e.touches[0].clientX - xOffset;
+                initialY = e.touches[0].clientY - yOffset;
+            } else {
+                initialX = e.clientX - xOffset;
+                initialY = e.clientY - yOffset;
+            }
+
+            // Only allow dragging if not clicking on map controls
+            if (e.target.closest('.map-controls') === null && e.target.closest('.replace-map-btn') === null) {
+                isDragging = true;
+                mapContainer.classList.add('dragging');
+            }
+        }
+        
+        function dragEnd(e) {
+            // ... (keep existing dragEnd logic)
+            isDragging = false;
+            mapContainer.classList.remove('dragging');
+            xOffset = currentX;
+            yOffset = currentY;
+        }
+
+        function drag(e) {
+            // ... (keep existing drag logic)
+            if (isDragging) {
+                e.preventDefault();
+
+                if (e.type === "touchmove") {
+                    currentX = e.touches[0].clientX - initialX;
+                    currentY = e.touches[0].clientY - initialY;
+                } else {
+                    currentX = e.clientX - initialX;
+                    currentY = e.clientY - initialY;
+                }
+
+                xOffset = currentX;
+                yOffset = currentY;
+                
+                updateImageTransform();
+            }
+        }
+        
+        // --- NEW: Admin UI/Auth Functions ---
+        
+        /**
+         * Updates the UI based on admin login state.
+         */
+        function updateAdminUI(loggedIn) {
+            isAdmin = loggedIn;
+
+            // Header UI
+            adminStatus.textContent = loggedIn ? 'Logged In' : 'Logged Out';
+            adminStatus.className = loggedIn ? 'admin-status logged-in' : 'admin-status logged-out';
+            
+            // Footer UI
+            adminLoginLink.classList.toggle('hidden', loggedIn);
+            adminLogoutLink.classList.toggle('hidden', !loggedIn);
+            
+            // Gallery View Admin Controls (Renders the 'Add Map' card and map-card buttons)
+            loadMaps(); 
+            
+            // Map View Admin Controls
+            mapViewAdminControls.style.display = loggedIn ? 'flex' : 'none';
+            replaceMapBtn.style.display = loggedIn ? 'flex' : 'none';
+            
+            // Inventory Table Admin Columns
+            tableActionsTh.classList.toggle('hidden', !loggedIn);
+            document.querySelectorAll('.admin-action-cell').forEach(cell => {
+                cell.classList.toggle('hidden', !loggedIn);
+            });
+
+            // Re-load current view to update inventory table
+            if (mapView.style.display !== 'none' && currentMapId) {
+                loadInventoryData(currentMapId);
+            }
+        }
+        
+        function openUnitModal(mode, unit = null) {
+            unitForm.reset();
+            unitIdHidden.value = '';
+            
+            unitModalTitle.textContent = mode === 'Add' ? 'Add New Unit' : 'Edit Unit';
+            unitPhase.value = currentMapName; // Always link to the current map name
+            unitSubmitBtn.innerHTML = mode === 'Add' ? '<i class="fas fa-plus"></i> Add Unit' : '<i class="fas fa-save"></i> Save Changes';
+
+            if (unit) {
+                unitIdHidden.value = unit.id;
+                unitBik.value = unit.bik || '';
+                unitLot.value = unit.lot || '';
+                unitLotArea.value = unit.lotArea || '';
+                unitFloorArea.value = unit.floorArea || '';
+                unitType.value = unit.unitType || '';
+            }
+            
+            unitModalOverlay.style.display = 'flex';
+            setTimeout(() => unitModalOverlay.querySelector('.modal').classList.add('show'), 10);
+        }
+        
+        // --- NEW: CRUD Operations ---
+        
+        /**
+         * Admin: Adds a new map and optionally uploads an image.
+         */
+        async function addMap(mapName, file) {
+            if (!isAdmin) return showToast('Permission denied.', true);
+            showLoading();
+            try {
+                let imageUrl = null;
+                let imagePath = null;
+                const mapId = db.collection('maps').doc().id;
+
+                if (file) {
+                    imagePath = `maps/${mapId}/${file.name}`;
+                    const storageRef = storage.ref(imagePath);
+                    const uploadTask = await storageRef.put(file);
+                    imageUrl = await uploadTask.ref.getDownloadURL();
+                }
+
+                await db.collection('maps').doc(mapId).set({
+                    name: mapName,
+                    imageUrl: imageUrl,
+                    imagePath: imagePath,
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                });
+
+                showToast(`Phase "${mapName}" added successfully!`);
+                closeAddMapModal.click();
+                loadMaps();
+            } catch (error) {
+                console.error('Error adding map: ', error);
+                showToast('Error adding map: ' + error.message, true);
+            } finally {
+                hideLoading();
+            }
+        }
+        
+        /**
+         * Admin: Deletes a map and all associated inventory data.
+         */
+        async function deleteMap(mapId) {
+            if (!isAdmin) return showToast('Permission denied.', true);
+            showLoading();
+            try {
+                // 1. Delete associated inventory documents (in batches for safety)
+                const inventorySnapshot = await db.collection('inventory').where('mapId', '==', mapId).get();
+                const batch = db.batch();
+                inventorySnapshot.docs.forEach(doc => {
+                    batch.delete(doc.ref);
+                });
+                await batch.commit();
+
+                // 2. Find and delete image from storage (if exists)
+                const mapDoc = await db.collection('maps').doc(mapId).get();
+                const mapData = mapDoc.data();
+                if (mapData && mapData.imagePath) {
+                    const imageRef = storage.ref(mapData.imagePath);
+                    await imageRef.delete();
+                }
+
+                // 3. Delete the map document
+                await db.collection('maps').doc(mapId).delete();
+
+                showToast('Phase and all inventory deleted successfully!');
+                showGallery(); // Go back to gallery view
+            } catch (error) {
+                console.error('Error deleting map: ', error);
+                showToast('Error deleting map: ' + error.message, true);
+            } finally {
+                hideLoading();
+            }
+        }
+        
+        /**
+         * Admin: Replaces the image for an existing map.
+         */
+        async function replaceMapImage(mapId, file) {
+            if (!isAdmin) return showToast('Permission denied.', true);
+            showLoading();
+            try {
+                const mapDoc = await db.collection('maps').doc(mapId).get();
+                const mapData = mapDoc.data();
+                
+                // 1. Delete old image if it exists
+                if (mapData && mapData.imagePath) {
+                    const oldImageRef = storage.ref(mapData.imagePath);
+                    await oldImageRef.delete().catch(err => console.warn('Could not delete old image:', err)); // Log but don't fail
+                }
+                
+                // 2. Upload new image
+                const imagePath = `maps/${mapId}/${file.name}`;
+                const storageRef = storage.ref(imagePath);
+                const uploadTask = await storageRef.put(file);
+                const imageUrl = await uploadTask.ref.getDownloadURL();
+                
+                // 3. Update map document
+                await db.collection('maps').doc(mapId).update({
+                    imageUrl: imageUrl,
+                    imagePath: imagePath,
+                    updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+                });
+                
+                // Update image source on screen
+                mapImage.src = imageUrl;
+                replaceMapFileInput.value = ''; // Clear file input
+                
+                showToast('Map image replaced successfully!');
+            } catch (error) {
+                console.error('Error replacing map image: ', error);
+                showToast('Error replacing map image: ' + error.message, true);
+            } finally {
+                hideLoading();
+            }
+        }
+        
+        /**
+         * Admin: Adds or updates an inventory unit.
+         */
+        async function saveUnit(unitData) {
+            if (!isAdmin) return showToast('Permission denied.', true);
+            showLoading();
+            try {
+                const unitRef = unitData.id ? db.collection('inventory').doc(unitData.id) : db.collection('inventory').doc();
+                
+                const dataToSave = {
+                    ...unitData,
+                    updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+                };
+                delete dataToSave.id; // Firestore handles ID automatically
+
+                await unitRef.set(dataToSave, { merge: true });
+
+                showToast(`Unit ${unitData.id ? 'updated' : 'added'} successfully!`);
+                closeUnitModal.click();
+                loadInventoryData(currentMapId);
+            } catch (error) {
+                console.error('Error saving unit: ', error);
+                showToast('Error saving unit: ' + error.message, true);
+            } finally {
+                hideLoading();
+            }
+        }
+        
+        /**
+         * Admin: Deletes a single inventory unit.
+         */
+        async function deleteUnit(unitId) {
+            if (!isAdmin) return showToast('Permission denied.', true);
+            showLoading();
+            try {
+                await db.collection('inventory').doc(unitId).delete();
+                showToast('Unit deleted successfully!');
+                loadInventoryData(currentMapId);
+            } catch (error) {
+                console.error('Error deleting unit: ', error);
+                showToast('Error deleting unit: ' + error.message, true);
+            } finally {
+                hideLoading();
+            }
+        }
+
+        // --- Core Application Logic ---
+        
+        function showGallery() {
+            galleryView.style.display = 'block';
+            mapView.style.display = 'none';
+            backToGalleryBtn.classList.add('hidden');
+            loadMaps();
+        }
+
+        function showMap(mapId) {
+            showLoading();
+            galleryView.style.display = 'none';
+            mapView.style.display = 'block';
+            backToGalleryBtn.classList.remove('hidden');
+
+            const map = maps.find(m => m.id === mapId);
+            if (map) {
+                currentMapId = mapId;
+                currentMapName = map.name; // NEW: Store name
+                mapTitle.textContent = map.name;
+
+                // Load map image
+                mapImage.src = map.imageUrl || '';
+
+                // Reset zoom and drag
+                currentZoom = 1;
+                currentX = 0;
+                currentY = 0;
+                xOffset = 0;
+                yOffset = 0;
+                updateImageTransform();
+                
+                // Hide PDF button and reset scroll switch
+                scrollSwitch.checked = false;
+                tableContainer.classList.remove('no-scroll');
+                saveAsPdfBtn.classList.add('hidden');
+                
+                // Load inventory data
+                loadInventoryData(mapId);
+            }
+        }
+
+        function loadMaps() {
+            showLoading();
+            db.collection('maps').orderBy('createdAt', 'desc').get()
+            .then((querySnapshot) => {
+                maps = [];
+                // Clear existing maps
+                mapsContainer.innerHTML = '';
+
+                // NEW: Add 'Add Map' card for admins
+                if (isAdmin) {
+                    const addCard = document.createElement('div');
+                    addCard.className = 'map-card';
+                    addCard.style.backgroundColor = 'var(--light-gray)';
+                    addCard.innerHTML = `
+                        <div class="map-card-header add-map-btn" onclick="document.getElementById('add-map-modal-overlay').style.display='flex'; setTimeout(() => document.getElementById('add-map-modal').classList.add('show'), 10);">
+                            <i class="fas fa-plus-circle"></i>
+                            <p style="font-weight: 600;">Add New Phase</p>
+                        </div>
+                        <div class="map-card-body" style="text-align: center;">
+                            <small style="color: var(--secondary);">Admin Feature</small>
+                        </div>
+                    `;
+                    mapsContainer.appendChild(addCard);
+                }
+
+                if (querySnapshot.empty && !isAdmin) {
+                    mapsContainer.innerHTML = `
+                        <div class="empty-state" style="grid-column: 1 / -1;">
+                            <i class="fas fa-map-marked-alt"></i>
+                            <h3>No Phases Found</h3>
+                            <p>Contact your administrator to add a property phase</p>
+                        </div>
+                    `;
+                } else {
+                    querySnapshot.forEach((doc) => {
+                        const map = { id: doc.id, ...doc.data() };
+                        maps.push(map);
+
+                        const mapCard = document.createElement('div');
+                        // NEW: Add admin-mode class to show controls
+                        mapCard.className = 'map-card' + (isAdmin ? ' admin-mode' : '');
+                        mapCard.innerHTML = `
+                            <div class="map-card-header">
+                                ${map.imageUrl ?
+                                    `<img src="${map.imageUrl}" alt="${map.name}" style="width:100%;height:100%;object-fit:cover;">` :
+                                    `<div><i class="fas fa-map-marked-alt" style="font-size: 3rem;"></i></div>`
+                                }
+                                <div class="map-card-admin-actions">
+                                    <button class="map-action-btn delete-map-card" title="Delete Phase" data-id="${doc.id}">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                                </div>
+                            <div class="map-card-body">
+                                <h3>${map.name}</h3>
+                                <div class="map-card-actions">
+                                    <button class="btn btn-primary view-map-btn" data-id="${doc.id}">
+                                        <i class="fas fa-eye"></i>
+                                        View
+                                    </button>
+                                </div>
+                            </div>
+                        `;
+
+                        mapsContainer.appendChild(mapCard);
+                    });
+
+                    // Add event listeners to view buttons
+                    document.querySelectorAll('.view-map-btn').forEach(button => {
+                        button.addEventListener('click', (e) => {
+                            showMap(e.target.closest('.view-map-btn').dataset.id);
+                        });
+                    });
+                    
+                    // NEW: Add event listeners to delete buttons
+                    document.querySelectorAll('.delete-map-card').forEach(button => {
+                        button.addEventListener('click', (e) => {
+                            e.stopPropagation(); // Prevent card click from triggering showMap
+                            const mapId = e.currentTarget.dataset.id;
+                            if (confirm('Are you sure you want to delete this phase?')) {
+                                deleteMap(mapId);
+                            }
+                        });
+                    });
+                }
+                hideLoading();
+            })
+            .catch((error) => {
+                console.error('Error loading maps: ', error);
+                showToast('Error loading maps: ' + error.message, true);
+                hideLoading();
+            });
+        }
+        
+        function addEmptyStateRow() {
+            const tbody = inventoryTable.querySelector('tbody');
+            tbody.innerHTML = `
+                <tr>
+                    <td colspan="${isAdmin ? 8 : 7}" class="empty-state">
+                        <i class="fas fa-table"></i>
+                        <h3>No Inventory Data</h3>
+                        <p>${isAdmin ? 'Use the "Add Unit" button to add data.' : 'Contact your administrator to add data'}</p>
+                    </td>
+                </tr>
+            `;
+            lastUpdated.textContent = 'Last updated: Never';
+            lastUpdatedTimestamp = 'Never';
+        }
+
+        function loadInventoryData(mapId) {
+            showLoading();
+            db.collection('inventory').where('mapId', '==', mapId).get()
+            .then((querySnapshot) => {
+                const tbody = inventoryTable.querySelector('tbody');
+                tbody.innerHTML = '';
+
+                if (!querySnapshot.empty) {
+                    const items = [];
+                    querySnapshot.forEach((doc) => {
+                        items.push({ id: doc.id, ...doc.data() });
+                    });
+
+                    // Sort by block and lot numbers
+                    items.sort((a, b) => {
+                        const bikA = a.bik ? a.bik.toString().padStart(5, '0') : '';
+                        const bikB = b.bik ? b.bik.toString().padStart(5, '0') : '';
+                        const lotA = a.lot ? a.lot.toString().padStart(5, '0') : '';
+                        const lotB = b.lot ? b.lot.toString().padStart(5, '0') : '';
+
+                        if (bikA !== bikB) {
+                            return bikA.localeCompare(bikB);
+                        }
+                        return lotA.localeCompare(lotB);
+                    });
+
+                    // Add rows to the table
+                    items.forEach((item, index) => {
+                        const row = document.createElement('tr');
+                        // NEW: Admin action cell visibility controlled by isAdmin
+                        row.innerHTML = `
+                            <td>${index + 1}</td>
+                            <td>${item.phase || ''}</td>
+                            <td>${item.bik || ''}</td>
+                            <td>${item.lot || ''}</td>
+                            <td>${item.lotArea || ''}</td>
+                            <td>${item.floorArea || ''}</td>
+                            <td>${item.unitType || ''}</td>
+                            <td class="action-cell admin-action-cell ${isAdmin ? '' : 'hidden'}" data-id="${item.id}">
+                                <button class="btn btn-warning btn-sm edit-unit">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button class="btn btn-danger btn-sm delete-unit">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </td>
+                        `;
+                        tbody.appendChild(row);
+                    });
+                    
+                    // NEW: Add event listeners for new admin buttons
+                    if (isAdmin) {
+                        document.querySelectorAll('.edit-unit').forEach(button => {
+                            button.addEventListener('click', (e) => {
+                                const unitId = e.currentTarget.closest('.admin-action-cell').dataset.id;
+                                const unit = items.find(i => i.id === unitId);
+                                openUnitModal('Edit', unit);
+                            });
+                        });
+                        document.querySelectorAll('.delete-unit').forEach(button => {
+                            button.addEventListener('click', (e) => {
+                                const unitId = e.currentTarget.closest('.admin-action-cell').dataset.id;
+                                if (confirm('Are you sure you want to delete this unit?')) {
+                                    deleteUnit(unitId);
+                                }
+                            });
+                        });
+                    }
+
+                    // Update last updated time
+                    const lastItem = items[items.length - 1];
+                    if (lastItem.updatedAt) {
+                        const date = lastItem.updatedAt.toDate();
+                        const formattedDate = date.toLocaleString();
+                        lastUpdated.textContent = 'Last updated: ' + formattedDate;
+                        lastUpdatedTimestamp = formattedDate;
+                    }
+                } else {
+                    addEmptyStateRow();
+                }
+                hideLoading();
+            })
+            .catch((error) => {
+                console.error('Error loading inventory data: ', error);
+                showToast('Error loading inventory data: ' + error.message, true);
+                hideLoading();
+            });
+        }
+
+        // --- Utility Functions (keep existing) ---
+        function showToast(message, isError = false) {
+            toastMessage.textContent = message;
+            toast.className = isError ? 'toast error' : 'toast';
+            toast.classList.add('show');
+
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+        
+        async function saveAsPdf() {
+            showLoading();
+            
+            // Hide elements before capture
+            const saveButton = document.getElementById('save-as-pdf');
+            const scrollSwitchContainer = saveButton.previousElementSibling.closest('.table-actions');
+            saveButton.style.display = 'none';
+            scrollSwitchContainer.style.display = 'none';
+
+            const element = document.getElementById('inventory-table-container');
+            const mapTitleElement = document.getElementById('map-title');
+            const mapName = mapTitleElement.textContent.trim();
+            const today = new Date();
+            const formattedDate = (today.getMonth() + 1).toString().padStart(2, '0') + '/' + today.getDate().toString().padStart(2, '0') + '/' + today.getFullYear().toString().slice(-2);
+            const filename = `BTB Inventory - ${mapName} - ${formattedDate}.pdf`;
+        
+            try {
+                const canvas = await html2canvas(element, { 
+                    scale: 2,
+                    useCORS: true 
+                });
+        
+                const { jsPDF } = window.jspdf;
+                const pdf = new jsPDF('p', 'in', 'a4');
+                const imgWidth = 8.5 - 2; // A4 width (8.5 inches) minus 1-inch margins on both sides
+                const pageHeight = 11 - 2; // A4 height (11 inches) minus 1-inch margins on top and bottom
+                
+                const canvasImageWidth = canvas.width;
+                const canvasImageHeight = canvas.height;
+        
+                const scaleFactor = imgWidth / canvasImageWidth;
+                const finalImageHeight = canvasImageHeight * scaleFactor;
+        
+                let position = 0;
+                let heightLeft = finalImageHeight;
+        
+                const imgData = canvas.toDataURL('image/jpeg', 1.0);
+        
+                pdf.addImage(imgData, 'JPEG', 1, 1, imgWidth, finalImageHeight);
+                heightLeft -= pageHeight;
+        
+                while (heightLeft > 0) {
+                    position = -pageHeight + heightLeft;
+                    pdf.addPage();
+                    pdf.addImage(imgData, 'JPEG', 1, 1 + position, imgWidth, finalImageHeight);
+                    heightLeft -= pageHeight;
+                }
+        
+                pdf.save(filename);
+                showToast('PDF successfully downloaded!');
+            } catch (error) {
+                console.error('Error generating PDF:', error);
+                showToast('Error generating PDF: ' + error.message, true);
+            } finally {
+                // Show elements again after capture
+                saveButton.style.display = 'inline-flex';
+                scrollSwitchContainer.style.display = 'flex';
+                hideLoading();
+            }
+        }
+        
+        function showLoading() {
+            loadingOverlay.style.display = 'flex';
+        }
+
+        function hideLoading() {
+            loadingOverlay.style.display = 'none';
+        }
+        
+        // Fix for mobile devices to prevent scaling to desktop view
+        const metaViewport = document.querySelector('meta[name="viewport"]');
+        if (metaViewport) {
+            metaViewport.setAttribute('content', 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no');
+        }
+
+        // --- Initialize the app ---
+        document.addEventListener('DOMContentLoaded', () => {
+            // NEW: Listen for authentication state changes
+            auth.onAuthStateChanged(user => {
+                if (user) {
+                    // User is signed in (Admin)
+                    updateAdminUI(true);
+                } else {
+                    // User is signed out (Public)
+                    updateAdminUI(false);
+                }
+            });
+            
+            // Initial load of the gallery
+            loadMaps();
+        });
+    </script>
+</body>
+</html>
