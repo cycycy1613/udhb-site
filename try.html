@@ -10,6 +10,7 @@
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
@@ -924,7 +925,7 @@
                             <input type="checkbox" id="scroll-switch">
                             <span class="slider"></span>
                         </label>
-                        <button id="save-as-pdf" class="btn btn-success hidden">
+                        <button id="save-as-pdf" class="btn btn-success">
                             <i class="fas fa-file-pdf"></i>
                             Save as PDF
                         </button>
@@ -1172,13 +1173,14 @@
             updateImageTransform();
         });
         
+        // The scroll switch and original PDF generation (html2canvas) are now decoupled.
+        // We can keep the switch to show/hide the scrollbar if the user still wants the option, 
+        // but it doesn't affect the new PDF generation method.
         scrollSwitch.addEventListener('change', (e) => {
             if (e.target.checked) {
                 tableContainer.classList.add('no-scroll');
-                saveAsPdfBtn.classList.remove('hidden');
             } else {
                 tableContainer.classList.remove('no-scroll');
-                saveAsPdfBtn.classList.add('hidden');
             }
         });
         
@@ -1367,9 +1369,9 @@
             replaceMapBtn.style.display = loggedIn ? 'flex' : 'none';
             
             // Inventory Table Admin Columns
-            tableActionsTh.classList.toggle('hidden', !loggedIn);
+            tableActionsTh.classList.toggle('hidden', loggedIn ? false : true);
             document.querySelectorAll('.admin-action-cell').forEach(cell => {
-                cell.classList.toggle('hidden', !loggedIn);
+                cell.classList.toggle('hidden', loggedIn ? false : true);
             });
 
             // Re-load current view to update inventory table
@@ -1610,10 +1612,9 @@
                 yOffset = 0;
                 updateImageTransform();
                 
-                // Hide PDF button and reset scroll switch
+                // Hide PDF button and reset scroll switch - NOT needed now as PDF logic is different
                 scrollSwitch.checked = false;
                 tableContainer.classList.remove('no-scroll');
-                saveAsPdfBtn.classList.add('hidden');
                 
                 // Load inventory data
                 loadInventoryData(mapId);
@@ -1727,35 +1728,54 @@
             lastUpdated.textContent = 'Last updated: Never';
         }
 
+        async function getSortedInventoryData(mapId) {
+            const querySnapshot = await db.collection('inventory').where('mapId', '==', mapId).get();
+            let items = [];
+            let latestTimestamp = 0;
+            let latestSource = 'Never';
+
+            if (!querySnapshot.empty) {
+                querySnapshot.forEach((doc) => {
+                    const item = { id: doc.id, ...doc.data() };
+                    items.push(item);
+                    
+                    // Find the absolute latest timestamp
+                    const unitUpdatedAt = item.updatedAt ? item.updatedAt.toDate().getTime() : 0;
+                    const unitCreatedAt = item.createdAt ? item.createdAt.toDate().getTime() : 0;
+                    const latestUnitTime = Math.max(unitUpdatedAt, unitCreatedAt);
+                    
+                    if (latestUnitTime > 0 && latestUnitTime > latestTimestamp) {
+                        latestTimestamp = latestUnitTime;
+                        latestSource = unitUpdatedAt > unitCreatedAt ? 'Unit Edited' : 'Unit Added';
+                    }
+                });
+
+                // Sort by block and lot numbers
+                items.sort((a, b) => {
+                    const bikA = a.bik ? a.bik.toString().padStart(5, '0') : '';
+                    const bikB = b.bik ? b.bik.toString().padStart(5, '0') : '';
+                    const lotA = a.lot ? a.lot.toString().padStart(5, '0') : '';
+                    const lotB = b.lot ? b.lot.toString().padStart(5, '0') : '';
+
+                    if (bikA !== bikB) {
+                        return bikA.localeCompare(bikB);
+                    }
+                    return lotA.localeCompare(lotB);
+                });
+            }
+            
+            return { items, latestTimestamp, latestSource };
+        }
+
         async function loadInventoryData(mapId) {
             showLoading();
             try {
-                const querySnapshot = await db.collection('inventory').where('mapId', '==', mapId).get();
                 const tbody = inventoryTable.querySelector('tbody');
                 tbody.innerHTML = '';
-                let latestTimestamp = null;
-                let latestSource = 'Never';
+                
+                const { items, latestTimestamp, latestSource } = await getSortedInventoryData(mapId);
 
-                if (!querySnapshot.empty) {
-                    const items = [];
-                    querySnapshot.forEach((doc) => {
-                        items.push({ id: doc.id, ...doc.data() });
-                    });
-
-                    // Sort by block and lot numbers
-                    items.sort((a, b) => {
-                        const bikA = a.bik ? a.bik.toString().padStart(5, '0') : '';
-                        const bikB = b.bik ? b.bik.toString().padStart(5, '0') : '';
-                        const lotA = a.lot ? a.lot.toString().padStart(5, '0') : '';
-                        const lotB = b.lot ? b.lot.toString().padStart(5, '0') : '';
-
-                        if (bikA !== bikB) {
-                            return bikA.localeCompare(bikB);
-                        }
-                        return lotA.localeCompare(lotB);
-                    });
-
-                    // Add rows to the table
+                if (items.length > 0) {
                     items.forEach((item, index) => {
                         const row = document.createElement('tr');
                         row.innerHTML = `
@@ -1776,16 +1796,6 @@
                             </td>
                         `;
                         tbody.appendChild(row);
-
-                        // Find the absolute latest timestamp
-                        const unitUpdatedAt = item.updatedAt ? item.updatedAt.toDate().getTime() : 0;
-                        const unitCreatedAt = item.createdAt ? item.createdAt.toDate().getTime() : 0;
-                        const latestUnitTime = Math.max(unitUpdatedAt, unitCreatedAt);
-                        
-                        if (latestUnitTime > 0 && (!latestTimestamp || latestUnitTime > latestTimestamp)) {
-                            latestTimestamp = latestUnitTime;
-                            latestSource = unitUpdatedAt > unitCreatedAt ? 'Unit Edited' : 'Unit Added';
-                        }
                     });
                     
                     // Add event listeners for new admin buttons
@@ -1837,101 +1847,104 @@
             }, 3000);
         }
         
+        /**
+         * UPDATED PDF GENERATION FUNCTION (Fixes jsPDF.text error)
+         * Fetches data directly from Firebase and uses jsPDF AutoTable for reliable, multi-page output.
+         */
         async function saveAsPdf() {
+            if (!currentMapId || !currentMapName) {
+                showToast('Please select a building first.', true);
+                return;
+            }
+            
             showLoading();
             
-            // --- Preparation ---
-            const saveButton = document.getElementById('save-as-pdf');
-            const scrollSwitchContainer = saveButton.previousElementSibling.closest('.table-actions');
-            
-            // Temporarily hide admin buttons and actions column for a clean PDF
-            const adminActionCells = document.querySelectorAll('.admin-action-cell');
-            const adminActionHeader = document.getElementById('table-actions-th');
-            const wasAdminActionsVisible = adminActionHeader && !adminActionHeader.classList.contains('hidden');
-            
-            saveButton.style.display = 'none';
-            scrollSwitchContainer.style.display = 'none';
-            if (wasAdminActionsVisible) {
-                adminActionCells.forEach(cell => cell.classList.add('hidden'));
-                adminActionHeader.classList.add('hidden');
-            }
-
-
-            // --- Capture and Generation ---
-            const element = document.getElementById('inventory-table-container');
-            const mapTitleElement = document.getElementById('map-title');
-            const mapName = mapTitleElement.textContent.trim();
-            const today = new Date();
-            const formattedDate = (today.getMonth() + 1).toString().padStart(2, '0') + '/' + today.getDate().toString().padStart(2, '0') + '/' + today.getFullYear().toString().slice(-2);
-            const filename = `UDHB Inventory - ${mapName} - ${formattedDate}.pdf`;
-        
             try {
-                const canvas = await html2canvas(element, { 
-                    scale: 2,
-                    useCORS: true 
-                });
-        
-                const { jsPDF } = window.jspdf;
-                // Determine orientation: Landscape ('l') if the captured width is much greater than height
-                // The ratio 1.5 is an arbitrary threshold to decide when landscape is beneficial.
-                const orientation = canvas.width / canvas.height > 1.5 ? 'l' : 'p';
-                const pdf = new jsPDF(orientation, 'in', 'a4');
-                
-                const pdfWidth = pdf.internal.pageSize.getWidth();
-                const pdfHeight = pdf.internal.pageSize.getHeight();
-                const margin = 0.5; // 0.5 inch margin on all sides
-                const imgWidth = pdfWidth - (2 * margin);
-                const pageContentHeight = pdfHeight - (2 * margin); 
-        
-                const canvasImageWidth = canvas.width;
-                const canvasImageHeight = canvas.height;
-        
-                const scaleFactor = imgWidth / canvasImageWidth;
-                const finalImageHeight = canvasImageHeight * scaleFactor;
-        
-                let position = 0;
-                let heightLeft = finalImageHeight;
-        
-                const imgData = canvas.toDataURL('image/jpeg', 1.0);
-        
-                // Add header content to PDF before image
-                const headerText = `Inventory for: ${mapName}`;
-                const dateText = `Date: ${new Date().toLocaleDateString()}`;
-                
-                pdf.setFontSize(14);
-                pdf.text(headerText, margin, margin + 0.25);
-                pdf.setFontSize(10);
-                pdf.text(dateText, margin, margin + 0.5);
-                
-                let yStart = margin + 0.75; // Starting Y position after header
-                let currentY = yStart;
+                const { items } = await getSortedInventoryData(currentMapId);
 
-                // Add image
-                pdf.addImage(imgData, 'JPEG', margin, currentY, imgWidth, finalImageHeight);
-                heightLeft -= (pageContentHeight - (currentY - margin));
-        
-                while (heightLeft > 0) {
-                    position = currentY - finalImageHeight + pageContentHeight;
-                    pdf.addPage();
-                    
-                    // Add image to new page, shifted up by the amount that was already displayed
-                    pdf.addImage(imgData, 'JPEG', margin, position, imgWidth, finalImageHeight);
-                    heightLeft -= pageContentHeight;
+                if (items.length === 0) {
+                    showToast('No inventory data to export for this building.', true);
+                    return;
                 }
-        
+
+                const { jsPDF } = window.jspdf;
+                const pdf = new jsPDF('p', 'pt', 'a4'); // 'p' for portrait, 'pt' for points, 'a4' for paper size
+                
+                const mapName = currentMapName;
+                const today = new Date();
+                const formattedDate = today.toLocaleDateString();
+                const filename = `UDHB_Inventory_${mapName.replace(/\s/g, '_')}_${today.getTime()}.pdf`;
+
+                // --- 1. Prepare Data for AutoTable ---
+                const head = [[
+                    'No.', 
+                    'Building', 
+                    'Slot#', 
+                    'Type', 
+                    'Size', 
+                    'Loanable', 
+                    'Status'
+                ]];
+                
+                const body = items.map((item, index) => [
+                    (index + 1).toString(),
+                    item.phase || '',
+                    item.bik || '',
+                    item.lot || '',
+                    item.lotArea || '',
+                    item.floorArea || '',
+                    item.unitType || ''
+                ]);
+
+                // --- 2. AutoTable Configuration ---
+                const startY = 90; // Starting Y position after header content
+                
+                pdf.autoTable({
+                    head: head,
+                    body: body,
+                    startY: startY,
+                    theme: 'grid', // 'striped', 'grid', 'plain'
+                    styles: { 
+                        fontSize: 10,
+                        cellPadding: 8
+                    },
+                    headStyles: {
+                        fillColor: [42, 40, 40], // var(--primary)
+                        textColor: 255,
+                        fontStyle: 'bold'
+                    },
+                    margin: { top: 70, bottom: 50, left: 40, right: 40 }, // Set margin for all sides (in points)
+                    
+                    // --- 3. Add Header and Footer to ALL pages ---
+                    didDrawPage: function (data) {
+                        // Header
+                        pdf.setFontSize(14);
+                        pdf.setTextColor(44, 62, 80); // Dark text
+                        pdf.text(`Inventory Report: ${mapName}`, data.settings.margin.left, 40);
+                        
+                        pdf.setFontSize(10);
+                        pdf.setTextColor(150); // Gray text
+                        pdf.text(`Date Generated: ${formattedDate}`, data.settings.margin.left, 55);
+
+                        // Footer (Page Number) - FIXED COORDINATE CALCULATION
+                        const pageCount = pdf.internal.getNumberOfPages();
+                        pdf.text(
+                            `Page ${data.pageNumber} of ${pageCount}`, 
+                            pdf.internal.pageSize.width - data.settings.margin.right, // X position: Right edge minus margin
+                            pdf.internal.pageSize.height - 30, // Y position: Bottom up
+                            { align: 'right' } // Right align the text
+                        );
+                    }
+                });
+
+                // --- 4. Save PDF ---
                 pdf.save(filename);
-                showToast('PDF successfully downloaded!');
+                showToast('PDF successfully downloaded using AutoTable!');
+
             } catch (error) {
                 console.error('Error generating PDF:', error);
-                showToast('Error generating PDF: ' + error.message, true);
+                showToast('Error generating PDF: Invalid arguments passed to jsPDF.text. Please check the browser console for details.', true);
             } finally {
-                // --- Cleanup ---
-                saveButton.style.display = 'inline-flex';
-                scrollSwitchContainer.style.display = 'flex';
-                if (wasAdminActionsVisible) {
-                    adminActionCells.forEach(cell => cell.classList.remove('hidden'));
-                    adminActionHeader.classList.remove('hidden');
-                }
                 hideLoading();
             }
         }
