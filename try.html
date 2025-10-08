@@ -1072,7 +1072,7 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
         const storage = firebase.storage();
-        const auth = firebase.auth(); // NEW: Initialize Firebase Auth
+        const auth = firebase.auth(); 
 
         // DOM Elements
         const loadingOverlay = document.getElementById('loading-overlay');
@@ -1094,8 +1094,7 @@
         const mapContainer = document.querySelector('.map-container');
         const saveAsPdfBtn = document.getElementById('save-as-pdf');
         
-        // NEW: Admin UI Elements
-        // const adminStatus = document.getElementById('admin-status'); // REMOVED from header HTML
+        // Admin UI Elements
         const adminLoginLink = document.getElementById('admin-login-link');
         const adminLogoutLink = document.getElementById('admin-logout-link');
         const tableActionsTh = document.getElementById('table-actions-th');
@@ -1105,20 +1104,20 @@
         const replaceMapBtn = document.getElementById('replace-map-btn');
         const replaceMapFileInput = document.getElementById('replace-map-file-input');
 
-        // NEW: Login Modal Elements
+        // Login Modal Elements
         const loginModalOverlay = document.getElementById('login-modal-overlay');
         const loginForm = document.getElementById('login-form');
         const closeLoginModal = document.getElementById('close-login-modal');
         const loginErrorMessage = document.getElementById('login-error-message');
         
-        // NEW: Add Map Modal Elements
+        // Add Map Modal Elements
         const addMapModalOverlay = document.getElementById('add-map-modal-overlay');
         const closeAddMapModal = document.getElementById('close-add-map-modal');
         const addMapForm = document.getElementById('add-map-form');
         const addMapImageUpload = document.getElementById('map-image-upload');
         const newMapNameInput = document.getElementById('new-map-name');
         
-        // NEW: Unit Modal Elements
+        // Unit Modal Elements
         const unitModalOverlay = document.getElementById('unit-modal-overlay');
         const closeUnitModal = document.getElementById('close-unit-modal');
         const unitForm = document.getElementById('unit-form');
@@ -1135,11 +1134,10 @@
 
         // Global Variables
         let currentMapId = null;
-        let currentMapName = null; // NEW: Store current map name
+        let currentMapName = null; 
         let currentZoom = 1;
         let maps = [];
-        let lastUpdatedTimestamp = '';
-        let isAdmin = false; // NEW: Admin state
+        let isAdmin = false; 
         
         let isDragging = false;
         let initialX;
@@ -1152,7 +1150,6 @@
         
         // --- EVENT LISTENERS ---
         
-        // Existing Event Listeners
         backToGalleryBtn.addEventListener('click', showGallery);
         
         zoomInBtn.addEventListener('click', () => {
@@ -1201,7 +1198,7 @@
         mapContainer.addEventListener('touchcancel', dragEnd);
         mapContainer.addEventListener('touchmove', drag);
         
-        // NEW: Admin Login/Logout Handlers
+        // Admin Login/Logout Handlers
         adminLoginLink.addEventListener('click', (e) => {
             e.preventDefault();
             if (!isAdmin) {
@@ -1224,7 +1221,7 @@
             loginForm.reset();
         });
 
-        // NEW: Admin Login Submission
+        // Admin Login Submission
         loginForm.addEventListener('submit', (e) => {
             e.preventDefault();
             const email = document.getElementById('admin-email').value;
@@ -1241,7 +1238,7 @@
             });
         });
 
-        // NEW: Add Map Modal Handlers
+        // Add Map Modal Handlers
         closeAddMapModal.addEventListener('click', () => {
             addMapModalOverlay.querySelector('.modal').classList.remove('show');
             setTimeout(() => addMapModalOverlay.style.display = 'none', 300);
@@ -1255,7 +1252,7 @@
             addMap(mapName, file);
         });
         
-        // NEW: Unit Modal Handlers
+        // Unit Modal Handlers
         closeUnitModal.addEventListener('click', () => {
             unitModalOverlay.querySelector('.modal').classList.remove('show');
             setTimeout(() => unitModalOverlay.style.display = 'none', 300);
@@ -1272,12 +1269,12 @@
                 lotArea: unitLotArea.value,
                 floorArea: unitFloorArea.value,
                 unitType: unitType.value,
-                mapId: currentMapId // Essential for linking
+                mapId: currentMapId 
             };
             saveUnit(unitData);
         });
 
-        // NEW: Admin actions in Map View
+        // Admin actions in Map View
         deleteMapViewBtn.addEventListener('click', () => {
             if (confirm(`Are you sure you want to delete the entire phase "${currentMapName}" and all its inventory data? This action is permanent.`)) {
                 deleteMap(currentMapId);
@@ -1309,7 +1306,6 @@
         }
         
         function dragStart(e) {
-            // ... (keep existing dragStart logic)
             if (e.type === "touchstart") {
                 initialX = e.touches[0].clientX - xOffset;
                 initialY = e.touches[0].clientY - yOffset;
@@ -1326,7 +1322,6 @@
         }
         
         function dragEnd(e) {
-            // ... (keep existing dragEnd logic)
             isDragging = false;
             mapContainer.classList.remove('dragging');
             xOffset = currentX;
@@ -1334,7 +1329,6 @@
         }
 
         function drag(e) {
-            // ... (keep existing drag logic)
             if (isDragging) {
                 e.preventDefault();
 
@@ -1353,7 +1347,7 @@
             }
         }
         
-        // --- NEW: Admin UI/Auth Functions ---
+        // --- Admin UI/Auth Functions ---
         
         /**
          * Updates the UI based on admin login state.
@@ -1361,10 +1355,6 @@
         function updateAdminUI(loggedIn) {
             isAdmin = loggedIn;
 
-            // Header UI - LOGGED OUT STATUS REMOVED FROM HTML AND JS
-            // adminStatus.textContent = loggedIn ? 'Logged In' : 'Logged Out';
-            // adminStatus.className = loggedIn ? 'admin-status logged-in' : 'admin-status logged-out';
-            
             // Footer UI
             adminLoginLink.classList.toggle('hidden', loggedIn);
             adminLogoutLink.classList.toggle('hidden', !loggedIn);
@@ -1409,7 +1399,7 @@
             setTimeout(() => unitModalOverlay.querySelector('.modal').classList.add('show'), 10);
         }
         
-        // --- NEW: CRUD Operations ---
+        // --- CRUD Operations ---
         
         /**
          * Admin: Adds a new map and optionally uploads an image.
@@ -1467,7 +1457,7 @@
                 const mapData = mapDoc.data();
                 if (mapData && mapData.imagePath) {
                     const imageRef = storage.ref(mapData.imagePath);
-                    await imageRef.delete();
+                    await imageRef.delete().catch(err => console.warn('Could not delete old image:', err));
                 }
 
                 // 3. Delete the map document
@@ -1527,24 +1517,35 @@
         
         /**
          * Admin: Adds or updates an inventory unit.
+         * Includes logic to ensure map document has an updatedAt field for proper tracking.
          */
         async function saveUnit(unitData) {
             if (!isAdmin) return showToast('Permission denied.', true);
             showLoading();
             try {
-                const unitRef = unitData.id ? db.collection('inventory').doc(unitData.id) : db.collection('inventory').doc();
+                const isNew = !unitData.id;
+                const unitRef = isNew ? db.collection('inventory').doc() : db.collection('inventory').doc(unitData.id);
                 
                 const dataToSave = {
                     ...unitData,
                     updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
                 };
-                delete dataToSave.id; // Firestore handles ID automatically
+                delete dataToSave.id;
+
+                if (isNew) {
+                    dataToSave.createdAt = firebase.firestore.FieldValue.serverTimestamp();
+                }
 
                 await unitRef.set(dataToSave, { merge: true });
 
-                showToast(`Unit ${unitData.id ? 'updated' : 'added'} successfully!`);
+                // Update the map document to reflect the change, which helps with 'Last Updated' calculation
+                await db.collection('maps').doc(currentMapId).update({
+                    updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+                }).catch(err => console.warn('Could not update map document timestamp:', err));
+
+                showToast(`Unit ${isNew ? 'added' : 'updated'} successfully!`);
                 closeUnitModal.click();
-                loadInventoryData(currentMapId);
+                await loadInventoryData(currentMapId); // REFRESH INVENTORY
             } catch (error) {
                 console.error('Error saving unit: ', error);
                 showToast('Error saving unit: ' + error.message, true);
@@ -1561,8 +1562,14 @@
             showLoading();
             try {
                 await db.collection('inventory').doc(unitId).delete();
+                
+                // Update the map document to reflect the change
+                await db.collection('maps').doc(currentMapId).update({
+                    updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+                }).catch(err => console.warn('Could not update map document timestamp:', err));
+
                 showToast('Unit deleted successfully!');
-                loadInventoryData(currentMapId);
+                await loadInventoryData(currentMapId); // REFRESH INVENTORY
             } catch (error) {
                 console.error('Error deleting unit: ', error);
                 showToast('Error deleting unit: ' + error.message, true);
@@ -1589,7 +1596,7 @@
             const map = maps.find(m => m.id === mapId);
             if (map) {
                 currentMapId = mapId;
-                currentMapName = map.name; // NEW: Store name
+                currentMapName = map.name; 
                 mapTitle.textContent = map.name;
 
                 // Load map image
@@ -1621,7 +1628,7 @@
                 // Clear existing maps
                 mapsContainer.innerHTML = '';
 
-                // NEW: Add 'Add Map' card for admins
+                // Add 'Add Map' card for admins
                 if (isAdmin) {
                     const addCard = document.createElement('div');
                     addCard.className = 'map-card';
@@ -1652,7 +1659,6 @@
                         maps.push(map);
 
                         const mapCard = document.createElement('div');
-                        // NEW: Add admin-mode class to show controls
                         mapCard.className = 'map-card' + (isAdmin ? ' admin-mode' : '');
                         mapCard.innerHTML = `
                             <div class="map-card-header">
@@ -1687,12 +1693,12 @@
                         });
                     });
                     
-                    // NEW: Add event listeners to delete buttons
+                    // Add event listeners to delete buttons
                     document.querySelectorAll('.delete-map-card').forEach(button => {
                         button.addEventListener('click', (e) => {
                             e.stopPropagation(); // Prevent card click from triggering showMap
                             const mapId = e.currentTarget.dataset.id;
-                            if (confirm('Are you sure you want to delete this?')) {
+                            if (confirm(`Are you sure you want to delete phase "${mapId}"?`)) {
                                 deleteMap(mapId);
                             }
                         });
@@ -1719,15 +1725,16 @@
                 </tr>
             `;
             lastUpdated.textContent = 'Last updated: Never';
-            lastUpdatedTimestamp = 'Never';
         }
 
-        function loadInventoryData(mapId) {
+        async function loadInventoryData(mapId) {
             showLoading();
-            db.collection('inventory').where('mapId', '==', mapId).get()
-            .then((querySnapshot) => {
+            try {
+                const querySnapshot = await db.collection('inventory').where('mapId', '==', mapId).get();
                 const tbody = inventoryTable.querySelector('tbody');
                 tbody.innerHTML = '';
+                let latestTimestamp = null;
+                let latestSource = 'Never';
 
                 if (!querySnapshot.empty) {
                     const items = [];
@@ -1751,7 +1758,6 @@
                     // Add rows to the table
                     items.forEach((item, index) => {
                         const row = document.createElement('tr');
-                        // NEW: Admin action cell visibility controlled by isAdmin
                         row.innerHTML = `
                             <td>${index + 1}</td>
                             <td>${item.phase || ''}</td>
@@ -1770,9 +1776,19 @@
                             </td>
                         `;
                         tbody.appendChild(row);
+
+                        // Find the absolute latest timestamp
+                        const unitUpdatedAt = item.updatedAt ? item.updatedAt.toDate().getTime() : 0;
+                        const unitCreatedAt = item.createdAt ? item.createdAt.toDate().getTime() : 0;
+                        const latestUnitTime = Math.max(unitUpdatedAt, unitCreatedAt);
+                        
+                        if (latestUnitTime > 0 && (!latestTimestamp || latestUnitTime > latestTimestamp)) {
+                            latestTimestamp = latestUnitTime;
+                            latestSource = unitUpdatedAt > unitCreatedAt ? 'Unit Edited' : 'Unit Added';
+                        }
                     });
                     
-                    // NEW: Add event listeners for new admin buttons
+                    // Add event listeners for new admin buttons
                     if (isAdmin) {
                         document.querySelectorAll('.edit-unit').forEach(button => {
                             button.addEventListener('click', (e) => {
@@ -1792,26 +1808,25 @@
                     }
 
                     // Update last updated time
-                    const lastItem = items[items.length - 1];
-                    if (lastItem.updatedAt) {
-                        const date = lastItem.updatedAt.toDate();
+                    if (latestTimestamp) {
+                        const date = new Date(latestTimestamp);
                         const formattedDate = date.toLocaleString();
-                        lastUpdated.textContent = 'Last updated: ' + formattedDate;
-                        lastUpdatedTimestamp = formattedDate;
+                        lastUpdated.innerHTML = `Last updated: ${formattedDate} <small>(${latestSource})</small>`;
+                    } else {
+                        lastUpdated.textContent = 'Last updated: Never';
                     }
                 } else {
                     addEmptyStateRow();
                 }
-                hideLoading();
-            })
-            .catch((error) => {
+            } catch (error) {
                 console.error('Error loading inventory data: ', error);
                 showToast('Error loading inventory data: ' + error.message, true);
+            } finally {
                 hideLoading();
-            });
+            }
         }
 
-        // --- Utility Functions (keep existing) ---
+        // --- Utility Functions ---
         function showToast(message, isError = false) {
             toastMessage.textContent = message;
             toast.className = isError ? 'toast error' : 'toast';
@@ -1825,18 +1840,30 @@
         async function saveAsPdf() {
             showLoading();
             
-            // Hide elements before capture
+            // --- Preparation ---
             const saveButton = document.getElementById('save-as-pdf');
             const scrollSwitchContainer = saveButton.previousElementSibling.closest('.table-actions');
+            
+            // Temporarily hide admin buttons and actions column for a clean PDF
+            const adminActionCells = document.querySelectorAll('.admin-action-cell');
+            const adminActionHeader = document.getElementById('table-actions-th');
+            const wasAdminActionsVisible = adminActionHeader && !adminActionHeader.classList.contains('hidden');
+            
             saveButton.style.display = 'none';
             scrollSwitchContainer.style.display = 'none';
+            if (wasAdminActionsVisible) {
+                adminActionCells.forEach(cell => cell.classList.add('hidden'));
+                adminActionHeader.classList.add('hidden');
+            }
 
+
+            // --- Capture and Generation ---
             const element = document.getElementById('inventory-table-container');
             const mapTitleElement = document.getElementById('map-title');
             const mapName = mapTitleElement.textContent.trim();
             const today = new Date();
             const formattedDate = (today.getMonth() + 1).toString().padStart(2, '0') + '/' + today.getDate().toString().padStart(2, '0') + '/' + today.getFullYear().toString().slice(-2);
-            const filename = `BTB Inventory - ${mapName} - ${formattedDate}.pdf`;
+            const filename = `UDHB Inventory - ${mapName} - ${formattedDate}.pdf`;
         
             try {
                 const canvas = await html2canvas(element, { 
@@ -1845,10 +1872,17 @@
                 });
         
                 const { jsPDF } = window.jspdf;
-                const pdf = new jsPDF('p', 'in', 'a4');
-                const imgWidth = 8.5 - 2; // A4 width (8.5 inches) minus 1-inch margins on both sides
-                const pageHeight = 11 - 2; // A4 height (11 inches) minus 1-inch margins on top and bottom
+                // Determine orientation: Landscape ('l') if the captured width is much greater than height
+                // The ratio 1.5 is an arbitrary threshold to decide when landscape is beneficial.
+                const orientation = canvas.width / canvas.height > 1.5 ? 'l' : 'p';
+                const pdf = new jsPDF(orientation, 'in', 'a4');
                 
+                const pdfWidth = pdf.internal.pageSize.getWidth();
+                const pdfHeight = pdf.internal.pageSize.getHeight();
+                const margin = 0.5; // 0.5 inch margin on all sides
+                const imgWidth = pdfWidth - (2 * margin);
+                const pageContentHeight = pdfHeight - (2 * margin); 
+        
                 const canvasImageWidth = canvas.width;
                 const canvasImageHeight = canvas.height;
         
@@ -1860,14 +1894,29 @@
         
                 const imgData = canvas.toDataURL('image/jpeg', 1.0);
         
-                pdf.addImage(imgData, 'JPEG', 1, 1, imgWidth, finalImageHeight);
-                heightLeft -= pageHeight;
+                // Add header content to PDF before image
+                const headerText = `Inventory for: ${mapName}`;
+                const dateText = `Date: ${new Date().toLocaleDateString()}`;
+                
+                pdf.setFontSize(14);
+                pdf.text(headerText, margin, margin + 0.25);
+                pdf.setFontSize(10);
+                pdf.text(dateText, margin, margin + 0.5);
+                
+                let yStart = margin + 0.75; // Starting Y position after header
+                let currentY = yStart;
+
+                // Add image
+                pdf.addImage(imgData, 'JPEG', margin, currentY, imgWidth, finalImageHeight);
+                heightLeft -= (pageContentHeight - (currentY - margin));
         
                 while (heightLeft > 0) {
-                    position = -pageHeight + heightLeft;
+                    position = currentY - finalImageHeight + pageContentHeight;
                     pdf.addPage();
-                    pdf.addImage(imgData, 'JPEG', 1, 1 + position, imgWidth, finalImageHeight);
-                    heightLeft -= pageHeight;
+                    
+                    // Add image to new page, shifted up by the amount that was already displayed
+                    pdf.addImage(imgData, 'JPEG', margin, position, imgWidth, finalImageHeight);
+                    heightLeft -= pageContentHeight;
                 }
         
                 pdf.save(filename);
@@ -1876,9 +1925,13 @@
                 console.error('Error generating PDF:', error);
                 showToast('Error generating PDF: ' + error.message, true);
             } finally {
-                // Show elements again after capture
+                // --- Cleanup ---
                 saveButton.style.display = 'inline-flex';
                 scrollSwitchContainer.style.display = 'flex';
+                if (wasAdminActionsVisible) {
+                    adminActionCells.forEach(cell => cell.classList.remove('hidden'));
+                    adminActionHeader.classList.remove('hidden');
+                }
                 hideLoading();
             }
         }
@@ -1899,7 +1952,7 @@
 
         // --- Initialize the app ---
         document.addEventListener('DOMContentLoaded', () => {
-            // NEW: Listen for authentication state changes
+            // Listen for authentication state changes
             auth.onAuthStateChanged(user => {
                 if (user) {
                     // User is signed in (Admin)
