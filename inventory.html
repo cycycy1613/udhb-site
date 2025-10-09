@@ -2101,8 +2101,8 @@
                     startY: startY,
                     theme: 'grid', // 'striped', 'grid', 'plain'
                     styles: { 
-                        fontSize: 10,
-                        cellPadding: 8
+                        fontSize: 8,
+                        cellPadding: 6
                     },
                     headStyles: {
                         fillColor: [42, 40, 40], // var(--primary)
@@ -2116,7 +2116,7 @@
                         // Header
                         pdf.setFontSize(14);
                         pdf.setTextColor(44, 62, 80); // Dark text
-                        pdf.text(`Inventory Report: ${mapName}`, data.settings.margin.left, 40);
+                        pdf.text(`UDH Batangas - Inventory: ${mapName}`, data.settings.margin.left, 40);
                         
                         pdf.setFontSize(10);
                         pdf.setTextColor(150); // Gray text
