@@ -419,6 +419,19 @@
             border-color: var(--secondary);
             box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
         }
+        
+        /* NEW: Action Chooser for Units */
+        .unit-action-chooser {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            padding: 10px;
+        }
+        .unit-action-chooser .btn {
+            width: 100%;
+            justify-content: center;
+        }
+
 
         /* Map View */
         #map-view {
@@ -957,7 +970,7 @@
             </div>
         </div>
     </main>
-
+    
     <div class="modal-overlay" id="login-modal-overlay">
         <div class="modal" id="login-modal">
             <div class="modal-header">
@@ -1003,6 +1016,26 @@
             </form>
         </div>
     </div>
+    
+    <div class="modal-overlay" id="unit-action-modal-overlay">
+        <div class="modal" id="unit-action-modal">
+            <div class="modal-header">
+                <h2>Add Unit Options</h2>
+                <button class="close-btn" id="close-unit-action-modal">&times;</button>
+            </div>
+            <div class="unit-action-chooser">
+                <button class="btn btn-primary" id="manual-add-unit-btn">
+                    <i class="fas fa-keyboard"></i>
+                    Manual Single Unit Entry
+                </button>
+                <button class="btn btn-success" id="json-upload-unit-btn">
+                    <i class="fas fa-file-upload"></i>
+                    Bulk Upload via JSON File
+                </button>
+            </div>
+        </div>
+    </div>
+
     <div class="modal-overlay" id="unit-modal-overlay">
         <div class="modal" id="unit-modal">
             <div class="modal-header">
@@ -1042,6 +1075,31 @@
             </form>
         </div>
     </div>
+
+    <div class="modal-overlay" id="json-upload-modal-overlay">
+        <div class="modal" id="json-upload-modal">
+            <div class="modal-header">
+                <h2>Bulk Upload Units (JSON)</h2>
+                <button class="close-btn" id="close-json-upload-modal">&times;</button>
+            </div>
+            <form id="json-upload-form">
+                <div class="form-group">
+                    <label for="json-file-upload">Select JSON File</label>
+                    <input type="file" id="json-file-upload" class="form-control" accept="application/json" required>
+                    <small class="text-light" style="display: block; margin-top: 5px;">
+                        The JSON file must be an array of objects. Each object should have keys: 
+                        `bik` (Slot#), `lot` (Type), `lotArea` (Size), `floorArea` (Loanable), and `unitType` (Status).
+                    </small>
+                </div>
+                <p id="json-upload-error-message" style="color: var(--danger); margin-bottom: 15px; display: none;"></p>
+                <button type="submit" class="btn btn-success" style="width: 100%;">
+                    <i class="fas fa-upload"></i>
+                    Upload and Save Units
+                </button>
+            </form>
+        </div>
+    </div>
+
     <footer>
         <div class="container">
             <p>UDHB Information Portal</p>
@@ -1118,7 +1176,13 @@
         const addMapImageUpload = document.getElementById('map-image-upload');
         const newMapNameInput = document.getElementById('new-map-name');
         
-        // Unit Modal Elements
+        // Unit Action Chooser Modal
+        const unitActionModalOverlay = document.getElementById('unit-action-modal-overlay');
+        const closeUnitActionModal = document.getElementById('close-unit-action-modal');
+        const manualAddUnitBtn = document.getElementById('manual-add-unit-btn');
+        const jsonUploadUnitBtn = document.getElementById('json-upload-unit-btn');
+
+        // Unit Modal Elements (Manual Entry)
         const unitModalOverlay = document.getElementById('unit-modal-overlay');
         const closeUnitModal = document.getElementById('close-unit-modal');
         const unitForm = document.getElementById('unit-form');
@@ -1131,6 +1195,13 @@
         const unitFloorArea = document.getElementById('unit-floorArea');
         const unitType = document.getElementById('unit-type');
         const unitSubmitBtn = document.getElementById('unit-submit-btn');
+
+        // JSON Upload Modal Elements
+        const jsonUploadModalOverlay = document.getElementById('json-upload-modal-overlay');
+        const closeJsonUploadModal = document.getElementById('close-json-upload-modal');
+        const jsonUploadForm = document.getElementById('json-upload-form');
+        const jsonFileUpload = document.getElementById('json-file-upload');
+        const jsonUploadErrorMessage = document.getElementById('json-upload-error-message');
 
 
         // Global Variables
@@ -1173,9 +1244,6 @@
             updateImageTransform();
         });
         
-        // The scroll switch and original PDF generation (html2canvas) are now decoupled.
-        // We can keep the switch to show/hide the scrollbar if the user still wants the option, 
-        // but it doesn't affect the new PDF generation method.
         scrollSwitch.addEventListener('change', (e) => {
             if (e.target.checked) {
                 tableContainer.classList.add('no-scroll');
@@ -1254,6 +1322,31 @@
             addMap(mapName, file);
         });
         
+        // --- NEW: Unit Action Chooser Modal Handlers ---
+        addInventoryRowBtn.addEventListener('click', () => {
+            if (!isAdmin) return showToast('Permission denied.', true);
+            unitActionModalOverlay.style.display = 'flex';
+            setTimeout(() => unitActionModalOverlay.querySelector('.modal').classList.add('show'), 10);
+        });
+        
+        closeUnitActionModal.addEventListener('click', () => {
+            unitActionModalOverlay.querySelector('.modal').classList.remove('show');
+            setTimeout(() => unitActionModalOverlay.style.display = 'none', 300);
+        });
+
+        manualAddUnitBtn.addEventListener('click', () => {
+            closeUnitActionModal.click(); // Close chooser
+            openUnitModal('Add'); // Open manual entry modal
+        });
+
+        jsonUploadUnitBtn.addEventListener('click', () => {
+            closeUnitActionModal.click(); // Close chooser
+            jsonUploadModalOverlay.style.display = 'flex'; // Open JSON upload modal
+            setTimeout(() => jsonUploadModalOverlay.querySelector('.modal').classList.add('show'), 10);
+        });
+        
+        // --- END NEW: Unit Action Chooser Modal Handlers ---
+
         // Unit Modal Handlers
         closeUnitModal.addEventListener('click', () => {
             unitModalOverlay.querySelector('.modal').classList.remove('show');
@@ -1275,16 +1368,30 @@
             };
             saveUnit(unitData);
         });
+        
+        // --- NEW: JSON Upload Modal Handlers ---
+        closeJsonUploadModal.addEventListener('click', () => {
+            jsonUploadModalOverlay.querySelector('.modal').classList.remove('show');
+            setTimeout(() => jsonUploadModalOverlay.style.display = 'none', 300);
+            jsonUploadForm.reset();
+            jsonUploadErrorMessage.style.display = 'none';
+        });
+
+        jsonUploadForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const file = jsonFileUpload.files[0];
+            if (file) {
+                bulkUploadUnits(file);
+            }
+        });
+        // --- END NEW: JSON Upload Modal Handlers ---
+
 
         // Admin actions in Map View
         deleteMapViewBtn.addEventListener('click', () => {
             if (confirm(`Are you sure you want to delete the entire phase "${currentMapName}" and all its inventory data? This action is permanent.`)) {
                 deleteMap(currentMapId);
             }
-        });
-        
-        addInventoryRowBtn.addEventListener('click', () => {
-            openUnitModal('Add');
         });
         
         replaceMapBtn.addEventListener('click', () => {
@@ -1519,7 +1626,6 @@
         
         /**
          * Admin: Adds or updates an inventory unit.
-         * Includes logic to ensure map document has an updatedAt field for proper tracking.
          */
         async function saveUnit(unitData) {
             if (!isAdmin) return showToast('Permission denied.', true);
@@ -1578,6 +1684,96 @@
             } finally {
                 hideLoading();
             }
+        }
+        
+        /**
+         * NEW: Admin: Bulk adds units from a JSON file using a Firestore batch write.
+         */
+        async function bulkUploadUnits(file) {
+            if (!isAdmin) return showToast('Permission denied.', true);
+            showLoading();
+            jsonUploadErrorMessage.style.display = 'none';
+
+            const reader = new FileReader();
+            reader.onload = async (e) => {
+                try {
+                    const jsonContent = JSON.parse(e.target.result);
+
+                    if (!Array.isArray(jsonContent)) {
+                        throw new Error('JSON file must contain an array of units.');
+                    }
+                    
+                    if (jsonContent.length === 0) {
+                        throw new Error('JSON array is empty.');
+                    }
+
+                    const unitsToSave = [];
+                    const requiredKeys = ['bik', 'lot', 'lotArea', 'floorArea', 'unitType'];
+
+                    for (const unit of jsonContent) {
+                        // Simple validation
+                        const missingKeys = requiredKeys.filter(key => !(key in unit));
+                        if (missingKeys.length > 0) {
+                             // Log the error and continue, but mark the unit as invalid
+                             console.warn(`Skipping unit due to missing keys: ${missingKeys.join(', ')}`, unit);
+                             continue;
+                        }
+                        
+                        unitsToSave.push({
+                            phase: currentMapName, // Automatically link to current building
+                            mapId: currentMapId,
+                            bik: unit.bik,
+                            lot: unit.lot,
+                            lotArea: unit.lotArea,
+                            floorArea: unit.floorArea,
+                            unitType: unit.unitType,
+                            createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                            updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                        });
+                    }
+
+                    if (unitsToSave.length === 0) {
+                         throw new Error('No valid units found in the JSON file.');
+                    }
+                    
+                    const batch = db.batch();
+                    unitsToSave.forEach(unit => {
+                        const newUnitRef = db.collection('inventory').doc();
+                        batch.set(newUnitRef, unit);
+                    });
+
+                    await batch.commit();
+                    
+                    // Update the map document to reflect the change
+                    await db.collection('maps').doc(currentMapId).update({
+                        updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    }).catch(err => console.warn('Could not update map document timestamp:', err));
+
+                    showToast(`${unitsToSave.length} units uploaded successfully!`);
+                    closeJsonUploadModal.click();
+                    await loadInventoryData(currentMapId); // REFRESH INVENTORY
+
+                } catch (error) {
+                    console.error('Bulk upload error: ', error);
+                    const msg = error.message.includes('Unexpected token') 
+                        ? 'Invalid JSON file structure.' 
+                        : error.message;
+                    jsonUploadErrorMessage.textContent = 'Upload failed: ' + msg;
+                    jsonUploadErrorMessage.style.display = 'block';
+                    showToast('Bulk upload failed. Check the error message.', true);
+                } finally {
+                    hideLoading();
+                }
+            };
+            
+            reader.onerror = (error) => {
+                console.error('File reading error: ', error);
+                jsonUploadErrorMessage.textContent = 'Error reading file.';
+                jsonUploadErrorMessage.style.display = 'block';
+                hideLoading();
+            };
+
+            reader.readAsText(file);
         }
 
         // --- Core Application Logic ---
