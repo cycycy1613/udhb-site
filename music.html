@@ -347,6 +347,16 @@
             color: var(--light-gray);
         }
         
+        /* Visualizer Style */
+        #visualizerCanvas {
+            width: 100%;
+            height: 80px;
+            margin: 15px 0;
+            background-color: var(--darker);
+            border: 1px solid var(--gray);
+            border-radius: 4px;
+        }
+        
         .player-controls {
             display: flex;
             justify-content: space-between;
@@ -588,7 +598,6 @@
     </style>
 </head>
 <body>
-    <!-- Login Screen (Initially Visible) -->
     <div id="loginScreen" class="login-container">
         <div class="login-box">
             <h2>Admin Login</h2>
@@ -605,7 +614,6 @@
         </div>
     </div>
 
-    <!-- Main App (Initially Hidden) -->
     <div id="app" style="display: none;">
         <div class="container">
             <header>
@@ -633,8 +641,7 @@
                             <h2>Music Categories</h2>
                         </div>
                         <div class="category-tabs" id="categoryTabs">
-                            <!-- Categories will be dynamically added here -->
-                        </div>
+                            </div>
                         <div class="category-settings" id="categorySettings">
                             <h3>Loop Settings for <span id="currentCategoryName">Category</span></h3>
                             <div class="loop-options">
@@ -651,8 +658,7 @@
                     </div>
 
                     <div class="music-grid" id="musicGrid">
-                        <!-- Music cards will be dynamically added here -->
-                    </div>
+                        </div>
                 </div>
 
                 <div class="player-section">
@@ -678,6 +684,7 @@
                         </div>
                     </div>
 
+                    <canvas id="visualizerCanvas" width="260" height="80"></canvas>
                     <div class="player-controls">
                         <div class="control-btn" id="prevBtn">
                             <i class="fas fa-step-backward"></i>
@@ -709,7 +716,6 @@
         </div>
     </div>
 
-    <!-- Upload Modal -->
     <div id="uploadModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
@@ -725,8 +731,7 @@
                     <label for="trackCategory">Category</label>
                     <select id="trackCategory" class="form-control" required>
                         <option value="">Select a category</option>
-                        <!-- Categories will be dynamically added here -->
-                    </select>
+                        </select>
                 </div>
                 <div class="form-group">
                     <label>Select Audio File</label>
@@ -742,7 +747,6 @@
         </div>
     </div>
 
-    <!-- Add Category Modal -->
     <div id="categoryModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
@@ -811,6 +815,14 @@
         const loopCategoryBtn = document.getElementById('loopCategoryBtn');
         const loopOptions = document.querySelectorAll('input[name="loopOption"]');
 
+        // NEW: Visualizer DOM Element
+        const visualizerCanvas = document.getElementById('visualizerCanvas');
+
+        // NEW: Web Audio API context and nodes
+        let audioCtx;
+        let analyser;
+        let source;
+
         // App state
         let categories = [];
         let music = [];
@@ -823,6 +835,13 @@
 
         // Initialize the app
         function init() {
+            // NEW: Initialize AudioContext only once
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                analyser = audioCtx.createAnalyser();
+                analyser.fftSize = 256; // Standard size for visualizer
+            }
+
             // Check if user is logged in
             auth.onAuthStateChanged(user => {
                 if (user) {
@@ -1180,8 +1199,11 @@
                 if (currentTrackIndex === trackIndex) {
                     if (currentAudio) {
                         currentAudio.pause();
-                        currentAudio = null;
                     }
+                    // Reset visualizer on stop
+                    visualizerCanvas.getContext('2d').clearRect(0, 0, visualizerCanvas.width, visualizerCanvas.height);
+                    
+                    currentAudio = null;
                     isPlaying = false;
                     currentTrackIndex = -1;
                     currentTrackTitle.textContent = "No track selected";
@@ -1271,6 +1293,16 @@
             currentAudio = new Audio(track.url);
             currentAudio.loop = loopMode === 'track';
             currentAudio.volume = volumeSlider.value / 100;
+
+            // NEW: Connect currentAudio to the Web Audio API graph for visualization
+            if (source) {
+                source.disconnect();
+                source = null;
+            }
+            source = audioCtx.createMediaElementSource(currentAudio);
+            source.connect(analyser);
+            analyser.connect(audioCtx.destination);
+            // --------------------------------------------------------------------------------
             
             // Set up progress tracking
             currentAudio.addEventListener('timeupdate', updateProgress);
@@ -1334,6 +1366,41 @@
             }, 50);
         }
 
+        // NEW: Draw the spectrum visualizer
+        function drawVisualizer() {
+            requestAnimationFrame(drawVisualizer);
+
+            if (!analyser || !isPlaying) {
+                visualizerCanvas.getContext('2d').clearRect(0, 0, visualizerCanvas.width, visualizerCanvas.height);
+                return;
+            }
+
+            const bufferLength = analyser.frequencyBinCount;
+            const dataArray = new Uint8Array(bufferLength);
+            analyser.getByteFrequencyData(dataArray);
+
+            const canvasCtx = visualizerCanvas.getContext('2d');
+            canvasCtx.clearRect(0, 0, visualizerCanvas.width, visualizerCanvas.height);
+
+            const barWidth = (visualizerCanvas.width / bufferLength) * 2.5;
+            let barHeight;
+            let x = 0;
+
+            for (let i = 0; i < bufferLength; i++) {
+                barHeight = dataArray[i] / 2; // Scale the height
+
+                // Gradient color from primary to secondary
+                const gradient = canvasCtx.createLinearGradient(0, visualizerCanvas.height, 0, 0);
+                gradient.addColorStop(0, '#8e44ad'); // var(--primary)
+                gradient.addColorStop(1, '#3498db'); // var(--secondary)
+                canvasCtx.fillStyle = gradient;
+
+                canvasCtx.fillRect(x, visualizerCanvas.height - barHeight, barWidth, barHeight);
+
+                x += barWidth + 1; // Add 1px gap
+            }
+        }
+
         // Update progress bar and time display
         function updateProgress() {
             if (currentAudio && !isSeeking) {
@@ -1356,13 +1423,18 @@
             
             isSeeking = true;
             const rect = progressBarContainer.getBoundingClientRect();
-            const percent = Math.min(Math.max(0, e.clientX - rect.left), rect.width) / rect.width;
+            // Use clientX for mouse events, and check for touch events for touchscreens
+            const clientX = e.clientX || (e.touches && e.touches[0] ? e.touches[0].clientX : 0);
+            const percent = Math.min(Math.max(0, clientX - rect.left), rect.width) / rect.width;
             
             seekTo(percent);
             
             const moveHandler = (moveEvent) => {
-                const newPercent = Math.min(Math.max(0, moveEvent.clientX - rect.left), rect.width) / rect.width;
+                const moveClientX = moveEvent.clientX || (moveEvent.touches && moveEvent.touches[0] ? moveEvent.touches[0].clientX : 0);
+                const newPercent = Math.min(Math.max(0, moveClientX - rect.left), rect.width) / rect.width;
                 seekTo(newPercent);
+                // Prevent scrolling on touch devices during seeking
+                if (moveEvent.type === 'touchmove') moveEvent.preventDefault();
             };
             
             const endHandler = () => {
@@ -1375,9 +1447,10 @@
             
             document.addEventListener('mousemove', moveHandler);
             document.addEventListener('mouseup', endHandler);
-            document.addEventListener('touchmove', moveHandler);
+            document.addEventListener('touchmove', moveHandler, { passive: false }); // Use passive: false for touchmove
             document.addEventListener('touchend', endHandler);
         }
+
 
         // Seek to a specific position in the track
         function seekTo(percent) {
@@ -1396,6 +1469,10 @@
                 currentAudio.pause();
                 playPauseBtn.innerHTML = '<i class="fas fa-play"></i>';
             } else {
+                // Resume AudioContext if it's suspended (common on user interaction)
+                if (audioCtx.state === 'suspended') {
+                    audioCtx.resume();
+                }
                 currentAudio.play();
                 playPauseBtn.innerHTML = '<i class="fas fa-pause"></i>';
             }
@@ -1444,7 +1521,10 @@
         }
 
         // Initialize the app when DOM is loaded
-        document.addEventListener('DOMContentLoaded', init);
+        document.addEventListener('DOMContentLoaded', () => {
+            init();
+            drawVisualizer(); // Start the visualizer drawing loop
+        });
     </script>
 </body>
 </html>
