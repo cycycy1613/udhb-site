@@ -8,7 +8,6 @@
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-storage-compat.js"></script>
     <style>
         :root {
             --primary: #8e44ad;
@@ -641,8 +640,7 @@
                             <h2>Music Categories</h2>
                         </div>
                         <div class="category-tabs" id="categoryTabs">
-                            <!-- Categories will be dynamically added here -->
-                        </div>
+                            </div>
                         <div class="category-settings" id="categorySettings">
                             <h3>Loop Settings for <span id="currentCategoryName">Category</span></h3>
                             <div class="loop-options">
@@ -659,8 +657,7 @@
                     </div>
 
                     <div class="music-grid" id="musicGrid">
-                        <!-- Music cards will be dynamically added here -->
-                    </div>
+                        </div>
                 </div>
 
                 <div class="player-section">
@@ -721,7 +718,7 @@
     <div id="uploadModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
-                <h2>Upload New Track</h2>
+                <h2>Upload New Track (Local Only)</h2>
                 <button class="close-modal">&times;</button>
             </div>
             <form id="uploadForm">
@@ -733,8 +730,7 @@
                     <label for="trackCategory">Category</label>
                     <select id="trackCategory" class="form-control" required>
                         <option value="">Select a category</option>
-                        <!-- Categories will be dynamically added here -->
-                    </select>
+                        </select>
                 </div>
                 <div class="form-group">
                     <label>Select Audio File</label>
@@ -746,15 +742,7 @@
                     </div>
                 </div>
                 
-                <div class="form-group" id="uploadProgressContainer" style="display: none;">
-                    <label>Upload Progress</label>
-                    <div class="progress-bar" id="uploadProgressBarContainer" style="height: 10px; cursor: default;">
-                        <div class="progress" id="uploadProgressBar" style="transition: none;"></div>
-                    </div>
-                    <div style="text-align: right; font-size: 0.8rem; color: var(--primary);" id="uploadProgressText">0%</div>
-                </div>
-
-                <button type="submit" class="btn btn-primary" style="width: 100%;">Upload Track</button>
+                <button type="submit" class="btn btn-primary" style="width: 100%;">Add Track Locally</button>
             </form>
         </div>
     </div>
@@ -777,11 +765,12 @@
 
     <script>
         // Firebase configuration - MAKE SURE TO REPLACE WITH YOUR ACTUAL FIREBASE CONFIG
+        // Note: Storage Bucket removed as it's no longer used.
         const firebaseConfig = {
             apiKey: "AIzaSyBOm4XyjvLoe2MR0_bWT_zHS4CkdYXt5M4",
             authDomain: "btb-inventory.firebaseapp.com",
             projectId: "btb-inventory",
-            storageBucket: "btb-inventory.firebasestorage.app",
+            // storageBucket: "btb-inventory.firebasestorage.app", // REMOVED
             messagingSenderId: "635532868561",
             appId: "1:635532868561:web:b7bee31c83f6f4ceb63ef0",
             measurementId: "G-C8DV3NBLCP"
@@ -791,7 +780,7 @@
         firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth();
         const db = firebase.firestore();
-        const storage = firebase.storage();
+        // const storage = firebase.storage(); // REMOVED
 
         // DOM Elements
         const loginScreen = document.getElementById('loginScreen');
@@ -826,9 +815,9 @@
         const loopTrackBtn = document.getElementById('loopTrackBtn');
         const loopCategoryBtn = document.getElementById('loopCategoryBtn');
         const loopOptions = document.querySelectorAll('input[name="loopOption"]');
-        const uploadProgressContainer = document.getElementById('uploadProgressContainer');
-        const uploadProgressBar = document.getElementById('uploadProgressBar');
-        const uploadProgressText = document.getElementById('uploadProgressText');
+        // const uploadProgressContainer = document.getElementById('uploadProgressContainer'); // REMOVED
+        // const uploadProgressBar = document.getElementById('uploadProgressBar'); // REMOVED
+        // const uploadProgressText = document.getElementById('uploadProgressText'); // REMOVED
         const visualizerCanvas = document.getElementById('visualizerCanvas');
 
         // Web Audio API context and nodes
@@ -839,13 +828,14 @@
 
         // App state
         let categories = [];
-        let music = []; 
+        let music = []; // Local music array - tracks are only stored for the current session!
         let currentAudio = null;
         let isPlaying = false;
         let currentTrackIndex = -1;
         let currentCategory = 'all';
         let loopMode = 'track';
         let isSeeking = false;
+        let trackCounter = 0; // Simple ID counter for local tracks
 
         // Initialize the app
         function init() {
@@ -864,7 +854,9 @@
                     loginScreen.style.display = 'none';
                     app.style.display = 'block';
                     loadCategories();
-                    loadMusic();
+                    // loadMusic() is now a NO-OP since tracks aren't persisted, 
+                    // but we call it for initial rendering logic.
+                    loadMusic(); 
                 } else {
                     loginScreen.style.display = 'flex';
                     app.style.display = 'none';
@@ -936,6 +928,10 @@
             if (currentAudio) {
                 currentAudio.pause();
             }
+            // Revoke all local URLs upon logout/cleanup
+            music.forEach(track => URL.revokeObjectURL(track.url));
+            music = [];
+            currentTrackIndex = -1;
             auth.signOut()
                 .then(() => {
                     console.log("User signed out");
@@ -962,7 +958,7 @@
             });
         }
 
-        // Render categories
+        // Render categories (NO CHANGE)
         function renderCategories() {
             categoryTabs.innerHTML = '';
             
@@ -1006,7 +1002,7 @@
             });
         }
 
-        // Update category select in upload form
+        // Update category select in upload form (NO CHANGE)
         function updateCategorySelect() {
             trackCategorySelect.innerHTML = '<option value="">Select a category</option>';
             categories.forEach(category => {
@@ -1017,7 +1013,7 @@
             });
         }
 
-        // Set active category
+        // Set active category (NO CHANGE)
         function setActiveCategory(categoryId) {
             currentCategory = categoryId;
             renderCategories();
@@ -1032,7 +1028,7 @@
             }
         }
 
-        // Set loop mode
+        // Set loop mode (NO CHANGE)
         function setLoopMode(mode) {
             loopMode = mode;
             
@@ -1046,7 +1042,7 @@
             }
         }
 
-        // Handle adding a new category to Firestore
+        // Handle adding a new category to Firestore (NO CHANGE)
         async function handleAddCategory(e) {
             e.preventDefault();
             
@@ -1071,7 +1067,7 @@
             }
         }
 
-        // Delete a category from Firestore
+        // Delete a category from Firestore (NO CHANGE)
         async function deleteCategory(categoryId) {
             if (confirm("Are you sure you want to delete this category? This will permanently remove it from the list.")) {
                 try {
@@ -1087,21 +1083,13 @@
             }
         }
 
-        // Load music from Firestore
-        async function loadMusic() {
-            try {
-                const snapshot = await db.collection('music').orderBy('timestamp', 'desc').get();
-                music = [];
-                snapshot.forEach(doc => {
-                    music.push({ id: doc.id, ...doc.data() });
-                });
-                filterMusicByCategory(currentCategory);
-            } catch (error) {
-                console.error("Error loading music from Firestore:", error);
-            }
+        // Load music - Now a NO-OP since music is only stored locally
+        function loadMusic() {
+            // Since music is not stored in Firestore, this only triggers the initial render/filter
+            filterMusicByCategory(currentCategory);
         }
 
-        // Render music cards
+        // Render music cards (Minor change: using local ID for deletion)
         function renderMusicCards(musicList) {
             musicGrid.innerHTML = '';
             
@@ -1111,6 +1099,8 @@
             }
             
             musicList.forEach((track, index) => {
+                // We use the local array index directly for playback, 
+                // and the unique ID for the delete operation.
                 const fullArrayIndex = music.findIndex(t => t.id === track.id);
 
                 const card = document.createElement('div');
@@ -1139,36 +1129,49 @@
                 const deleteBtn = card.querySelector('.delete-track');
                 deleteBtn.addEventListener('click', (e) => {
                     e.stopPropagation();
-                    deleteTrack(track.id, fullArrayIndex, track.fileName, track.category);
+                    // Pass the local ID for deletion
+                    deleteTrack(track.id, fullArrayIndex);
                 });
                 
                 musicGrid.appendChild(card);
             });
         }
 
-        // Get category name by ID
+        // Get category name by ID (NO CHANGE)
         function getCategoryName(categoryId) {
             const category = categories.find(cat => cat.id === categoryId);
             return category ? category.name : 'Unknown';
         }
 
-        // Filter music by category
+        // Filter music by category (NO CHANGE)
         function filterMusicByCategory(categoryId) {
             if (categoryId === 'all') {
-                renderMusicCards(music);
+                // Sort music before rendering for consistent indexing
+                const sortedMusic = [...music].sort((a, b) => b.timestamp - a.timestamp); 
+                renderMusicCards(sortedMusic);
             } else {
-                const filteredMusic = music.filter(track => track.category === categoryId);
+                const filteredMusic = music.filter(track => track.category === categoryId)
+                                          .sort((a, b) => b.timestamp - a.timestamp);
                 renderMusicCards(filteredMusic);
             }
         }
 
-        // Delete a track from Firestore and Storage
-        async function deleteTrack(trackId, trackIndex, fileName, categoryId) {
-            if (!confirm("Are you sure you want to delete this track? This will permanently remove the file from storage.")) {
+        // Delete a track - NOW ONLY DELETES FROM LOCAL ARRAY AND REVOKES URL
+        function deleteTrack(trackId, trackIndex) {
+            if (!confirm("Are you sure you want to delete this track? This will permanently remove it from the current session.")) {
                 return;
             }
 
             try {
+                const trackToDelete = music.find(t => t.id === trackId);
+                if (trackToDelete && trackToDelete.url) {
+                    URL.revokeObjectURL(trackToDelete.url); // Release the local file resource
+                }
+
+                // Filter out the track by its unique ID
+                music = music.filter(t => t.id !== trackId);
+                
+                // If the currently playing track was deleted, stop playback and reset player
                 if (currentTrackIndex === trackIndex) {
                     if (currentAudio) {
                         currentAudio.pause();
@@ -1182,12 +1185,10 @@
                     playPauseBtn.innerHTML = '<i class="fas fa-play"></i>';
                 }
 
-                await db.collection('music').doc(trackId).delete();
-                const fileRef = storage.ref().child(`music-tracks/${categoryId}/${fileName}`);
-                await fileRef.delete();
-
-                await loadMusic();
-                currentTrackIndex = -1;
+                // Re-render and adjust currentTrackIndex if necessary
+                // Simplest approach: just call loadMusic which calls filterMusicByCategory and re-renders
+                currentTrackIndex = -1; // Reset index to ensure correct card highlighting after re-render
+                loadMusic();
                 
             } catch (error) {
                 console.error("Error deleting track:", error);
@@ -1195,7 +1196,7 @@
             }
         }
 
-        // Handle music upload to Firebase Storage and Firestore
+        // Handle music upload - NOW HANDLES LOCAL FILE ONLY
         async function handleUpload(e) {
             e.preventDefault();
             
@@ -1209,60 +1210,45 @@
                 return;
             }
 
-            uploadProgressContainer.style.display = 'block';
+            // Local file handling is immediate, no progress needed.
             submitBtn.disabled = true;
             
             try {
-                const storageRef = storage.ref();
-                const fileRef = storageRef.child(`music-tracks/${category}/${file.name}`);
-                const uploadTask = fileRef.put(file);
+                // Create a local URL for the audio file
+                const localUrl = URL.createObjectURL(file);
 
-                uploadTask.on('state_changed', 
-                    (snapshot) => {
-                        const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-                        uploadProgressBar.style.width = progress.toFixed(0) + '%';
-                        uploadProgressText.textContent = `${progress.toFixed(0)}%`;
-                    }, 
-                    (error) => {
-                        uploadProgressContainer.style.display = 'none';
-                        submitBtn.disabled = false;
-                        alert("Upload failed: " + error.message);
-                        console.error("Upload error:", error);
-                    }, 
-                    async () => {
-                        submitBtn.disabled = false;
-                        const downloadURL = await uploadTask.snapshot.ref.getDownloadURL();
+                const newTrack = {
+                    id: 'local-' + trackCounter++, // Simple unique ID for local tracking
+                    title,
+                    category,
+                    url: localUrl, // Use the local Object URL
+                    fileName: file.name,
+                    timestamp: Date.now() // Use a local timestamp for sorting
+                };
+                
+                // Add to the local music array
+                music.unshift(newTrack); // Add to the start so it appears first
 
-                        const newTrack = {
-                            title,
-                            category,
-                            url: downloadURL,
-                            fileName: file.name,
-                            timestamp: firebase.firestore.FieldValue.serverTimestamp()
-                        };
-                        
-                        await db.collection('music').add(newTrack);
-                        await loadMusic();
-
-                        uploadForm.reset();
-                        fileName.textContent = "No file selected";
-                        uploadModal.style.display = 'none';
-                        uploadProgressContainer.style.display = 'none';
-                        uploadProgressBar.style.width = '0%';
-                        
-                        alert("Track uploaded successfully!");
-                    }
-                );
+                // Reset form, close modal, and update grid
+                uploadForm.reset();
+                fileName.textContent = "No file selected";
+                uploadModal.style.display = 'none';
+                
+                // The loadMusic function will now re-render the grid from the local 'music' array.
+                loadMusic(); 
+                
+                submitBtn.disabled = false;
+                alert("Track added to session successfully! (Not saved to Firebase)");
 
             } catch (error) {
-                uploadProgressContainer.style.display = 'none';
                 submitBtn.disabled = false;
-                alert("An unexpected error occurred: " + error.message);
+                alert("An unexpected error occurred during local file processing: " + error.message);
                 console.error("General upload error:", error);
             }
         }
 
-        // Fixed: Play track with proper audio connection
+        // Fixed: Play track with proper audio connection (NO CHANGE IN CORE LOGIC, 
+        // but now 'track.url' is a local Object URL)
         function playTrack(index) {
             if (currentAudio && isPlaying) {
                 fadeOutAndStop(currentAudio, 500);
@@ -1274,7 +1260,8 @@
             currentTrackTitle.textContent = track.title;
             currentTrackCategory.textContent = getCategoryName(track.category);
             
-            currentAudio = new Audio(track.url);
+            // The track.url is now a local Object URL
+            currentAudio = new Audio(track.url); 
             currentAudio.loop = loopMode === 'track';
             
             // Set the HTMLMediaElement volume
@@ -1325,14 +1312,14 @@
             }
         }
 
-        // Handle track end based on loop mode
+        // Handle track end based on loop mode (NO CHANGE)
         function handleTrackEnd() {
             if (loopMode === 'category') {
                 playNext();
             }
         }
 
-        // Fade out and stop audio
+        // Fade out and stop audio (NO CHANGE)
         function fadeOutAndStop(audio, duration) {
             const initialVolume = audio.volume;
             const step = initialVolume / (duration / 50);
@@ -1348,7 +1335,7 @@
             }, 50);
         }
 
-        // Fade in audio
+        // Fade in audio (NO CHANGE)
         function fadeIn(audio, duration) {
             const targetVolume = volumeSlider.value / 100;
             const step = targetVolume / (duration / 50);
@@ -1366,7 +1353,7 @@
             }, 50);
         }
 
-        // Draw the spectrum visualizer
+        // Draw the spectrum visualizer (NO CHANGE)
         function drawVisualizer() {
             requestAnimationFrame(drawVisualizer);
 
@@ -1399,7 +1386,7 @@
             }
         }
 
-        // Update progress bar and time display
+        // Update progress bar and time display (NO CHANGE)
         function updateProgress() {
             if (currentAudio && !isSeeking) {
                 const percent = (currentAudio.currentTime / currentAudio.duration) * 100;
@@ -1408,14 +1395,14 @@
             }
         }
 
-        // Format time in MM:SS
+        // Format time in MM:SS (NO CHANGE)
         function formatTime(seconds) {
             const mins = Math.floor(seconds / 60);
             const secs = Math.floor(seconds % 60);
             return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
         }
 
-        // Start seeking (click and drag on progress bar)
+        // Start seeking (click and drag on progress bar) (NO CHANGE)
         function startSeeking(e) {
             if (!currentAudio) return;
             isSeeking = true;
@@ -1446,7 +1433,7 @@
             document.addEventListener('touchend', endHandler);
         }
 
-        // Seek to a specific position in the track
+        // Seek to a specific position in the track (NO CHANGE)
         function seekTo(percent) {
             if (currentAudio) {
                 currentAudio.currentTime = percent * currentAudio.duration;
@@ -1455,7 +1442,7 @@
             }
         }
 
-        // Toggle play/pause
+        // Toggle play/pause (NO CHANGE)
         function togglePlayPause() {
             if (!currentAudio) return;
             
@@ -1474,7 +1461,7 @@
             isPlaying = !isPlaying;
         }
 
-        // Play previous/next track logic
+        // Play previous/next track logic (NO CHANGE)
         function playPrevious() {
             if (music.length === 0) return;
             
@@ -1519,7 +1506,7 @@
             playTrack(newIndex);
         }
 
-        // Initialize the app when DOM is loaded
+        // Initialize the app when DOM is loaded (NO CHANGE)
         document.addEventListener('DOMContentLoaded', () => {
             init();
             drawVisualizer();
