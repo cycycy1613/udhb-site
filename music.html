@@ -625,7 +625,7 @@
                         <i class="fas fa-plus"></i> Add Category
                     </button>
                     <button id="uploadBtn" class="btn btn-primary">
-                        <i class="fas fa-upload"></i> Upload Music
+                        <i class="fas fa-upload"></i> Upload Music (Local PC Storage)
                     </button>
                     <button id="logoutBtn" class="btn btn-danger">
                         <i class="fas fa-sign-out-alt"></i> Logout
@@ -718,7 +718,7 @@
     <div id="uploadModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
-                <h2>Upload New Track (Local Only)</h2>
+                <h2>Upload New Track (Local Persistent Storage)</h2>
                 <button class="close-modal">&times;</button>
             </div>
             <form id="uploadForm">
@@ -742,7 +742,7 @@
                     </div>
                 </div>
                 
-                <button type="submit" class="btn btn-primary" style="width: 100%;">Add Track Locally</button>
+                <button type="submit" class="btn btn-primary" style="width: 100%;">Add Track Persistently</button>
             </form>
         </div>
     </div>
@@ -765,12 +765,10 @@
 
     <script>
         // Firebase configuration - MAKE SURE TO REPLACE WITH YOUR ACTUAL FIREBASE CONFIG
-        // Note: Storage Bucket removed as it's no longer used.
         const firebaseConfig = {
             apiKey: "AIzaSyBOm4XyjvLoe2MR0_bWT_zHS4CkdYXt5M4",
             authDomain: "btb-inventory.firebaseapp.com",
             projectId: "btb-inventory",
-            // storageBucket: "btb-inventory.firebasestorage.app", // REMOVED
             messagingSenderId: "635532868561",
             appId: "1:635532868561:web:b7bee31c83f6f4ceb63ef0",
             measurementId: "G-C8DV3NBLCP"
@@ -780,7 +778,6 @@
         firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth();
         const db = firebase.firestore();
-        // const storage = firebase.storage(); // REMOVED
 
         // DOM Elements
         const loginScreen = document.getElementById('loginScreen');
@@ -815,9 +812,6 @@
         const loopTrackBtn = document.getElementById('loopTrackBtn');
         const loopCategoryBtn = document.getElementById('loopCategoryBtn');
         const loopOptions = document.querySelectorAll('input[name="loopOption"]');
-        // const uploadProgressContainer = document.getElementById('uploadProgressContainer'); // REMOVED
-        // const uploadProgressBar = document.getElementById('uploadProgressBar'); // REMOVED
-        // const uploadProgressText = document.getElementById('uploadProgressText'); // REMOVED
         const visualizerCanvas = document.getElementById('visualizerCanvas');
 
         // Web Audio API context and nodes
@@ -828,14 +822,95 @@
 
         // App state
         let categories = [];
-        let music = []; // Local music array - tracks are only stored for the current session!
+        let music = []; // Local music array populated from IndexedDB
         let currentAudio = null;
         let isPlaying = false;
         let currentTrackIndex = -1;
         let currentCategory = 'all';
         let loopMode = 'track';
         let isSeeking = false;
-        let trackCounter = 0; // Simple ID counter for local tracks
+        
+        // --- INDEXEDDB SETUP ---
+        const DB_NAME = 'DJMusicDB';
+        const STORE_NAME = 'tracks';
+        const DB_VERSION = 1;
+
+        /**
+         * Opens the IndexedDB database.
+         * @returns {Promise<IDBDatabase>} The database object.
+         */
+        function openDatabase() {
+            return new Promise((resolve, reject) => {
+                const request = indexedDB.open(DB_NAME, DB_VERSION);
+
+                request.onupgradeneeded = (e) => {
+                    const db = e.target.result;
+                    if (!db.objectStoreNames.contains(STORE_NAME)) {
+                        // Create an object store to hold information about our music files.
+                        // The 'id' will be the key path.
+                        db.createObjectStore(STORE_NAME, { keyPath: 'id' });
+                    }
+                };
+
+                request.onsuccess = (e) => {
+                    resolve(e.target.result);
+                };
+
+                request.onerror = (e) => {
+                    console.error("IndexedDB error:", e.target.error);
+                    reject(e.target.error);
+                };
+            });
+        }
+
+        /**
+         * Saves a track (including its file ArrayBuffer) to IndexedDB.
+         */
+        async function saveTrackToDB(track) {
+            const db = await openDatabase();
+            const tx = db.transaction(STORE_NAME, 'readwrite');
+            const store = tx.objectStore(STORE_NAME);
+
+            // The track object now includes 'fileData' (ArrayBuffer)
+            const request = store.put(track);
+
+            return new Promise((resolve, reject) => {
+                request.onsuccess = () => resolve();
+                request.onerror = () => reject(request.error);
+            });
+        }
+
+        /**
+         * Retrieves all tracks from IndexedDB.
+         */
+        async function getTracksFromDB() {
+            const db = await openDatabase();
+            const tx = db.transaction(STORE_NAME, 'readonly');
+            const store = tx.objectStore(STORE_NAME);
+            const request = store.getAll();
+
+            return new Promise((resolve, reject) => {
+                request.onsuccess = (e) => resolve(e.target.result);
+                request.onerror = () => reject(request.error);
+            });
+        }
+
+        /**
+         * Deletes a track from IndexedDB.
+         */
+        async function deleteTrackFromDB(id) {
+            const db = await openDatabase();
+            const tx = db.transaction(STORE_NAME, 'readwrite');
+            const store = tx.objectStore(STORE_NAME);
+            const request = store.delete(id);
+
+            return new Promise((resolve, reject) => {
+                request.onsuccess = () => resolve();
+                request.onerror = () => reject(request.error);
+            });
+        }
+        // --- END INDEXEDDB SETUP ---
+
 
         // Initialize the app
         function init() {
@@ -854,12 +929,17 @@
                     loginScreen.style.display = 'none';
                     app.style.display = 'block';
                     loadCategories();
-                    // loadMusic() is now a NO-OP since tracks aren't persisted, 
-                    // but we call it for initial rendering logic.
+                    // Load music from persistent IndexedDB
                     loadMusic(); 
                 } else {
                     loginScreen.style.display = 'flex';
                     app.style.display = 'none';
+                    // Revoke any remaining Object URLs on logout/cleanup
+                    music.forEach(track => {
+                        if (track.objectUrl) URL.revokeObjectURL(track.objectUrl);
+                    });
+                    music = [];
+                    currentTrackIndex = -1;
                 }
             });
 
@@ -928,8 +1008,10 @@
             if (currentAudio) {
                 currentAudio.pause();
             }
-            // Revoke all local URLs upon logout/cleanup
-            music.forEach(track => URL.revokeObjectURL(track.url));
+            // Revoke all temporary local URLs upon logout/cleanup
+            music.forEach(track => {
+                if (track.objectUrl) URL.revokeObjectURL(track.objectUrl);
+            });
             music = [];
             currentTrackIndex = -1;
             auth.signOut()
@@ -958,7 +1040,7 @@
             });
         }
 
-        // Render categories (NO CHANGE)
+        // Render categories 
         function renderCategories() {
             categoryTabs.innerHTML = '';
             
@@ -1002,7 +1084,7 @@
             });
         }
 
-        // Update category select in upload form (NO CHANGE)
+        // Update category select in upload form 
         function updateCategorySelect() {
             trackCategorySelect.innerHTML = '<option value="">Select a category</option>';
             categories.forEach(category => {
@@ -1013,7 +1095,7 @@
             });
         }
 
-        // Set active category (NO CHANGE)
+        // Set active category 
         function setActiveCategory(categoryId) {
             currentCategory = categoryId;
             renderCategories();
@@ -1028,7 +1110,7 @@
             }
         }
 
-        // Set loop mode (NO CHANGE)
+        // Set loop mode 
         function setLoopMode(mode) {
             loopMode = mode;
             
@@ -1042,7 +1124,7 @@
             }
         }
 
-        // Handle adding a new category to Firestore (NO CHANGE)
+        // Handle adding a new category to Firestore 
         async function handleAddCategory(e) {
             e.preventDefault();
             
@@ -1067,10 +1149,12 @@
             }
         }
 
-        // Delete a category from Firestore (NO CHANGE)
+        // Delete a category from Firestore 
         async function deleteCategory(categoryId) {
             if (confirm("Are you sure you want to delete this category? This will permanently remove it from the list.")) {
                 try {
+                    // Check if any music belongs to this category (optional: delete music too)
+                    // For now, only delete the category document
                     await db.collection('categories').doc(categoryId).delete();
                     
                     if (currentCategory === categoryId) {
@@ -1083,13 +1167,33 @@
             }
         }
 
-        // Load music - Now a NO-OP since music is only stored locally
-        function loadMusic() {
-            // Since music is not stored in Firestore, this only triggers the initial render/filter
-            filterMusicByCategory(currentCategory);
+        // Load music - NOW loads from IndexedDB
+        async function loadMusic() {
+            try {
+                // Fetch the persisted track data, including the ArrayBuffer
+                const storedTracks = await getTracksFromDB();
+                
+                // Map the stored data to the active music array
+                music = storedTracks.map(track => {
+                    return {
+                        id: track.id,
+                        title: track.title,
+                        category: track.category,
+                        fileData: track.fileData, // ArrayBuffer containing the actual file data
+                        fileMimeType: track.fileMimeType,
+                        objectUrl: null, // Temporary URL created only on playback
+                        timestamp: track.timestamp
+                    };
+                }).sort((a, b) => b.timestamp - a.timestamp); 
+                
+                filterMusicByCategory(currentCategory);
+            } catch (error) {
+                console.error("Error loading music from IndexedDB:", error);
+                // Alert only if there's a serious failure
+            }
         }
 
-        // Render music cards (Minor change: using local ID for deletion)
+        // Render music cards 
         function renderMusicCards(musicList) {
             musicGrid.innerHTML = '';
             
@@ -1098,9 +1202,8 @@
                 return;
             }
             
-            musicList.forEach((track, index) => {
-                // We use the local array index directly for playback, 
-                // and the unique ID for the delete operation.
+            musicList.forEach((track) => {
+                // Find the index in the global `music` array (needed for playNext/playPrev)
                 const fullArrayIndex = music.findIndex(t => t.id === track.id);
 
                 const card = document.createElement('div');
@@ -1129,7 +1232,7 @@
                 const deleteBtn = card.querySelector('.delete-track');
                 deleteBtn.addEventListener('click', (e) => {
                     e.stopPropagation();
-                    // Pass the local ID for deletion
+                    // Pass the persistent ID for deletion
                     deleteTrack(track.id, fullArrayIndex);
                 });
                 
@@ -1137,16 +1240,15 @@
             });
         }
 
-        // Get category name by ID (NO CHANGE)
+        // Get category name by ID 
         function getCategoryName(categoryId) {
             const category = categories.find(cat => cat.id === categoryId);
             return category ? category.name : 'Unknown';
         }
 
-        // Filter music by category (NO CHANGE)
+        // Filter music by category 
         function filterMusicByCategory(categoryId) {
             if (categoryId === 'all') {
-                // Sort music before rendering for consistent indexing
                 const sortedMusic = [...music].sort((a, b) => b.timestamp - a.timestamp); 
                 renderMusicCards(sortedMusic);
             } else {
@@ -1156,22 +1258,20 @@
             }
         }
 
-        // Delete a track - NOW ONLY DELETES FROM LOCAL ARRAY AND REVOKES URL
-        function deleteTrack(trackId, trackIndex) {
-            if (!confirm("Are you sure you want to delete this track? This will permanently remove it from the current session.")) {
+        // Delete a track - NOW deletes from IndexedDB
+        async function deleteTrack(trackId, trackIndex) {
+            if (!confirm("Are you sure you want to delete this track? This will permanently remove it from your browser's local storage.")) {
                 return;
             }
 
             try {
+                // 1. Find the track and revoke any existing temporary URL
                 const trackToDelete = music.find(t => t.id === trackId);
-                if (trackToDelete && trackToDelete.url) {
-                    URL.revokeObjectURL(trackToDelete.url); // Release the local file resource
+                if (trackToDelete && trackToDelete.objectUrl) {
+                    URL.revokeObjectURL(trackToDelete.objectUrl); 
                 }
 
-                // Filter out the track by its unique ID
-                music = music.filter(t => t.id !== trackId);
-                
-                // If the currently playing track was deleted, stop playback and reset player
+                // 2. Stop playback if necessary
                 if (currentTrackIndex === trackIndex) {
                     if (currentAudio) {
                         currentAudio.pause();
@@ -1184,11 +1284,13 @@
                     currentTrackCategory.textContent = "-";
                     playPauseBtn.innerHTML = '<i class="fas fa-play"></i>';
                 }
+                
+                // 3. Delete from IndexedDB (the persistent storage)
+                await deleteTrackFromDB(trackId);
 
-                // Re-render and adjust currentTrackIndex if necessary
-                // Simplest approach: just call loadMusic which calls filterMusicByCategory and re-renders
+                // 4. Reload the music array from the database and re-render
                 currentTrackIndex = -1; // Reset index to ensure correct card highlighting after re-render
-                loadMusic();
+                await loadMusic();
                 
             } catch (error) {
                 console.error("Error deleting track:", error);
@@ -1196,7 +1298,7 @@
             }
         }
 
-        // Handle music upload - NOW HANDLES LOCAL FILE ONLY
+        // Handle music upload - NOW SAVES TO INDEXEDDB
         async function handleUpload(e) {
             e.preventDefault();
             
@@ -1210,65 +1312,89 @@
                 return;
             }
 
-            // Local file handling is immediate, no progress needed.
             submitBtn.disabled = true;
             
             try {
-                // Create a local URL for the audio file
-                const localUrl = URL.createObjectURL(file);
+                // Read the file content into an ArrayBuffer
+                const fileData = await new Promise((resolve, reject) => {
+                    const reader = new FileReader();
+                    reader.onload = () => resolve(reader.result);
+                    reader.onerror = (error) => reject(error);
+                    reader.readAsArrayBuffer(file);
+                });
+
+                // Create a unique ID for persistent IndexedDB storage
+                const trackId = `idb-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
 
                 const newTrack = {
-                    id: 'local-' + trackCounter++, // Simple unique ID for local tracking
+                    id: trackId,
                     title,
                     category,
-                    url: localUrl, // Use the local Object URL
-                    fileName: file.name,
-                    timestamp: Date.now() // Use a local timestamp for sorting
+                    fileData: fileData, // Store the raw ArrayBuffer
+                    fileMimeType: file.type,
+                    timestamp: Date.now()
                 };
                 
-                // Add to the local music array
-                music.unshift(newTrack); // Add to the start so it appears first
+                // 1. Save to IndexedDB
+                await saveTrackToDB(newTrack);
 
-                // Reset form, close modal, and update grid
+                // 2. Reload the local music array from the database and re-render
+                await loadMusic(); 
+
+                // Reset form, close modal
                 uploadForm.reset();
                 fileName.textContent = "No file selected";
                 uploadModal.style.display = 'none';
                 
-                // The loadMusic function will now re-render the grid from the local 'music' array.
-                loadMusic(); 
-                
                 submitBtn.disabled = false;
-                alert("Track added to session successfully! (Not saved to Firebase)");
+                alert("Track saved to your browser's local storage successfully! It will persist across reloads.");
 
             } catch (error) {
                 submitBtn.disabled = false;
-                alert("An unexpected error occurred during local file processing: " + error.message);
-                console.error("General upload error:", error);
+                alert("An unexpected error occurred during local file processing/saving: " + error.message);
+                console.error("Upload error:", error);
             }
         }
 
-        // Fixed: Play track with proper audio connection (NO CHANGE IN CORE LOGIC, 
-        // but now 'track.url' is a local Object URL)
+        // Fixed: Play track - NOW creates a temporary URL from the ArrayBuffer
         function playTrack(index) {
+            // Clean up the previous track's temporary URL before starting a new one
             if (currentAudio && isPlaying) {
                 fadeOutAndStop(currentAudio, 500);
+                if (music[currentTrackIndex] && music[currentTrackIndex].objectUrl) {
+                    URL.revokeObjectURL(music[currentTrackIndex].objectUrl);
+                    music[currentTrackIndex].objectUrl = null;
+                }
+            } else if (currentAudio) {
+                // If audio was paused, clean up its URL before playing a new one
+                 if (music[currentTrackIndex] && music[currentTrackIndex].objectUrl) {
+                    URL.revokeObjectURL(music[currentTrackIndex].objectUrl);
+                    music[currentTrackIndex].objectUrl = null;
+                }
             }
             
             currentTrackIndex = index;
             const track = music[index];
+
+            // 1. Create a Blob from the ArrayBuffer and generate a temporary Object URL
+            const blob = new Blob([track.fileData], { type: track.fileMimeType });
+            const objectUrl = URL.createObjectURL(blob);
+            
+            // Store the URL temporarily for later cleanup
+            track.objectUrl = objectUrl; 
             
             currentTrackTitle.textContent = track.title;
             currentTrackCategory.textContent = getCategoryName(track.category);
             
-            // The track.url is now a local Object URL
-            currentAudio = new Audio(track.url); 
+            // 2. Play using the temporary Object URL
+            currentAudio = new Audio(objectUrl); 
             currentAudio.loop = loopMode === 'track';
             
             // Set the HTMLMediaElement volume
             const initialVolume = volumeSlider.value / 100;
             currentAudio.volume = initialVolume;
 
-            // Resume AudioContext if it's suspended (required for autoplay policies)
+            // Resume AudioContext if it's suspended
             if (audioCtx.state === 'suspended') {
                 audioCtx.resume();
             }
@@ -1279,16 +1405,9 @@
                 source = null;
             }
             source = audioCtx.createMediaElementSource(currentAudio);
-            
-            // Fixed: Proper audio connection chain
-            // Connect source to analyser (for visualization)
             source.connect(analyser);
-            // Connect analyser to gain node (for volume control)
             analyser.connect(gainNode);
-            // Connect gain node to destination (speakers)
             gainNode.connect(audioCtx.destination);
-            
-            // Set the GainNode volume to match
             gainNode.gain.value = initialVolume;
             
             // Set up progress tracking
@@ -1312,14 +1431,23 @@
             }
         }
 
-        // Handle track end based on loop mode (NO CHANGE)
+        // Handle track end - NOW includes URL cleanup
         function handleTrackEnd() {
+            // Clean up the temporary URL of the just-finished track
+            if (currentTrackIndex !== -1) {
+                const finishedTrack = music[currentTrackIndex];
+                if (finishedTrack && finishedTrack.objectUrl) {
+                    URL.revokeObjectURL(finishedTrack.objectUrl);
+                    finishedTrack.objectUrl = null;
+                }
+            }
+            
             if (loopMode === 'category') {
                 playNext();
             }
         }
 
-        // Fade out and stop audio (NO CHANGE)
+        // Fade out and stop audio 
         function fadeOutAndStop(audio, duration) {
             const initialVolume = audio.volume;
             const step = initialVolume / (duration / 50);
@@ -1335,7 +1463,7 @@
             }, 50);
         }
 
-        // Fade in audio (NO CHANGE)
+        // Fade in audio 
         function fadeIn(audio, duration) {
             const targetVolume = volumeSlider.value / 100;
             const step = targetVolume / (duration / 50);
@@ -1353,7 +1481,7 @@
             }, 50);
         }
 
-        // Draw the spectrum visualizer (NO CHANGE)
+        // Draw the spectrum visualizer 
         function drawVisualizer() {
             requestAnimationFrame(drawVisualizer);
 
@@ -1386,7 +1514,7 @@
             }
         }
 
-        // Update progress bar and time display (NO CHANGE)
+        // Update progress bar and time display 
         function updateProgress() {
             if (currentAudio && !isSeeking) {
                 const percent = (currentAudio.currentTime / currentAudio.duration) * 100;
@@ -1395,14 +1523,14 @@
             }
         }
 
-        // Format time in MM:SS (NO CHANGE)
+        // Format time in MM:SS 
         function formatTime(seconds) {
             const mins = Math.floor(seconds / 60);
             const secs = Math.floor(seconds % 60);
             return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
         }
 
-        // Start seeking (click and drag on progress bar) (NO CHANGE)
+        // Start seeking (click and drag on progress bar) 
         function startSeeking(e) {
             if (!currentAudio) return;
             isSeeking = true;
@@ -1433,7 +1561,7 @@
             document.addEventListener('touchend', endHandler);
         }
 
-        // Seek to a specific position in the track (NO CHANGE)
+        // Seek to a specific position in the track 
         function seekTo(percent) {
             if (currentAudio) {
                 currentAudio.currentTime = percent * currentAudio.duration;
@@ -1442,7 +1570,7 @@
             }
         }
 
-        // Toggle play/pause (NO CHANGE)
+        // Toggle play/pause 
         function togglePlayPause() {
             if (!currentAudio) return;
             
@@ -1461,7 +1589,7 @@
             isPlaying = !isPlaying;
         }
 
-        // Play previous/next track logic (NO CHANGE)
+        // Play previous/next track logic 
         function playPrevious() {
             if (music.length === 0) return;
             
@@ -1506,7 +1634,7 @@
             playTrack(newIndex);
         }
 
-        // Initialize the app when DOM is loaded (NO CHANGE)
+        // Initialize the app when DOM is loaded
         document.addEventListener('DOMContentLoaded', () => {
             init();
             drawVisualizer();
