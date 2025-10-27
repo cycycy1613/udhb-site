@@ -120,6 +120,24 @@
     .nav-menu a:hover::after {
         width: 100%;
     }
+
+    /* Unique Style for Sellers Link */
+    .nav-menu .sellers-link a {
+        color: var(--secondary-color);
+        font-weight: 700;
+    }
+
+    .nav-menu .sellers-link a:hover {
+        color: var(--primary-color);
+    }
+
+    .nav-menu .sellers-link a::after {
+        background-color: var(--primary-color);
+    }
+
+    .nav-menu .sellers-link a:hover::after {
+        background-color: var(--secondary-color);
+    }
     
     /* Hero Section */
     .hero {
@@ -904,6 +922,11 @@
             color: var(--primary-color);
         }
 
+        /* Ensure Sellers link maintains its unique color in mobile */
+        .nav-menu.active .sellers-link a {
+            color: var(--secondary-color);
+        }
+
         .nav-menu li a::after {
             background-color: var(--secondary-color);
         }
@@ -951,6 +974,7 @@
                 <li><a href="#amenities">Amenities</a></li>
                 <li><a href="#location">Location</a></li>
                 <li><a href="#contact">Contact</a></li>
+                <li class="sellers-link"><a href="#codeModal" data-modal-target="codeModal">Sellers</a></li>
             </ul>
         </div>
     </header>
@@ -961,7 +985,6 @@
             <p>a residential community located in Barangay Balagtas, Batangas City. It is designed to offer affordable, comfortable, and modern living spaces for families, professionals, and first-time homebuyers.</p>
             <div class="hero-buttons">
                 <a href="https://m.me/fb.urbandecahomesbatangas" class="btn btn-primary">Inquire Now</a>
-                <a href="https://urbandecahomesbatangas.com/members" class="btn btn-secondary">Sellers Portal</a>
             </div>
         </div>
     </section>
@@ -1261,7 +1284,7 @@
 
     <div id="codeModal" class="seller-modal-backdrop">
         <div class="seller-modal-content">
-            <span class="seller-close-btn">&times;</span>
+            <span class="seller-close-btn">×</span>
             <div class="modal-header">
                 <i class="fas fa-lock"></i>
                 <h2>Sellers Portal</h2>
@@ -1344,8 +1367,18 @@
         // Smooth scrolling for navigation links
         document.querySelectorAll('.nav-menu a[href^="#"]').forEach(anchor => {
             anchor.addEventListener('click', function(e) {
-                e.preventDefault();
                 const targetId = this.getAttribute('href');
+                
+                // If the link points to the codeModal, handle it with the modal logic instead of scrolling
+                if (targetId === '#codeModal') {
+                    e.preventDefault(); // Stop default anchor behavior
+                    codeModal.classList.add('show');
+                    codeInput.value = ''; // Clear any previous input
+                    codeInput.focus();
+                    return; // Stop here for the modal logic
+                }
+
+                e.preventDefault();
                 if (targetId === '#') return;
                 
                 const targetElement = document.querySelector(targetId);
@@ -1363,7 +1396,7 @@
         // ** NEW JAVASCRIPT FOR SELLERS PORTAL MODAL **
         // **********************************************
 
-        const sellersPortalLink = document.querySelector('.btn-secondary[href="https://urbandecahomesbatangas.com/members"]');
+        // Note: The sellersPortalLink logic has been moved into the smooth scrolling function.
         const codeModal = document.getElementById('codeModal');
         const closeModalBtn = codeModal.querySelector('.seller-close-btn');
         const submitCodeBtn = document.getElementById('submitCodeBtn');
@@ -1371,14 +1404,6 @@
         const toastNotification = document.getElementById('toastNotification');
         const CORRECT_CODE = '8990';
         const DESTINATION_URL = 'https://urbandecahomesbatangas.com/members';
-
-        // 1. Intercept the Sellers Portal click
-        sellersPortalLink.addEventListener('click', function(e) {
-            e.preventDefault(); // Prevent default navigation
-            codeModal.classList.add('show');
-            codeInput.value = ''; // Clear any previous input
-            codeInput.focus();
-        });
 
         // 2. Close Modal functionality
         function closeModalHandler() {
