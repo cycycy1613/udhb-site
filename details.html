@@ -26,6 +26,7 @@
             --success: #228B22;
         }
         
+        /* DEFAULT DARK MODE STYLES (Overridden by .light-mode below) */
         body {
             background: linear-gradient(135deg, #1a1a1a 0%, #2a0f0f 100%);
             color: var(--light);
@@ -527,6 +528,104 @@
             position: relative;
             z-index: 2;
         }
+
+        /* --- LIGHT MODE OVERRIDES --- */
+
+        .light-mode body {
+            /* Light Background, Dark Text */
+            background: var(--light); /* #F5F5F5 */
+            color: var(--dark); /* #2C2C2C */
+        }
+        
+        .light-mode header {
+            background: linear-gradient(135deg, var(--primary-light), var(--primary));
+            color: white; /* Keep text white on dark red header */
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1); /* Lighter shadow */
+        }
+        
+        .light-mode h1,
+        .light-mode .tagline {
+            text-shadow: none;
+        }
+        
+        .light-mode .info-card,
+        .light-mode .unit-card,
+        .light-mode .cost-card,
+        .light-mode .chart-container,
+        .light-mode .comparison-card {
+            /* Light Card Background, Dark Text */
+            background: #FFFFFF; /* Pure White */
+            color: var(--dark); /* Dark text on white card */
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08); /* Lighter shadow */
+            border-left: 5px solid var(--primary); /* Keep accent color */
+            border-top: none; /* Remove dark mode border, rely on left border and shadow */
+            border: 1px solid rgba(0, 0, 0, 0.05); /* Very subtle border */
+        }
+
+        .light-mode .unit-card {
+            border-top: 4px solid var(--secondary); /* Keep gold accent on unit cards */
+        }
+        
+        .light-mode .info-card::before {
+             /* Lighten the inner glow effect for light mode */
+            opacity: 0.05;
+        }
+
+        .light-mode .card-title,
+        .light-mode .card-content,
+        .light-mode .unit-title,
+        .light-mode .cost-title,
+        .light-mode .chart-title,
+        .light-mode .comparison-title,
+        .light-mode .step-title {
+            color: var(--dark); /* Ensure all text is dark on light cards/body */
+        }
+
+        .light-mode .highlight {
+             /* Darker accent background, white text */
+            background: var(--primary-light);
+            color: white;
+            box-shadow: none;
+        }
+
+        .light-mode .unit-size {
+            color: var(--primary); /* Use primary brand color for emphasis */
+            text-shadow: none;
+        }
+        
+        .light-mode .capacity i,
+        .light-mode .feature-list i,
+        .light-mode .location-highlight i {
+            color: var(--primary); /* Use primary brand color for icons */
+        }
+
+        .light-mode .amenity {
+            /* Keep the amenity chips with brand colors */
+            background: linear-gradient(135deg, var(--primary), var(--primary-light));
+            color: white;
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .light-mode .step-icon {
+            /* Keep the step icons with brand colors */
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+        }
+
+        .light-mode .cost-amount {
+            color: var(--primary); /* Use primary brand color for amounts */
+            text-shadow: none;
+        }
+
+        .light-mode .cost-note,
+        .light-mode .step-duration {
+            color: var(--gray); /* Keep gray text */
+        }
+
+        .light-mode .feature-list li {
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1); /* Darker separator for light mode */
+        }
+
+        /* --- END LIGHT MODE OVERRIDES --- */
         
         @media (max-width: 768px) {
             .info-grid {
@@ -590,7 +689,7 @@
         }
     </style>
 </head>
-<body>
+<body class="light-mode">
     <header>
         <div class="container">
             <div class="logo-container">
@@ -829,12 +928,9 @@
             <div class="contact-info">
                 <div class="contact-item">
                     <i class="fas fa-phone-alt"></i>
-                    <span>+63 991-382-7663</span>
+                    <span>Sales Officer: +63 991-382-7663</span>
                 </div>
-                <div class="contact-item">
-                    <i class="fas fa-envelope"></i>
-                    <span>cyron.panganiban@decagold.com</span>
-                </div>
+                
                 <div class="contact-item">
                     <i class="fas fa-map-marker-alt"></i>
                     <span>Balagtas, Batangas City</span>
@@ -868,6 +964,10 @@
             
             // Initialize chart
             const ctx = document.getElementById('unitChart').getContext('2d');
+
+            // Set the text color to dark for light mode
+            const chartTextColor = '#2C2C2C'; 
+            
             const unitChart = new Chart(ctx, {
                 type: 'doughnut',
                 data: {
@@ -893,7 +993,7 @@
                         legend: {
                             position: 'bottom',
                             labels: {
-                                color: '#F5F5F5',
+                                color: chartTextColor,
                                 font: {
                                     size: 14
                                 }
@@ -902,7 +1002,7 @@
                         title: {
                             display: true,
                             text: 'Unit Distribution',
-                            color: '#F5F5F5',
+                            color: chartTextColor,
                             font: {
                                 size: 18
                             }
