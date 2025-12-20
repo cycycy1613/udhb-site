@@ -3,1694 +3,827 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>UDHB Information Portal</title>
+    <title>Urban Deca Homes Batangas - Price & Financing Calculator</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-storage-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
     <style>
         * {
+            box-sizing: border-box;
             margin: 0;
             padding: 0;
-            box-sizing: border-box;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
-
+        
         body {
-            background: linear-gradient(135deg, #f5f7fa 0%, #e4edf5 100%);
+            background-color: #f5f7fa;
             color: #333;
             line-height: 1.6;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .container {
-            width: 100%;
-            max-width: 1200px;
-            margin: 0 auto;
             padding: 20px;
-            flex: 1;
-        }
-
-        header {
-            background: linear-gradient(to right, #2C3E50, #E74C3C);
-            color: white;
-            padding: 25px 0;
-            text-align: center;
-            border-radius: 12px;
-            margin-bottom: 30px;
-            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.15);
-            animation: slideDown 0.5s ease-out;
-            position: relative; 
         }
         
-        /* REMOVED: Old #admin-logout-btn style */
-
-        header h1 {
-            font-size: 2.5rem;
-            margin-bottom: 10px;
-            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.2);
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+            overflow: hidden;
         }
-
-        header p {
-            font-size: 1.1rem;
+        
+        header {
+            background: linear-gradient(135deg, #0d47a1, #1976d2);
+            color: white;
+            padding: 25px 30px;
+            border-bottom: 5px solid #ff9800;
+        }
+        
+        h1 {
+            font-size: 28px;
+            margin-bottom: 5px;
+        }
+        
+        .subtitle {
+            font-size: 16px;
             opacity: 0.9;
         }
-
-        .sections-container {
+        
+        .disclaimer {
+            background-color: #fff8e1;
+            border-left: 4px solid #ff9800;
+            padding: 12px 20px;
+            margin: 15px 30px;
+            font-size: 14px;
+            border-radius: 4px;
+        }
+        
+        .calculator-section {
+            padding: 25px 30px;
+            border-bottom: 1px solid #eaeaea;
+        }
+        
+        .section-title {
+            color: #0d47a1;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #eaeaea;
+            font-size: 22px;
+        }
+        
+        .controls {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .control-group {
             display: flex;
             flex-direction: column;
-            gap: 30px;
-            margin-bottom: 40px;
-            animation: fadeIn 0.8s ease-out;
         }
-
-        .section {
-            background: white;
-            border-radius: 12px;
-            padding: 25px;
-            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-        }
-
-        .section:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
-        }
-
-        .section-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-            padding-bottom: 15px;
-            border-bottom: 2px solid #eaeaea;
-        }
-
-        .section-title {
-            font-size: 1.8rem;
-            color: #2a5298;
+        
+        label {
             font-weight: 600;
-        }
-
-        .upload-icon {
-            width: 50px;
-            height: 50px;
-            background: #2a5298;
-            border-radius: 50%;
+            margin-bottom: 8px;
+            color: #555;
             display: flex;
-            justify-content: center;
             align-items: center;
-            color: white;
-            font-size: 1.5rem;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.15);
-            /* NEW: Initial hidden state */
-            display: none; 
-        }
-
-        .upload-icon:hover {
-            background: #1a3a6c;
-            transform: scale(1.05) rotate(5deg);
-        }
-
-        /* Gallery Styles */
-        .gallery {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-            gap: 15px;
-        }
-
-        .gallery-item {
-            position: relative;
-            border-radius: 10px;
-            overflow: hidden;
-            box-shadow: 0 3px 12px rgba(0, 0, 0, 0.1);
-            cursor: pointer;
-            transition: all 0.3s ease;
-            animation: fadeIn 0.5s ease-out;
-        }
-
-        .gallery-item:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.15);
-        }
-
-        .gallery-item img {
-            width: 100%;
-            height: 130px;
-            object-fit: cover;
-            display: block;
-            transition: transform 0.5s ease;
-        }
-
-        .gallery-item:hover img {
-            transform: scale(1.05);
-        }
-
-        .gallery-item p {
-            padding: 10px;
-            font-size: 0.85rem;
-            background: white;
-            text-align: center;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            font-weight: 500;
-        }
-
-        /* Folder System Styles */
-        .folders-container {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-            gap: 20px;
-        }
-
-        .folder-item {
-            background: white;
-            border-radius: 12px;
-            padding: 20px;
-            text-align: center;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
-            transition: all 0.3s ease;
-            cursor: pointer;
-            position: relative;
-        }
-
-        .folder-item:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
-        }
-
-        .folder-icon {
-            font-size: 3.5rem;
-            color: #ffa726;
-            margin-bottom: 15px;
-        }
-
-        .folder-name {
-            font-weight: 600;
-            color: #2a5298;
-            margin-bottom: 5px;
-            word-break: break-word;
-        }
-
-        .folder-count {
-            font-size: 0.85rem;
-            color: #888;
-        }
-
-        .folder-actions {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            display: flex;
             gap: 8px;
         }
-
-        .folder-action {
-            width: 30px;
-            height: 30px;
-            border-radius: 50%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            background: rgba(0, 0, 0, 0.7);
-            color: white;
-            font-size: 0.9rem;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            opacity: 0;
+        
+        .select-wrapper {
+            position: relative;
         }
-
-        .folder-item:hover .folder-action {
-            opacity: 1;
-        }
-
-        .folder-action:hover {
-            transform: scale(1.1);
-            background: rgba(0, 0, 0, 0.9);
-        }
-
-        .folder-delete {
-            background: rgba(244, 67, 54, 0.8);
-        }
-
-        .folder-delete:hover {
-            background: rgba(211, 47, 47, 0.9);
-        }
-
-        .folder-view-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-            padding: 15px;
-            background: #f5f7fa;
-            border-radius: 10px;
-        }
-
-        .folder-view-title {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-size: 1.5rem;
-            color: #2a5298;
-            font-weight: 600;
-        }
-
-        .back-button {
-            padding: 8px 16px;
-            background: #2a5298;
-            color: white;
-            border: none;
+        
+        select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #ccc;
             border-radius: 6px;
+            font-size: 16px;
+            background-color: white;
+            appearance: none;
             cursor: pointer;
-            font-weight: 500;
-            transition: all 0.2s;
-            display: flex;
-            align-items: center;
-            gap: 8px;
+            transition: border-color 0.3s;
         }
-
-        .back-button:hover {
-            background: #1a3a6c;
+        
+        select:focus {
+            outline: none;
+            border-color: #1976d2;
+            box-shadow: 0 0 0 2px rgba(25, 118, 210, 0.2);
         }
-
-        /* Modal Styles */
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.95);
-            z-index: 1000;
-            justify-content: center;
-            align-items: center;
-            opacity: 0;
-            transition: opacity 0.3s ease;
-        }
-
-        .modal.active {
-            opacity: 1;
-        }
-
-        .modal-content {
-            position: relative;
-            max-width: 90vw;
-            max-height: 90vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            animation: zoomIn 0.3s ease-out;
-            overflow: hidden; /* To keep images within bounds */
-        }
-
-        .modal-content img {
-            max-width: 100%;
-            max-height: 80vh;
-            border-radius: 8px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-        }
-
-        .modal-controls {
+        
+        .select-icon {
             position: absolute;
-            top: 20px;
-            right: 20px;
-            display: flex;
-            gap: 15px;
-            z-index: 1001;
-        }
-
-        .modal-control {
-            width: 50px;
-            height: 50px;
-            background: rgba(0, 0, 0, 0.7);
-            border-radius: 50%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            color: white;
-            font-size: 1.3rem;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
-            border: 2px solid white;
-        }
-
-        .modal-control:hover {
-            transform: scale(1.1);
-            background: rgba(0, 0, 0, 0.9);
-        }
-
-        /* Swipe navigation buttons */
-        /* These are now always visible for user convenience in the modal */
-        .modal-nav {
-            position: absolute;
+            right: 15px;
             top: 50%;
             transform: translateY(-50%);
-            z-index: 1002;
-            padding: 10px;
-            background: rgba(0, 0, 0, 0.5);
-            color: white;
-            border: none;
-            cursor: pointer;
-            font-size: 1.5rem;
-            border-radius: 5px;
-            transition: background 0.2s;
-        }
-        .modal-nav:hover {
-            background: rgba(0, 0, 0, 0.7);
-        }
-        .modal-nav-prev {
-            left: 20px;
-        }
-        .modal-nav-next {
-            right: 20px;
-        }
-
-
-        .upload-modal, .delete-modal, .folder-modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.85);
-            z-index: 1000;
-            justify-content: center;
-            align-items: center;
-            opacity: 0;
-            transition: opacity 0.3s ease;
-        }
-
-        .upload-modal.active, .delete-modal.active, .folder-modal.active {
-            opacity: 1;
-        }
-
-        .modal-box {
-            background: white;
-            padding: 30px;
-            border-radius: 15px;
-            width: 90%;
-            max-width: 500px;
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.25);
-            transform: translateY(20px);
-            transition: transform 0.3s ease;
-            animation: modalSlideIn 0.3s ease-out;
-        }
-
-        .upload-modal.active .modal-box, .delete-modal.active .modal-box {
-            transform: translateY(0);
-        }
-
-        .modal-box h2 {
-            margin-bottom: 20px;
-            color: #2a5298;
-            text-align: center;
-            font-size: 1.8rem;
-            font-weight: 600;
-        }
-
-        .form-group {
-            margin-bottom: 20px;
-            position: relative;
-        }
-
-        .password-toggle {
-            position: absolute;
-            right: 10px;
-            top: 38px;
-            cursor: pointer;
-            color: #777;
-        }
-
-        .form-group label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 600;
-            color: #444;
-        }
-
-        .form-group input, .form-group select {
-            width: 100%;
-            padding: 14px;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            font-size: 1rem;
-            transition: border-color 0.3s ease, box-shadow 0.3s ease;
-        }
-
-        .form-group input:focus, .form-group select:focus {
-            border-color: #2a5298;
-            box-shadow: 0 0 0 3px rgba(42, 82, 152, 0.2);
-            outline: none;
-        }
-
-        .form-actions {
-            display: flex;
-            justify-content: flex-end;
-            gap: 12px;
-            margin-top: 25px;
-            flex-wrap: wrap;
-        }
-
-        .btn {
-            padding: 14px 26px;
-            border: none;
-            border-radius: 8px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            font-size: 1rem;
-            min-width: 120px;
-        }
-
-        .btn-primary {
-            background: #2a5298;
-            color: white;
-            box-shadow: 0 4px 10px rgba(42, 82, 152, 0.25);
-        }
-
-        .btn-primary:hover {
-            background: #1a3a6c;
-            transform: translateY(-2px);
-            box-shadow: 0 6px 15px rgba(42, 82, 152, 0.3);
-        }
-
-        .btn-secondary {
-            background: #eaeaea;
-            color: #555;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-        }
-
-        .btn-secondary:hover {
-            background: #d4d4d4;
-            transform: translateY(-2px);
-            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
-        }
-
-        footer {
-            text-align: center;
-            padding: 25px;
+            pointer-events: none;
             color: #666;
-            font-size: 0.9rem;
-            background: white;
-            margin-top: 40px;
-            border-top: 1px solid #eee;
         }
-
-        footer a {
-            color: #2a5298;
-            text-decoration: none;
-            font-weight: 600;
-            transition: color 0.2s;
+        
+        .results {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-top: 25px;
         }
-
-        footer a:hover {
-            color: #1a3a6c;
-            text-decoration: underline;
-        }
-
-        .empty-gallery, .empty-folders {
+        
+        .result-card {
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            padding: 20px;
             text-align: center;
-            padding: 40px 20px;
-            color: #888;
-            font-style: italic;
-            grid-column: 1 / -1;
+            border: 1px solid #eaeaea;
+            transition: transform 0.3s, box-shadow 0.3s;
         }
-
-        .notification {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            padding: 15px 25px;
-            border-radius: 10px;
-            background: #4caf50;
-            color: white;
-            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
-            transform: translateX(100%);
-            transition: transform 0.3s ease;
-            z-index: 1100;
-            font-weight: 500;
+        
+        .result-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .result-card.highlight {
+            background: linear-gradient(135deg, #e3f2fd, #bbdefb);
+            border-color: #1976d2;
+        }
+        
+        .result-label {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 8px;
+        }
+        
+        .result-value {
+            font-size: 24px;
+            font-weight: 700;
+            color: #0d47a1;
+        }
+        
+        .result-unit {
+            font-size: 16px;
+            color: #1976d2;
+        }
+        
+        .amortization-section {
+            padding: 25px 30px;
+        }
+        
+        .loan-term-selector {
             display: flex;
-            align-items: center;
+            flex-wrap: wrap;
             gap: 10px;
+            margin-bottom: 25px;
         }
-
-        .notification.show {
-            transform: translateX(0);
+        
+        .term-btn {
+            padding: 10px 20px;
+            background-color: #f1f1f1;
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
         }
-
-        .notification.error {
-            background: #f44336;
+        
+        .term-btn:hover {
+            background-color: #e3e3e3;
         }
-
-        .progress-bar {
-            height: 6px;
-            background: #ddd;
-            border-radius: 10px;
-            margin-top: 10px;
+        
+        .term-btn.active {
+            background-color: #1976d2;
+            color: white;
+        }
+        
+        .amortization-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
+            border-radius: 8px;
             overflow: hidden;
-            display: none;
         }
-
-        .progress {
-            height: 100%;
-            background: linear-gradient(to right, #2a5298, #3a6cc8);
-            width: 0%;
-            transition: width 0.3s ease;
-            border-radius: 10px;
+        
+        .amortization-table th {
+            background-color: #0d47a1;
+            color: white;
+            padding: 15px;
+            text-align: left;
         }
-
-        .spinner {
-            border: 4px solid rgba(0, 0, 0, 0.1);
-            border-left: 4px solid #2a5298;
-            border-radius: 50%;
-            width: 30px;
-            height: 30px;
-            animation: spin 1s linear infinite;
-            margin: 15px auto;
+        
+        .amortization-table td {
+            padding: 15px;
+            border-bottom: 1px solid #eaeaea;
         }
-
-        /* Animations */
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+        
+        .amortization-table tr:nth-child(even) {
+            background-color: #f9f9f9;
         }
-
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
+        
+        .amortization-table tr:hover {
+            background-color: #f0f7ff;
         }
-
-        @keyframes slideDown {
-            from {
-                opacity: 0;
-                transform: translateY(-20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+        
+        .gmir-row {
+            background-color: #e8f5e9 !important;
+            font-weight: 600;
         }
-
-        @keyframes zoomIn {
-            from {
-                opacity: 0;
-                transform: scale(0.9);
-            }
-            to {
-                opacity: 1;
-                transform: scale(1);
-            }
+        
+        footer {
+            background-color: #f1f1f1;
+            padding: 20px 30px;
+            text-align: center;
+            color: #666;
+            font-size: 14px;
+            border-top: 1px solid #eaeaea;
         }
-
-        @keyframes modalSlideIn {
-            from {
-                opacity: 0;
-                transform: translateY(-30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+        
+        .footer-notes {
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            margin-top: 15px;
+            font-size: 13px;
         }
-
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-            100% { transform: scale(1); }
+        
+        .footer-notes div {
+            margin: 5px 10px;
         }
-
-        /* Responsive Design */
-        @media (max-width: 992px) {
-            .gallery {
-                grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-            }
-        }
-
+        
         @media (max-width: 768px) {
-            .container {
-                padding: 15px;
+            .controls {
+                grid-template-columns: 1fr;
             }
-
-            header {
-                padding: 20px 0;
-                border-radius: 10px;
-            }
-
-            header h1 {
-                font-size: 2rem;
-            }
-
-            .sections-container {
-                gap: 20px;
-            }
-
-            .section {
-                min-width: 100%;
-            }
-
-            .section-title {
-                font-size: 1.6rem;
-            }
-
-            .gallery {
-                grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-                gap: 12px;
-            }
-
-            .gallery-item img {
-                height: 110px;
-            }
-
-            .modal-controls {
-                top: 15px;
-                right: 15px;
-            }
-
-            .modal-control {
-                width: 45px;
-                height: 45px;
-                font-size: 1.2rem;
-            }
-
-            .modal-box {
-                padding: 25px 20px;
-            }
-
-            .form-actions {
-                flex-direction: column;
-            }
-
-            .btn {
-                width: 100%;
-            }
-        }
-
-        @media (max-width: 480px) {
-            header h1 {
-                font-size: 1.7rem;
-            }
-
-            header p {
-                font-size: 1rem;
-            }
-
-            .section-header {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 15px;
-            }
-
-            .upload-icon {
-                align-self: flex-end;
-            }
-
-            .gallery {
+            
+            .results {
                 grid-template-columns: repeat(2, 1fr);
             }
-
-            .gallery-item img {
-                height: 100px;
+            
+            .amortization-table {
+                font-size: 14px;
             }
-
-            .modal-content img {
-                max-height: 70vh;
+            
+            .amortization-table th, 
+            .amortization-table td {
+                padding: 10px;
             }
-
-            .modal-controls {
-                top: 10px;
-                right: 10px;
-                flex-direction: column;
+            
+            header {
+                padding: 20px;
             }
-
-            .modal-control {
-                width: 40px;
-                height: 40px;
-                font-size: 1.1rem;
+            
+            .calculator-section, .amortization-section {
+                padding: 20px;
             }
+        }
+        
+        @media (max-width: 480px) {
+            .results {
+                grid-template-columns: 1fr;
+            }
+            
+            .term-btn {
+                flex-grow: 1;
+                text-align: center;
+            }
+        }
+        
+        .no-data {
+            text-align: center;
+            padding: 40px;
+            color: #888;
+            font-style: italic;
+        }
+        
+        .unit-area {
+            font-size: 14px;
+            color: #777;
+            margin-left: 5px;
         }
     </style>
 </head>
 <body>
     <div class="container">
         <header>
-            <h1>Computations</h1>
-            <p>Your One-Stop Hub for Sample Computations</p>
-            </header>
-
-        <div class="sections-container">
-            <div class="section" id="gallery-section">
-                <div class="section-header">
-                    <h2 class="section-title">Folders</h2>
-                    <div class="upload-icon" id="create-folder-icon" onclick="openFolderModal()">
-                        <i class="fas fa-folder-plus"></i>
+            <h1><i class="fas fa-home"></i> Urban Deca Homes Batangas</h1>
+            <p class="subtitle">Price List & Financing Calculator | As of February 5, 2025</p>
+        </header>
+        
+        <div class="disclaimer">
+            <i class="fas fa-exclamation-circle"></i> <strong>Important Note:</strong> Prices are subject to change without prior notice. Interest rates change over time. These are only best estimates at this time. The final computation will be released by 8990, Pag-IBIG, or Bank.
+        </div>
+        
+        <div class="calculator-section">
+            <h2 class="section-title"><i class="fas fa-calculator"></i> Unit & Financing Selection</h2>
+            
+            <div class="controls">
+                <div class="control-group">
+                    <label for="unitType"><i class="fas fa-building"></i> Unit Type</label>
+                    <div class="select-wrapper">
+                        <select id="unitType">
+                            <option value="">Select Unit Type</option>
+                            <option value="2BR-A">2BR-A (36.34 sqm)</option>
+                            <option value="2BR-B">2BR-B (36.91 sqm)</option>
+                            <option value="2BR-D">2BR-D (37.11 sqm)</option>
+                            <option value="3BR-A">3BR-A (44.85 sqm)</option>
+                            <option value="3BR-B">3BR-B (53.64 sqm)</option>
+                        </select>
+                        <div class="select-icon"><i class="fas fa-chevron-down"></i></div>
                     </div>
                 </div>
-                <div id="gallery-folders" class="folders-container">
-                    <div class="empty-folders">
-                        <div class="spinner"></div>
-                        <div>Loading folders...</div>
+                
+                <div class="control-group">
+                    <label for="zoneLevel"><i class="fas fa-layer-group"></i> Zone / Floor Level</label>
+                    <div class="select-wrapper">
+                        <select id="zoneLevel">
+                            <option value="">Select Zone/Floor</option>
+                            <option value="2nd">2nd Floor</option>
+                            <option value="3rd-4th">3rd - 4th Floor</option>
+                            <option value="5th-6th">5th - 6th Floor</option>
+                        </select>
+                        <div class="select-icon"><i class="fas fa-chevron-down"></i></div>
                     </div>
                 </div>
-                <div id="gallery-view" class="gallery" style="display: none;">
+                
+                <div class="control-group">
+                    <label for="financing"><i class="fas fa-university"></i> Financing Option</label>
+                    <div class="select-wrapper">
+                        <select id="financing">
+                            <option value="">Select Financing</option>
+                            <option value="HDMF">Pag-IBIG Fund (HDMF)</option>
+                            <option value="BPI">BPI MyBahay</option>
+                            <option value="BDO">BDO</option>
+                            <option value="SBC">Security Bank (SBC)</option>
+                            <option value="SBC2">Security Bank Alt (SBC)</option>
+                        </select>
+                        <div class="select-icon"><i class="fas fa-chevron-down"></i></div>
                     </div>
+                </div>
+            </div>
+            
+            <div class="results">
+                <div class="result-card highlight">
+                    <div class="result-label">NET TOO</div>
+                    <div class="result-value" id="netTooValue">₱ -</div>
+                    <div class="result-unit">Total Contract Price</div>
+                </div>
+                
+                <div class="result-card">
+                    <div class="result-label">EQUITY PROMO</div>
+                    <div class="result-value" id="equityPromoValue">₱ -</div>
+                    <div class="result-unit">Promotional Discount</div>
+                </div>
+                
+                <div class="result-card">
+                    <div class="result-label">RESERVATION FEE (RF)</div>
+                    <div class="result-value" id="rfValue">₱ -</div>
+                    <div class="result-unit">One-time Payment</div>
+                </div>
+                
+                <div class="result-card">
+                    <div class="result-label">LOAN AMOUNT</div>
+                    <div class="result-value" id="loanAmountValue">₱ -</div>
+                    <div class="result-unit">Financing Required</div>
+                </div>
             </div>
         </div>
-
+        
+        <div class="amortization-section">
+            <h2 class="section-title"><i class="fas fa-table"></i> Monthly Amortization Schedule</h2>
+            
+            <p>Select loan term to view monthly amortization (Principal + Interest only):</p>
+            
+            <div class="loan-term-selector">
+                <button class="term-btn active" data-term="30">30 Years</button>
+                <button class="term-btn" data-term="25">25 Years</button>
+                <button class="term-btn" data-term="20">20 Years</button>
+                <button class="term-btn" data-term="15">15 Years</button>
+                <button class="term-btn" data-term="10">10 Years</button>
+                <button class="term-btn" data-term="5">5 Years</button>
+            </div>
+            
+            <div id="amortizationTableContainer">
+                <table class="amortization-table">
+                    <thead>
+                        <tr>
+                            <th>Financing Institution</th>
+                            <th>Interest Rate</th>
+                            <th>Loan Term</th>
+                            <th>Monthly Amortization</th>
+                            <th>GMIR</th>
+                        </tr>
+                    </thead>
+                    <tbody id="amortizationBody">
+                        <tr>
+                            <td colspan="5" class="no-data">Please select a unit type, zone level, and financing option to view amortization details.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
         <footer>
-            <p>UDHB Information Portal 
-                <a href="#" onclick="openLoginModal(event)" id="admin-login-link">Login</a>
-                <span id="admin-footer-separator" style="display: none;"> | </span>
-                <a href="#" onclick="adminLogout(event)" id="admin-logout-link" style="display: none;">Logout</a>
-            </p>
+            <div>8990 Housing Development Corporation</div>
+            <div>Urban Deca Homes Batangas | Price List as of February 5, 2025</div>
+            
+            <div class="footer-notes">
+                <div><i class="fas fa-file-contract"></i> Prepared By: Maria V. Padagdag</div>
+                <div><i class="fas fa-check-circle"></i> Recommended By: Roan B. Torregoza</div>
+                <div><i class="fas fa-user-check"></i> Approved By: Alexander Ace Sotto</div>
+            </div>
         </footer>
     </div>
-    
-    <div id="loginModal" class="upload-modal">
-        <div class="modal-box">
-            <h2>Admin Login</h2>
-            <div class="form-group">
-                <label for="adminEmail">Email</label>
-                <input type="email" id="adminEmail" placeholder="Enter admin email">
-            </div>
-            <div class="form-group">
-                <label for="adminPassword">Password</label>
-                <input type="password" id="adminPassword" placeholder="Enter password">
-                <span class="password-toggle" onclick="togglePassword('adminPassword')">
-                    <i class="fas fa-eye"></i>
-                </span>
-            </div>
-            <div class="form-actions">
-                <button class="btn btn-secondary" onclick="closeLoginModal()">Cancel</button>
-                <button class="btn btn-primary" onclick="adminLogin()">Login</button>
-            </div>
-        </div>
-    </div>
-
-    <div id="uploadModal" class="upload-modal">
-        <div class="modal-box">
-            <h2 id="uploadModalTitle">Upload Image</h2>
-            <div class="form-group">
-                <label for="fileName">Image Name</label>
-                <input type="text" id="fileName" placeholder="Enter image name">
-            </div>
-            <div class="form-group">
-                <label for="fileInput">Select Image</label>
-                <input type="file" id="fileInput" accept="image/*">
-            </div>
-            <div class="form-group" id="folderNameGroup" style="display: none;">
-                <label for="folderName">Folder Name</label>
-                <input type="text" id="folderName" placeholder="Enter folder name">
-            </div>
-            <div class="progress-bar">
-                <div class="progress" id="uploadProgress"></div>
-            </div>
-            <div class="form-actions">
-                <button class="btn btn-secondary" onclick="closeUploadModal()">Cancel</button>
-                <button class="btn btn-primary" id="uploadButton" onclick="uploadFile()">Upload</button>
-            </div>
-        </div>
-    </div>
-
-    <div id="deleteModal" class="delete-modal">
-        <div class="modal-box">
-            <h2>Confirm Deletion</h2>
-            <p style="text-align: center; margin-bottom: 20px;">
-                Are you sure you want to delete this item?
-            </p>
-            <div class="form-actions">
-                <button class="btn btn-secondary" onclick="closeDeleteModal()">Cancel</button>
-                <button class="btn btn-primary" onclick="confirmDelete()">Delete</button>
-            </div>
-        </div>
-    </div>
-
-    <div id="folderModal" class="folder-modal">
-        <div class="modal-box">
-            <h2>Create New Folder</h2>
-            <div class="form-group">
-                <label for="newFolderName">Folder Name</label>
-                <input type="text" id="newFolderName" placeholder="Enter new folder name">
-            </div>
-            <div class="form-actions">
-                <button class="btn btn-secondary" onclick="closeFolderModal()">Cancel</button>
-                <button class="btn btn-primary" onclick="createFolder()">Create Folder</button>
-            </div>
-        </div>
-    </div>
-
-    <div id="imageModal" class="modal">
-        <div class="modal-content">
-            <img id="modalImage" src="" alt="">
-            <div class="modal-controls">
-                <div class="modal-control delete-icon-modal" id="modal-delete-icon" onclick="deleteImage()" style="display: none;">
-                    <i class="fas fa-trash"></i>
-                </div>
-                <div class="modal-control" onclick="closeModal()">
-                    <i class="fas fa-times"></i>
-                </div>
-            </div>
-            <button class="modal-nav modal-nav-prev" onclick="prevImage()">
-                <i class="fas fa-chevron-left"></i>
-            </button>
-            <button class="modal-nav modal-nav-next" onclick="nextImage()">
-                <i class="fas fa-chevron-right"></i>
-            </button>
-        </div>
-    </div>
-
-    <div id="notification" class="notification"></div>
 
     <script>
-        // Firebase configuration
-        const firebaseConfig = {
-            apiKey: "AIzaSyAno9NDbUgrgBi7NrC4krNXQg4dMXzN-7g",
-            authDomain: "udhb-site.firebaseapp.com",
-            databaseURL: "https://udhb-site-default-rtdb.firebaseio.com",
-            projectId: "udhb-site",
-            storageBucket: "udhb-site.firebasestorage.app",
-            messagingSenderId: "214765051025",
-            appId: "1:214765051025:web:5e72b00e570919bf3c7330"
+        // Data extracted from the PDF
+        const propertyData = {
+            "2nd": {
+                "2BR-A": {
+                    unitArea: "36.34",
+                    netTOO: 2583984.42,
+                    equityPromo: 119199.22,
+                    rf: 10000,
+                    loanAmount: 2454785.20,
+                    amortizations: {
+                        HDMF: { rate: "6.250%", term: 30, monthly: 15114.53, gmir: 43184.38 },
+                        BPI: { rate: "7.000%", term: 30, monthly: 16331.75, gmir: 40829.37 },
+                        BDO: { rate: "6.500%", term: 20, monthly: 18302.22, gmir: 52292.05 },
+                        SBC: { rate: "6.800%", term: 20, monthly: 18738.35, gmir: 50000.00 },
+                        SBC2: { rate: "6.800%", term: 20, monthly: 15677.70, gmir: 50000.00 }
+                    }
+                },
+                "2BR-B": {
+                    unitArea: "36.91",
+                    netTOO: 2624052.42,
+                    equityPromo: 121202.62,
+                    rf: 10000,
+                    loanAmount: 2492849.80,
+                    amortizations: {
+                        HDMF: { rate: "6.250%", term: 30, monthly: 15348.90, gmir: 43854.01 },
+                        BPI: { rate: "7.000%", term: 30, monthly: 16584.99, gmir: 41462.48 },
+                        BDO: { rate: "6.500%", term: 20, monthly: 18586.02, gmir: 53102.91 },
+                        SBC: { rate: "6.800%", term: 20, monthly: 19028.91, gmir: 50000.00 },
+                        SBC2: { rate: "6.800%", term: 20, monthly: 15920.81, gmir: 50000.00 }
+                    }
+                },
+                "2BR-D": {
+                    unitArea: "37.11",
+                    netTOO: 2638111.37,
+                    equityPromo: 121905.57,
+                    rf: 10000,
+                    loanAmount: 2506205.80,
+                    amortizations: {
+                        HDMF: { rate: "6.250%", term: 30, monthly: 15431.14, gmir: 44088.97 },
+                        BPI: { rate: "7.000%", term: 30, monthly: 16673.85, gmir: 41684.62 },
+                        BDO: { rate: "6.500%", term: 20, monthly: 18685.60, gmir: 53387.42 },
+                        SBC: { rate: "6.800%", term: 20, monthly: 19130.86, gmir: 50000.00 },
+                        SBC2: { rate: "6.800%", term: 20, monthly: 16006.10, gmir: 50000.00 }
+                    }
+                },
+                "3BR-A": {
+                    unitArea: "44.85",
+                    netTOO: 3157982.11,
+                    equityPromo: 142899.11,
+                    rf: 15000,
+                    loanAmount: 3000083.00,
+                    amortizations: {
+                        HDMF: { rate: "6.250%", term: 30, monthly: 18472.03, gmir: 52777.22 },
+                        BPI: { rate: "7.000%", term: 30, monthly: 19959.63, gmir: 49899.07 },
+                        BDO: { rate: "6.500%", term: 20, monthly: 22367.81, gmir: 63908.04 },
+                        SBC: { rate: "6.800%", term: 20, monthly: 22900.82, gmir: 57252.05 },
+                        SBC2: { rate: "6.800%", term: 20, monthly: 19160.29, gmir: 50000.00 }
+                    }
+                },
+                "3BR-B": {
+                    unitArea: "53.64",
+                    netTOO: 3775872.84,
+                    equityPromo: 173793.64,
+                    rf: 15000,
+                    loanAmount: 3587079.20,
+                    amortizations: {
+                        HDMF: { rate: "6.250%", term: 30, monthly: 22086.26, gmir: 63103.61 },
+                        BPI: { rate: "7.000%", term: 30, monthly: 23864.93, gmir: 59662.32 },
+                        BDO: { rate: "6.500%", term: 20, monthly: 26744.30, gmir: 76412.28 },
+                        SBC: { rate: "6.800%", term: 20, monthly: 27381.59, gmir: 68453.98 },
+                        SBC2: { rate: "6.800%", term: 20, monthly: 22909.20, gmir: 57272.99 }
+                    }
+                }
+            },
+            "3rd-4th": {
+                "2BR-A": {
+                    unitArea: "36.34",
+                    netTOO: 2606300.21,
+                    equityPromo: 120315.01,
+                    rf: 10000,
+                    loanAmount: 2475985.20,
+                    amortizations: {
+                        HDMF: { rate: "6.250%", term: 30, monthly: 15245.07, gmir: 43557.33 },
+                        BPI: { rate: "7.000%", term: 30, monthly: 16472.79, gmir: 41181.98 },
+                        BDO: { rate: "6.500%", term: 20, monthly: 18460.28, gmir: 52743.66 },
+                        SBC: { rate: "6.800%", term: 20, monthly: 18900.17, gmir: 50000.00 },
+                        SBC2: { rate: "6.800%", term: 20, monthly: 15813.10, gmir: 50000.00 }
+                    }
+                },
+                "2BR-B": {
+                    unitArea: "36.91",
+                    netTOO: 2646368.21,
+                    equityPromo: 122318.41,
+                    rf: 10000,
+                    loanAmount: 2514049.80,
+                    amortizations: {
+                        HDMF: { rate: "6.250%", term: 30, monthly: 15479.44, gmir: 44226.96 },
+                        BPI: { rate: "7.000%", term: 30, monthly: 16726.04, gmir: 41815.09 },
+                        BDO: { rate: "6.500%", term: 20, monthly: 18744.08, gmir: 53554.51 },
+                        SBC: { rate: "6.800%", term: 20, monthly: 19190.74, gmir: 50000.00 },
+                        SBC2: { rate: "6.800%", term: 20, monthly: 16056.20, gmir: 50000.00 }
+                    }
+                },
+                "2BR-D": {
+                    unitArea: "37.11",
+                    netTOO: 2660427.16,
+                    equityPromo: 123021.36,
+                    rf: 10000,
+                    loanAmount: 2527405.80,
+                    amortizations: {
+                        HDMF: { rate: "6.250%", term: 30, monthly: 15561.67, gmir: 44461.92 },
+                        BPI: { rate: "7.000%", term: 30, monthly: 16814.89, gmir: 42037.23 },
+                        BDO: { rate: "6.500%", term: 20, monthly: 18843.66, gmir: 53839.02 },
+                        SBC: { rate: "6.800%", term: 20, monthly: 19292.69, gmir: 50000.00 },
+                        SBC2: { rate: "6.800%", term: 20, monthly: 16141.50, gmir: 50000.00 }
+                    }
+                },
+                "3BR-A": {
+                    unitArea: "44.85",
+                    netTOO: 3180297.89,
+                    equityPromo: 144014.89,
+                    rf: 15000,
+                    loanAmount: 3021283.00,
+                    amortizations: {
+                        HDMF: { rate: "6.250%", term: 30, monthly: 18602.56, gmir: 53150.17 },
+                        BPI: { rate: "7.000%", term: 30, monthly: 20100.67, gmir: 50251.68 },
+                        BDO: { rate: "6.500%", term: 20, monthly: 22525.87, gmir: 64359.64 },
+                        SBC: { rate: "6.800%", term: 20, monthly: 23062.65, gmir: 57656.62 },
+                        SBC2: { rate: "6.800%", term: 20, monthly: 19295.69, gmir: 50000.00 }
+                    }
+                },
+                "3BR-B": {
+                    unitArea: "53.64",
+                    netTOO: 3798188.63,
+                    equityPromo: 174909.43,
+                    rf: 15000,
+                    loanAmount: 3608279.20,
+                    amortizations: {
+                        HDMF: { rate: "6.250%", term: 30, monthly: 22216.80, gmir: 63476.56 },
+                        BPI: { rate: "7.000%", term: 30, monthly: 24005.97, gmir: 60014.93 },
+                        BDO: { rate: "6.500%", term: 20, monthly: 26902.36, gmir: 76863.89 },
+                        SBC: { rate: "6.800%", term: 20, monthly: 27543.42, gmir: 68858.55 },
+                        SBC2: { rate: "6.800%", term: 20, monthly: 23044.59, gmir: 57611.48 }
+                    }
+                }
+            },
+            "5th-6th": {
+                "2BR-A": {
+                    unitArea: "36.34",
+                    netTOO: 2628616.00,
+                    equityPromo: 121430.80,
+                    rf: 10000,
+                    loanAmount: 2497185.20,
+                    amortizations: {
+                        HDMF: { rate: "6.250%", term: 30, monthly: 15375.60, gmir: 43930.28 },
+                        BPI: { rate: "7.000%", term: 30, monthly: 16613.84, gmir: 41534.59 },
+                        BDO: { rate: "6.500%", term: 20, monthly: 18618.34, gmir: 53195.26 },
+                        SBC: { rate: "6.800%", term: 20, monthly: 19062.00, gmir: 50000.00 },
+                        SBC2: { rate: "6.800%", term: 20, monthly: 15948.49, gmir: 50000.00 }
+                    }
+                },
+                "2BR-B": {
+                    unitArea: "36.91",
+                    netTOO: 2668684.00,
+                    equityPromo: 123434.20,
+                    rf: 10000,
+                    loanAmount: 2535249.80,
+                    amortizations: {
+                        HDMF: { rate: "6.250%", term: 30, monthly: 15609.97, gmir: 44599.91 },
+                        BPI: { rate: "7.000%", term: 30, monthly: 16867.08, gmir: 42167.70 },
+                        BDO: { rate: "6.500%", term: 20, monthly: 18902.14, gmir: 54006.12 },
+                        SBC: { rate: "6.800%", term: 20, monthly: 19352.56, gmir: 50000.00 },
+                        SBC2: { rate: "6.800%", term: 20, monthly: 16191.60, gmir: 50000.00 }
+                    }
+                },
+                "2BR-D": {
+                    unitArea: "37.11",
+                    netTOO: 2682742.95,
+                    equityPromo: 124137.15,
+                    rf: 10000,
+                    loanAmount: 2548605.80,
+                    amortizations: {
+                        HDMF: { rate: "6.250%", term: 30, monthly: 15692.20, gmir: 44834.87 },
+                        BPI: { rate: "7.000%", term: 30, monthly: 16955.94, gmir: 42389.84 },
+                        BDO: { rate: "6.500%", term: 20, monthly: 19001.72, gmir: 54290.63 },
+                        SBC: { rate: "6.800%", term: 20, monthly: 19454.52, gmir: 50000.00 },
+                        SBC2: { rate: "6.800%", term: 20, monthly: 16276.90, gmir: 50000.00 }
+                    }
+                },
+                "3BR-A": {
+                    unitArea: "44.85",
+                    netTOO: 3202613.68,
+                    equityPromo: 145130.68,
+                    rf: 15000,
+                    loanAmount: 3042483.00,
+                    amortizations: {
+                        HDMF: { rate: "6.250%", term: 30, monthly: 18733.09, gmir: 53523.12 },
+                        BPI: { rate: "7.000%", term: 30, monthly: 20241.72, gmir: 50604.29 },
+                        BDO: { rate: "6.500%", term: 20, monthly: 22683.94, gmir: 64811.25 },
+                        SBC: { rate: "6.800%", term: 20, monthly: 23224.48, gmir: 58061.19 },
+                        SBC2: { rate: "6.800%", term: 20, monthly: 19431.09, gmir: 50000.00 }
+                    }
+                },
+                "3BR-B": {
+                    unitArea: "53.64",
+                    netTOO: 3820504.42,
+                    equityPromo: 176025.22,
+                    rf: 15000,
+                    loanAmount: 3629479.20,
+                    amortizations: {
+                        HDMF: { rate: "6.250%", term: 30, monthly: 22347.33, gmir: 63849.51 },
+                        BPI: { rate: "7.000%", term: 30, monthly: 24147.02, gmir: 60367.54 },
+                        BDO: { rate: "6.500%", term: 20, monthly: 27060.42, gmir: 77315.49 },
+                        SBC: { rate: "6.800%", term: 20, monthly: 27705.25, gmir: 69263.12 },
+                        SBC2: { rate: "6.800%", term: 20, monthly: 23179.99, gmir: 57949.97 }
+                    }
+                }
+            }
         };
 
-        // Initialize Firebase
-        firebase.initializeApp(firebaseConfig);
-        const storage = firebase.storage();
-        const database = firebase.database();
-        const auth = firebase.auth(); // NEW: Initialize Firebase Auth
-
-        // Global variables
-        let currentSection = 'gallery';
-        let currentFolderId = '';
-        let currentFolderName = '';
-        let currentFolderView = false;
-        let currentImageKey = '';
-        let currentImageStoragePath = '';
-        let uploadTask = null;
-        let dataLoaded = false;
-        let itemToDelete = null;
-        let imagesInFolder = [];
-        let currentImageIndex = 0;
-        let isAdmin = false; // NEW: Global Admin status
-
-        // Swipe variables
-        let touchstartX = 0;
-        let touchendX = 0;
-
-        // Toggle password visibility
-        function togglePassword(inputId) {
-            const input = document.getElementById(inputId);
-            const iconContainer = input.nextElementSibling;
-            const icon = iconContainer ? iconContainer.querySelector('i') : null;
-
-            if (input.type === 'password') {
-                input.type = 'text';
-                if (icon) {
-                    icon.classList.remove('fa-eye');
-                    icon.classList.add('fa-eye-slash');
-                }
-            } else {
-                input.type = 'password';
-                if (icon) {
-                    icon.classList.remove('fa-eye-slash');
-                    icon.classList.add('fa-eye');
-                }
-            }
-        }
-
-        // Show notification
-        function showNotification(message, isError = false) {
-            const notification = document.getElementById('notification');
-            notification.innerHTML = `<i class="fas ${isError ? 'fa-exclamation-circle' : 'fa-check-circle'}"></i> ${message}`;
-            notification.classList.remove('error');
-
-            if (isError) {
-                notification.classList.add('error');
-            }
-
-            notification.classList.add('show');
-
-            setTimeout(() => {
-                notification.classList.remove('show');
-            }, 3000);
+        // DOM elements
+        const unitTypeSelect = document.getElementById('unitType');
+        const zoneLevelSelect = document.getElementById('zoneLevel');
+        const financingSelect = document.getElementById('financing');
+        const termButtons = document.querySelectorAll('.term-btn');
+        const netTooValue = document.getElementById('netTooValue');
+        const equityPromoValue = document.getElementById('equityPromoValue');
+        const rfValue = document.getElementById('rfValue');
+        const loanAmountValue = document.getElementById('loanAmountValue');
+        const amortizationBody = document.getElementById('amortizationBody');
+        
+        // Selected values
+        let selectedUnitType = '';
+        let selectedZone = '';
+        let selectedFinancing = '';
+        let selectedTerm = '30'; // Default to 30 years
+        
+        // Format currency in PHP
+        function formatCurrency(amount) {
+            return '₱ ' + amount.toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
         }
         
-        // UPDATED: Admin Feature Toggler
-        function toggleAdminFeatures(isLoggedIn) {
-            isAdmin = isLoggedIn;
-            const createFolderIcon = document.getElementById('create-folder-icon');
-            const modalDeleteIcon = document.getElementById('modal-delete-icon');
-            
-            // Footer Elements
-            const adminLoginLink = document.getElementById('admin-login-link');
-            const adminLogoutLink = document.getElementById('admin-logout-link'); // NEW ID
-            const separator = document.getElementById('admin-footer-separator'); // NEW ID
-
-            // Toggle main controls
-            if (createFolderIcon) {
-                createFolderIcon.style.display = isLoggedIn ? 'flex' : 'none';
-            }
-            if (modalDeleteIcon) {
-                modalDeleteIcon.style.display = isLoggedIn ? 'flex' : 'none';
-            }
-            
-            // Toggle footer login/logout elements
-            if (isLoggedIn) {
-                if (adminLoginLink) adminLoginLink.style.display = 'none';
-                if (adminLogoutLink) adminLogoutLink.style.display = 'inline';
-                if (separator) separator.style.display = 'none'; // Separator not needed when login is hidden
-            } else {
-                if (adminLoginLink) adminLoginLink.style.display = 'inline';
-                if (adminLogoutLink) adminLogoutLink.style.display = 'none';
-                if (separator) separator.style.display = 'none'; // Separator not needed when logout is hidden
-            }
-
-            // Re-render folder view to update inline delete buttons
-            if (dataLoaded) {
-                if (currentFolderView) {
-                    // Update current folder view header to show upload button
-                    const gallerySectionHeader = document.querySelector('#gallery-section .section-header');
-                    gallerySectionHeader.innerHTML = `
-                        <div class="folder-view-title">
-                            <i class="fas fa-folder-open"></i>
-                            <span>${currentFolderName}</span>
-                        </div>
-                        <div style="display: flex; gap: 10px;">
-                            <div class="upload-icon" onclick="openUploadModal()" title="Upload Image" style="display: ${isAdmin ? 'flex' : 'none'};">
-                                <i class="fas fa-upload"></i>
-                            </div>
-                            <button class="back-button" onclick="backToFolders()">
-                                <i class="fas fa-arrow-left"></i>
-                                Back
-                            </button>
-                        </div>
-                    `;
-                    loadFolderImages(currentFolderId);
-                } else {
-                    loadFolders();
-                }
-            }
-        }
-
-        // NEW: Login/Logout Modal Functions
-        function openLoginModal(e) {
-            if (e) e.preventDefault();
-            const modal = document.getElementById('loginModal');
-            modal.style.display = 'flex';
-            setTimeout(() => {
-                modal.classList.add('active');
-            }, 10);
-        }
-
-        function closeLoginModal() {
-            const modal = document.getElementById('loginModal');
-            modal.classList.remove('active');
-            setTimeout(() => {
-                modal.style.display = 'none';
-                document.getElementById('adminEmail').value = '';
-                document.getElementById('adminPassword').value = '';
-            }, 300);
-        }
-
-        async function adminLogin() {
-            const email = document.getElementById('adminEmail').value.trim();
-            const password = document.getElementById('adminPassword').value.trim();
-
-            if (!email || !password) {
-                showNotification('Please enter both email and password', true);
-                return;
-            }
-
-            try {
-                // In a real application, you would check if the user is authorized here (e.g., using claims or a database lookup)
-                await auth.signInWithEmailAndPassword(email, password);
-                showNotification('Admin login successful!');
-                closeLoginModal();
-            } catch (error) {
-                console.error('Login failed:', error);
-                showNotification('Login failed: ' + error.message, true);
-            }
-        }
-
-        // UPDATED: Logout function to handle hyperlink event
-        async function adminLogout(e) {
-            if (e) e.preventDefault(); // Stop the hyperlink from navigating
-            try {
-                await auth.signOut();
-                showNotification('Logged out successfully!');
-            } catch (error) {
-                console.error('Logout failed:', error);
-                showNotification('Logout failed. Please try again.', true);
-            }
-        }
-        // End NEW: Login/Logout Modal Functions
-
-
-        // Modal functions
-        function openUploadModal() {
-            // NEW: Check isAdmin status
-            if (!isAdmin) {
-                showNotification('Please login as admin to upload files.', true);
-                return;
-            }
-
-            const modal = document.getElementById('uploadModal');
-            const folderNameGroup = document.getElementById('folderNameGroup');
-
-            // Show folder name input only when not in a folder view
-            if (currentFolderView) {
-                folderNameGroup.style.display = 'none';
-            } else {
-                folderNameGroup.style.display = 'block';
-            }
-
-            modal.style.display = 'flex';
-
-            setTimeout(() => {
-                modal.classList.add('active');
-            }, 10);
-        }
-
-        function closeUploadModal() {
-            // Cancel any ongoing upload
-            if (uploadTask) {
-                uploadTask.cancel();
-                uploadTask = null;
-            }
-
-            const modal = document.getElementById('uploadModal');
-            modal.classList.remove('active');
-
-            setTimeout(() => {
-                modal.style.display = 'none';
-                document.getElementById('fileName').value = '';
-                document.getElementById('fileInput').value = '';
-                document.getElementById('folderName').value = '';
-                document.querySelector('.progress-bar').style.display = 'none';
-                document.getElementById('uploadProgress').style.width = '0%';
-
-                // Re-enable upload button
-                document.getElementById('uploadButton').disabled = false;
-                document.getElementById('uploadButton').textContent = 'Upload';
-            }, 300);
-        }
-
-        function openFolderModal() {
-            // NEW: Check isAdmin status
-            if (!isAdmin) {
-                showNotification('Please login as admin to create folders.', true);
-                return;
-            }
-
-            const modal = document.getElementById('folderModal');
-            modal.style.display = 'flex';
-
-            setTimeout(() => {
-                modal.classList.add('active');
-            }, 10);
-        }
-
-        function closeFolderModal() {
-            const modal = document.getElementById('folderModal');
-            modal.classList.remove('active');
-
-            setTimeout(() => {
-                modal.style.display = 'none';
-                document.getElementById('newFolderName').value = '';
-            }, 300);
-        }
-
-        function openDeleteModal() {
-            // NEW: Check isAdmin status
-            if (!isAdmin) {
-                showNotification('Please login as admin to delete items.', true);
-                return;
-            }
-
-            const modal = document.getElementById('deleteModal');
-            modal.style.display = 'flex';
-
-            setTimeout(() => {
-                modal.classList.add('active');
-            }, 10);
-        }
-
-        function closeDeleteModal() {
-            const modal = document.getElementById('deleteModal');
-            modal.classList.remove('active');
-
-            setTimeout(() => {
-                modal.style.display = 'none';
-                // itemToDelete is cleared in confirmDelete
-            }, 300);
-        }
-
-        function openModal(imageIndex) {
-            if (!imagesInFolder || imagesInFolder.length === 0) {
-                return;
-            }
-
-            const modal = document.getElementById('imageModal');
-            currentImageIndex = imageIndex;
-            showImage(currentImageIndex);
-
-            modal.style.display = 'flex';
-
-            setTimeout(() => {
-                modal.classList.add('active');
-            }, 10);
-
-            // Prevent body from scrolling when modal is open
-            document.body.style.overflow = 'hidden';
-            
-            // Add swipe event listeners
-            const modalImage = document.getElementById('modalImage');
-            modalImage.addEventListener('touchstart', handleTouchStart, false);
-            modalImage.addEventListener('touchmove', handleTouchMove, false);
-            modalImage.addEventListener('touchend', handleTouchEnd, false);
-
-            // Add keyboard event listener for desktop
-            document.addEventListener('keydown', handleKeyDown);
-        }
-        
-        function showImage(index) {
-            const modalImage = document.getElementById('modalImage');
-            const image = imagesInFolder[index];
-            modalImage.src = image.data;
-            currentImageKey = image.key;
-            currentImageStoragePath = image.storagePath;
-
-            // NEW: Toggle visibility of the delete icon in the modal based on admin status
-            const modalDeleteIcon = document.getElementById('modal-delete-icon');
-            if(modalDeleteIcon) {
-                modalDeleteIcon.style.display = isAdmin ? 'flex' : 'none';
-            }
-        }
-        
-        function nextImage() {
-            currentImageIndex = (currentImageIndex + 1) % imagesInFolder.length;
-            showImage(currentImageIndex);
-        }
-        
-        function prevImage() {
-            currentImageIndex = (currentImageIndex - 1 + imagesInFolder.length) % imagesInFolder.length;
-            showImage(currentImageIndex);
-        }
-
-        function closeModal() {
-            const modal = document.getElementById('imageModal');
-            modal.classList.remove('active');
-
-            setTimeout(() => {
-                modal.style.display = 'none';
-                // Re-enable body scrolling
-                document.body.style.overflow = 'auto';
-            }, 300);
-            
-            const modalImage = document.getElementById('modalImage');
-            modalImage.removeEventListener('touchstart', handleTouchStart, false);
-            modalImage.removeEventListener('touchmove', handleTouchMove, false);
-            modalImage.removeEventListener('touchend', handleTouchEnd, false);
-            document.removeEventListener('keydown', handleKeyDown);
-        }
-
-        // Swipe gesture handlers
-        function handleTouchStart(e) {
-            touchstartX = e.changedTouches[0].screenX;
-        }
-
-        function handleTouchMove(e) {
-            // No action needed for touchmove, we only care about the end position
-        }
-
-        function handleTouchEnd(e) {
-            touchendX = e.changedTouches[0].screenX;
-            handleGesture();
-        }
-
-        function handleGesture() {
-            const swipeThreshold = 50; // Minimum distance for a swipe
-
-            if (touchendX < touchstartX - swipeThreshold) {
-                // Swiped left
-                nextImage();
-            }
-
-            if (touchendX > touchstartX + swipeThreshold) {
-                // Swiped right
-                prevImage();
-            }
-        }
-        
-        // Keyboard navigation for desktop
-        function handleKeyDown(e) {
-            if (e.key === 'ArrowRight') {
-                nextImage();
-            } else if (e.key === 'ArrowLeft') {
-                prevImage();
-            }
-        }
-
-        // Delete image from modal
-        function deleteImage() {
-            if (!isAdmin) {
-                showNotification('You must be logged in as an admin to delete images', true);
-                return;
-            }
-
-            if (!currentImageKey || !currentImageStoragePath) {
-                showNotification('No image selected for deletion', true);
-                return;
-            }
-
-            // Set the item to delete as an image
-            itemToDelete = { type: 'image', key: currentImageKey, storagePath: currentImageStoragePath };
-            closeModal();
-            openDeleteModal();
-        }
-
-        // Create folder function
-        async function createFolder() {
-            // NEW: Check isAdmin status
-            if (!isAdmin) {
-                showNotification('You must be logged in as an admin to create folders', true);
-                return;
-            }
-
-            const folderName = document.getElementById('newFolderName').value.trim();
-
-            if (!folderName) {
-                showNotification('Please enter a folder name', true);
-                return;
-            }
-
-            try {
-                const newFolderRef = database.ref('folders01').push();
-                await newFolderRef.set({
-                    name: folderName,
-                    timestamp: Date.now()
-                });
-                showNotification('Folder created successfully!');
-                closeFolderModal();
-                loadFolders(); // Reload to show new folder
-            } catch (error) {
-                console.error('Error creating folder:', error);
-                showNotification('Failed to create folder. Please try again.', true);
-            }
-        }
-
-        // View folder contents
-        function viewFolder(folderId, folderName) {
-            currentFolderId = folderId;
-            currentFolderName = folderName;
-            currentFolderView = true;
-
-            document.getElementById('gallery-folders').style.display = 'none';
-            document.getElementById('gallery-view').style.display = 'grid';
-
-            // Update header for folder view, including the upload button toggled by isAdmin
-            const gallerySectionHeader = document.querySelector('#gallery-section .section-header');
-            gallerySectionHeader.innerHTML = `
-                <div class="folder-view-title">
-                    <i class="fas fa-folder-open"></i>
-                    <span>${folderName}</span>
-                </div>
-                <div style="display: flex; gap: 10px;">
-                    <div class="upload-icon" onclick="openUploadModal()" title="Upload Image" style="display: ${isAdmin ? 'flex' : 'none'};">
-                        <i class="fas fa-upload"></i>
-                    </div>
-                    <button class="back-button" onclick="backToFolders()">
-                        <i class="fas fa-arrow-left"></i>
-                        Back
-                    </button>
-                </div>
-            `;
-
-            loadFolderImages(folderId);
-        }
-
-        // Load images for a specific folder
-        async function loadFolderImages(folderId) {
-            try {
-                const filesRef = database.ref('files01').orderByChild('folderId').equalTo(folderId);
-                const snapshot = await filesRef.once('value');
-                const filesData = snapshot.val();
-
-                const galleryView = document.getElementById('gallery-view');
-                galleryView.innerHTML = '';
-                imagesInFolder = [];
-
-                if (!filesData) {
-                    galleryView.innerHTML = '<div class="empty-gallery">No images in this folder</div>';
-                    return;
-                }
-
-                const images = [];
-                Object.keys(filesData).forEach(key => {
-                    const file = filesData[key];
-                    if (file.section === 'gallery') {
-                        file.key = key;
-                        images.push(file);
-                    }
-                });
-
-                // Sort images by timestamp (newest first)
-                images.sort((a, b) => b.timestamp - a.timestamp);
-                imagesInFolder = images; // Store for modal navigation
-
-                images.forEach((image, index) => {
-                    const galleryItem = document.createElement('div');
-                    galleryItem.className = 'gallery-item';
-                    galleryItem.innerHTML = `
-                        <img src="${image.data}" alt="${image.name}">
-                        <p>${image.name}</p>
-                    `;
-                    galleryItem.addEventListener('click', () => openModal(index));
-                    galleryView.appendChild(galleryItem);
-                });
-
-            } catch (error) {
-                console.error('Error loading folder images:', error);
-                showNotification('Error loading images. Please try again.', true);
-            }
-        }
-
-        // Back to folders view
-        function backToFolders() {
-            currentFolderId = '';
-            currentFolderName = '';
-            currentFolderView = false;
-
-            document.getElementById('gallery-view').style.display = 'none';
-            document.getElementById('gallery-folders').style.display = 'grid';
-
-            // Restore original header
-            const gallerySectionHeader = document.querySelector('#gallery-section .section-header');
-            gallerySectionHeader.innerHTML = `
-                <h2 class="section-title">Folders</h2>
-                <div class="upload-icon" id="create-folder-icon" onclick="openFolderModal()" style="display: ${isAdmin ? 'flex' : 'none'};">
-                    <i class="fas fa-folder-plus"></i>
-                </div>
-            `;
-            loadFolders();
-        }
-
-        // Request delete confirmation for folder or image
-        function requestDelete(type, key, storagePath = '') {
-            // NEW: Check isAdmin status
-            if (!isAdmin) {
-                showNotification('You must be logged in as an admin to delete folders', true);
-                return;
-            }
-
-            itemToDelete = { type, key, storagePath };
-            openDeleteModal();
-        }
-
-        // Confirm delete from Firebase
-        async function confirmDelete() {
-            // NEW: Check isAdmin status
-            if (!isAdmin) {
-                showNotification('You must be logged in as an admin to delete items', true);
-                closeDeleteModal();
-                return;
-            }
-
-            if (!itemToDelete) {
-                showNotification('No item selected for deletion', true);
-                return;
-            }
-
-            try {
-                if (itemToDelete.type === 'folder') {
-                    // Delete folder and all its contents
-                    const folderRef = database.ref(`folders01/${itemToDelete.key}`);
-                    await folderRef.remove();
-
-                    // Delete all images within that folder and from storage
-                    const imagesInFolderRef = database.ref('files01').orderByChild('folderId').equalTo(itemToDelete.key);
-                    const snapshot = await imagesInFolderRef.once('value');
-                    const updates = {};
-                    const storageDeletions = [];
-                    snapshot.forEach(childSnapshot => {
-                        updates[childSnapshot.key] = null; // Set to null to delete from Realtime DB
-                        const storagePath = childSnapshot.val().storagePath;
-                        if (storagePath) {
-                            storageDeletions.push(storage.ref(storagePath).delete());
-                        }
-                    });
-                    
-                    if (Object.keys(updates).length > 0) {
-                        await database.ref('files01').update(updates);
-                    }
-                    
-                    await Promise.all(storageDeletions);
-
-                    showNotification('Folder and its contents deleted successfully');
-                } else if (itemToDelete.type === 'image') {
-                    // Delete image from Realtime DB and Storage
-                    const fileRef = database.ref(`files01/${itemToDelete.key}`);
-                    await fileRef.remove();
-                    
-                    // Delete from storage
-                    if (itemToDelete.storagePath) {
-                        const imageRef = storage.ref(itemToDelete.storagePath);
-                        await imageRef.delete();
-                    }
-                    
-                    showNotification('Image deleted successfully');
-                }
-
-                closeDeleteModal();
-                itemToDelete = null;
-
-                // Refresh the view
-                if (currentFolderView) {
-                    loadFolderImages(currentFolderId);
-                } else {
-                    loadFolders();
-                }
-            } catch (error) {
-                console.error('Error deleting item:', error);
-                showNotification('Failed to delete item. Please try again.', true);
-            }
-        }
-
-        // Load folders from Firebase
-        async function loadFolders() {
-            try {
-                const foldersRef = database.ref('folders01');
-                const snapshot = await foldersRef.once('value');
-                const foldersData = snapshot.val();
-
-                const foldersContainer = document.getElementById('gallery-folders');
-                foldersContainer.innerHTML = '';
-
-                if (!foldersData) {
-                    foldersContainer.innerHTML = '<div class="empty-folders">No folders created yet</div>';
-                    dataLoaded = true;
-                    return;
-                }
-
-                const folders = [];
-                Object.keys(foldersData).forEach(key => {
-                    const folder = foldersData[key];
-                    folder.key = key;
-                    folders.push(folder);
-                });
-
-                // Sort folders by timestamp (newest first)
-                folders.sort((a, b) => b.timestamp - a.timestamp);
-
-                // Count images in each folder
-                for (const folder of folders) {
-                    const filesRef = database.ref('files01').orderByChild('folderId').equalTo(folder.key);
-                    const filesSnapshot = await filesRef.once('value');
-                    folder.imageCount = filesSnapshot.exists() ? filesSnapshot.numChildren() : 0;
-                }
-
-                folders.forEach(folder => {
-                    const folderItem = document.createElement('div');
-                    folderItem.className = 'folder-item';
-                    folderItem.innerHTML = `
-                        <div class="folder-actions" style="display: ${isAdmin ? 'flex' : 'none'};">
-                            <div class="folder-action folder-delete" onclick="event.stopPropagation(); requestDelete('folder', '${folder.key}')">
-                                <i class="fas fa-trash"></i>
-                            </div>
-                        </div>
-                        <div class="folder-icon">
-                            <i class="fas fa-folder"></i>
-                        </div>
-                        <div class="folder-name">${folder.name}</div>
-                        <div class="folder-count">${folder.imageCount} image(s)</div>
-                    `;
-                    folderItem.addEventListener('click', () => viewFolder(folder.key, folder.name));
-                    foldersContainer.appendChild(folderItem);
-                });
-
-                dataLoaded = true;
-            } catch (error) {
-                console.error('Error loading folders:', error);
-                showNotification('Error loading folders. Please try again.', true);
-                dataLoaded = true;
-            }
-        }
-
-        // Upload file to Firebase
-        async function uploadFile() {
-            // NEW: Check isAdmin status
-            if (!isAdmin) {
-                showNotification('You must be logged in as an admin to upload files', true);
-                return;
-            }
-
-            const fileName = document.getElementById('fileName').value.trim();
-            const fileInput = document.getElementById('fileInput');
-            const folderName = document.getElementById('folderName').value.trim();
-            const uploadButton = document.getElementById('uploadButton');
-
-            if (!fileName) {
-                showNotification('Please enter a file name', true);
-                return;
-            }
-
-            if (!fileInput.files[0]) {
-                showNotification('Please select a file to upload', true);
-                return;
-            }
-            
-            // Determine the target folder ID
-            let targetFolderId = currentFolderView ? currentFolderId : '';
-
-            // If not in a folder view, check if a folder name was provided (create or use existing)
-            if (!currentFolderView) {
-                if (!folderName) {
-                    showNotification('Please enter a folder name to upload an image outside of a folder.', true);
-                    return;
-                }
+        // Update the main results display
+        function updateResults() {
+            if (selectedUnitType && selectedZone && propertyData[selectedZone] && propertyData[selectedZone][selectedUnitType]) {
+                const data = propertyData[selectedZone][selectedUnitType];
                 
-                try {
-                    const foldersRef = database.ref('folders01');
-                    const snapshot = await foldersRef.orderByChild('name').equalTo(folderName).once('value');
-
-                    if (snapshot.exists()) {
-                        // Use existing folder
-                        const folderData = snapshot.val();
-                        targetFolderId = Object.keys(folderData)[0];
-                    } else {
-                        // Create new folder
-                        const newFolderRef = foldersRef.push();
-                        targetFolderId = newFolderRef.key;
-                        await newFolderRef.set({
-                            name: folderName,
-                            timestamp: Date.now()
-                        });
-                    }
-                } catch (error) {
-                    console.error('Error finding or creating folder:', error);
-                    showNotification('Failed to process folder. Please try again.', true);
-                    return;
-                }
-            }
-
-            // Disable upload button to prevent multiple clicks
-            uploadButton.disabled = true;
-            uploadButton.textContent = 'Uploading...';
-
-            const file = fileInput.files[0];
-            const fileExtension = file.name.split('.').pop();
-            const timestamp = Date.now();
-            const storagePath = `images/${fileName}_${timestamp}.${fileExtension}`;
-            const storageRef = storage.ref().child(storagePath);
-
-            try {
-                // Show progress bar
-                const progressBar = document.querySelector('.progress-bar');
-                const progressElement = document.getElementById('uploadProgress');
-                progressBar.style.display = 'block';
-
-                // Upload to Firebase Storage
-                uploadTask = storageRef.put(file);
-
-                // Monitor upload progress
-                uploadTask.on('state_changed',
-                    (snapshot) => {
-                        const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-                        progressElement.style.width = progress + '%';
-                    },
-                    (error) => {
-                        console.error('Upload error:', error);
-                        showNotification('Upload failed. Please try again.', true);
-                        progressBar.style.display = 'none';
-                        uploadButton.disabled = false;
-                        uploadButton.textContent = 'Upload';
-                    },
-                    async () => {
-                        try {
-                            // Get download URL
-                            const downloadURL = await uploadTask.snapshot.ref.getDownloadURL();
-
-                            // Save to Realtime Database
-                            const fileData = {
-                                name: fileName,
-                                data: downloadURL,
-                                storagePath: storagePath, // Save the storage path
-                                timestamp: timestamp,
-                                section: currentSection,
-                                folderId: targetFolderId
-                            };
-
-                            await database.ref('files01').push(fileData);
-
-                            showNotification('File uploaded successfully!');
-                            closeUploadModal();
-
-                            // Refresh the view
-                            if (currentFolderView) {
-                                loadFolderImages(currentFolderId);
-                            } else {
-                                loadFolders();
-                            }
-                        } catch (error) {
-                            console.error('Error saving file data:', error);
-                            showNotification('Upload completed but failed to save metadata. Please try again.', true);
-                        }
-                    }
-                );
-            } catch (error) {
-                console.error('Upload error:', error);
-                showNotification('Upload failed. Please try again.', true);
-                uploadButton.disabled = false;
-                uploadButton.textContent = 'Upload';
+                netTooValue.textContent = formatCurrency(data.netTOO);
+                equityPromoValue.textContent = formatCurrency(data.equityPromo);
+                rfValue.textContent = formatCurrency(data.rf);
+                loanAmountValue.textContent = formatCurrency(data.loanAmount);
+            } else {
+                netTooValue.textContent = '₱ -';
+                equityPromoValue.textContent = '₱ -';
+                rfValue.textContent = '₱ -';
+                loanAmountValue.textContent = '₱ -';
             }
         }
-
-        // Initialize the app
-        document.addEventListener('DOMContentLoaded', function() {
-            // NEW: Firebase Authentication State Listener
-            auth.onAuthStateChanged(user => {
-                if (user) {
-                    // User is signed in. Assume any logged-in user is an admin.
-                    // NOTE: For better security, you should check user claims or a separate database entry to confirm admin role.
-                    toggleAdminFeatures(true);
-                    showNotification(`Welcome, Admin: ${user.email}`);
-                } else {
-                    // User is signed out.
-                    toggleAdminFeatures(false);
+        
+        // Update amortization table based on selections
+        function updateAmortizationTable() {
+            if (!selectedUnitType || !selectedZone || !selectedFinancing) {
+                amortizationBody.innerHTML = `
+                    <tr>
+                        <td colspan="5" class="no-data">Please select a unit type, zone level, and financing option to view amortization details.</td>
+                    </tr>
+                `;
+                return;
+            }
+            
+            const data = propertyData[selectedZone][selectedUnitType];
+            if (!data) return;
+            
+            const amortizationData = data.amortizations[selectedFinancing];
+            if (!amortizationData) return;
+            
+            // Calculate amortization for different terms based on the selected financing
+            const monthlyData = calculateAmortizationForTerms(
+                data.loanAmount, 
+                parseFloat(amortizationData.rate) / 100, 
+                amortizationData.term,
+                selectedTerm
+            );
+            
+            let tableHTML = '';
+            
+            // Add the main row for the selected financing
+            tableHTML += `
+                <tr class="gmir-row">
+                    <td>${getInstitutionName(selectedFinancing)}</td>
+                    <td>${amortizationData.rate}</td>
+                    <td>${selectedTerm} years</td>
+                    <td>${formatCurrency(monthlyData.selectedTermMonthly)}</td>
+                    <td>${formatCurrency(amortizationData.gmir)}</td>
+                </tr>
+            `;
+            
+            // Add rows for other terms
+            for (const term of Object.keys(monthlyData.otherTerms)) {
+                tableHTML += `
+                    <tr>
+                        <td>${getInstitutionName(selectedFinancing)}</td>
+                        <td>${amortizationData.rate}</td>
+                        <td>${term} years</td>
+                        <td>${formatCurrency(monthlyData.otherTerms[term])}</td>
+                        <td>-</td>
+                    </tr>
+                `;
+            }
+            
+            amortizationBody.innerHTML = tableHTML;
+        }
+        
+        // Calculate monthly amortization for different terms
+        function calculateAmortizationForTerms(loanAmount, annualRate, originalTerm, selectedTerm) {
+            const terms = [30, 25, 20, 15, 10, 5];
+            const result = { otherTerms: {} };
+            
+            // Calculate for selected term
+            const monthlyRate = annualRate / 12;
+            const selectedTermMonths = parseInt(selectedTerm) * 12;
+            
+            // Monthly payment formula: P * r * (1+r)^n / ((1+r)^n - 1)
+            const selectedTermMonthly = loanAmount * monthlyRate * Math.pow(1 + monthlyRate, selectedTermMonths) / 
+                                      (Math.pow(1 + monthlyRate, selectedTermMonths) - 1);
+            
+            result.selectedTermMonthly = selectedTermMonthly;
+            
+            // Calculate for other terms
+            for (const term of terms) {
+                if (term.toString() !== selectedTerm) {
+                    const termMonths = term * 12;
+                    const monthly = loanAmount * monthlyRate * Math.pow(1 + monthlyRate, termMonths) / 
+                                   (Math.pow(1 + monthlyRate, termMonths) - 1);
+                    result.otherTerms[term] = monthly;
                 }
-            });
-
-            loadFolders();
+            }
+            
+            return result;
+        }
+        
+        // Get full institution name
+        function getInstitutionName(code) {
+            const names = {
+                HDMF: "Pag-IBIG Fund (HDMF)",
+                BPI: "BPI MyBahay",
+                BDO: "BDO",
+                SBC: "Security Bank (SBC)",
+                SBC2: "Security Bank Alt (SBC)"
+            };
+            return names[code] || code;
+        }
+        
+        // Event listeners for dropdowns
+        unitTypeSelect.addEventListener('change', function() {
+            selectedUnitType = this.value;
+            updateResults();
+            updateAmortizationTable();
         });
+        
+        zoneLevelSelect.addEventListener('change', function() {
+            selectedZone = this.value;
+            updateResults();
+            updateAmortizationTable();
+        });
+        
+        financingSelect.addEventListener('change', function() {
+            selectedFinancing = this.value;
+            updateAmortizationTable();
+        });
+        
+        // Event listeners for term buttons
+        termButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                // Remove active class from all buttons
+                termButtons.forEach(btn => btn.classList.remove('active'));
+                
+                // Add active class to clicked button
+                this.classList.add('active');
+                
+                // Update selected term
+                selectedTerm = this.getAttribute('data-term');
+                
+                // Update amortization table
+                updateAmortizationTable();
+            });
+        });
+        
+        // Initialize with default values
+        updateResults();
+        updateAmortizationTable();
     </script>
 </body>
 </html>
