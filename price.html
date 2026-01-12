@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Urban Deca Homes Batangas - Price</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-red: #C0392B;
+            --accent-brown: #5D4037;
+            --dark-black: #212121;
+            --light-bg: #FFFFFF;
+            --gray-bg: #F5F5F5;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: var(--light-bg);
+            color: var(--dark-black);
+            line-height: 1.6;
+        }
+
+        header {
+            background-color: var(--light-bg);
+            border-bottom: 3px solid var(--primary-red);
+            padding: 20px;
+            text-align: center;
+        }
+
+        header h1 {
+            margin: 0;
+            color: var(--primary-red);
+            font-size: 1.8rem;
+            text-transform: uppercase;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 40px auto;
+            padding: 20px;
+        }
+
+        /* Tabs Styling */
+        .tabs {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .tab-button {
+            padding: 12px 24px;
+            border: 2px solid var(--accent-brown);
+            background: transparent;
+            color: var(--accent-brown);
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+            border-radius: 4px;
+        }
+
+        .tab-button.active {
+            background-color: var(--primary-red);
+            border-color: var(--primary-red);
+            color: white;
+        }
+
+        /* Unit Content */
+        .unit-content {
+            display: none;
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        }
+
+        .unit-content.active {
+            display: flex;
+            flex-direction: row;
+        }
+
+        .unit-image {
+            flex: 1;
+            background-color: #000; /* Placeholder */
+            min-height: 400px;
+            aspect-ratio: 1 / 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 0.8rem;
+        }
+
+        .unit-details {
+            flex: 1;
+            padding: 40px;
+        }
+
+        .unit-details h2 {
+            color: var(--accent-brown);
+            margin-top: 0;
+            border-bottom: 2px solid var(--primary-red);
+            display: inline-block;
+            padding-bottom: 5px;
+        }
+
+        .price-tag {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--primary-red);
+            margin: 15px 0;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .info-item b {
+            display: block;
+            color: var(--accent-brown);
+            font-size: 0.85rem;
+            text-transform: uppercase;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+
+        .status-available { background: #E8F5E9; color: #2E7D32; }
+        .status-soldout { background: #FFEBEE; color: #C62828; }
+
+        .cta-button {
+            display: block;
+            width: 100%;
+            text-align: center;
+            background: var(--dark-black);
+            color: white;
+            padding: 15px;
+            text-decoration: none;
+            margin-top: 30px;
+            font-weight: bold;
+            border-radius: 4px;
+            transition: background 0.3s;
+        }
+
+        .cta-button:hover {
+            background: var(--primary-red);
+        }
+
+        @media (max-width: 768px) {
+            .unit-content.active { flex-direction: column; }
+            .info-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>Urban Deca Homes Batangas</h1>
+    <p>Premium Living. Flexible Financing. 0% Downpayment.</p>
+</header>
+
+<div class="container">
+    <div class="tabs">
+        <button class="tab-button active" onclick="openUnit(event, '2br-a')">2 Bedroom - Type A</button>
+        <button class="tab-button" onclick="openUnit(event, '3br-a')">3 Bedroom - Type A</button>
+        <button class="tab-button" onclick="openUnit(event, '3br-b')">3 Bedroom - Type B</button>
+    </div>
+
+    <div id="2br-a" class="unit-content active">
+        <div class="unit-image">
+            <img src="" alt="2BR Type A Image Placeholder" style="width:100%; height:100%; object-fit: cover;">
+            <span>[ 1:1 Image URL Placeholder ]</span>
+        </div>
+        <div class="unit-details">
+            <h2>2 Bedroom - Type A</h2>
+            <div class="price-tag">₱2,454,785</div>
+            <p><strong>Monthly Amortization starts at:</strong> <span style="color:var(--primary-red); font-weight:bold;">₱15,114.53</span></p>
+            
+            <div class="info-grid">
+                <div class="info-item"><b>Floor Area</b> 36.34 sqm</div>
+                <div class="info-item"><b>Downpayment</b> ₱0</div>
+                <div class="info-item"><b>RFO (Bldg U)</b> <span class="status-badge status-available">Available</span></div>
+                <div class="info-item"><b>Pre-Selling (Bldg T)</b> <span class="status-badge status-available">Available</span></div>
+                <div class="info-item"><b>Financing</b> Pag-IBIG, Bank, In-House</div>
+            </div>
+
+            <a href="https://m.me/urbandecahomesbatangas.8990" class="cta-button">Inquire via Messenger</a>
+        </div>
+    </div>
+
+    <div id="3br-a" class="unit-content">
+        <div class="unit-image">
+            <img src="" alt="3BR Type A Image Placeholder" style="width:100%; height:100%; object-fit: cover;">
+            <span>[ 1:1 Image URL Placeholder ]</span>
+        </div>
+        <div class="unit-details">
+            <h2>3 Bedroom - Type A</h2>
+            <div class="price-tag">₱3,083,000</div>
+            <p><strong>Monthly Amortization starts at:</strong> <span style="color:var(--primary-red); font-weight:bold;">₱18,472.03</span></p>
+            
+            <div class="info-grid">
+                <div class="info-item"><b>Floor Area</b> 44.85 sqm</div>
+                <div class="info-item"><b>Downpayment</b> ₱0</div>
+                <div class="info-item"><b>RFO (Bldg U)</b> <span class="status-badge status-available">Available</span></div>
+                <div class="info-item"><b>Pre-Selling (Bldg T)</b> <span class="status-badge status-available">Available</span></div>
+                <div class="info-item"><b>Financing</b> Pag-IBIG, Bank, In-House</div>
+            </div>
+
+            <a href="https://m.me/urbandecahomesbatangas.8990" class="cta-button">Inquire via Messenger</a>
+        </div>
+    </div>
+
+    <div id="3br-b" class="unit-content">
+        <div class="unit-image">
+            <img src="" alt="3BR Type B Image Placeholder" style="width:100%; height:100%; object-fit: cover;">
+            <span>[ 1:1 Image URL Placeholder ]</span>
+        </div>
+        <div class="unit-details">
+            <h2>3 Bedroom - Type B</h2>
+            <div class="price-tag">₱3,587,079</div>
+            <p><strong>Monthly Amortization starts at:</strong> <span style="color:var(--primary-red); font-weight:bold;">₱22,086.26</span></p>
+            
+            <div class="info-grid">
+                <div class="info-item"><b>Floor Area</b> 53.64 sqm</div>
+                <div class="info-item"><b>Downpayment</b> ₱0</div>
+                <div class="info-item"><b>RFO (Bldg U)</b> <span class="status-badge status-soldout">Sold Out</span></div>
+                <div class="info-item"><b>Pre-Selling (Bldg T)</b> <span class="status-badge status-available">Available</span></div>
+                <div class="info-item"><b>Financing</b> Pag-IBIG, Bank, In-House</div>
+            </div>
+
+            <a href="https://m.me/urbandecahomesbatangas.8990" class="cta-button">Inquire via Messenger</a>
+        </div>
+    </div>
+</div>
+
+<script>
+    function openUnit(evt, unitName) {
+        var i, tabcontent, tablinks;
+        tabcontent = document.getElementsByClassName("unit-content");
+        for (i = 0; i < tabcontent.length; i++) {
+            tabcontent[i].style.display = "none";
+            tabcontent[i].className = tabcontent[i].className.replace(" active", "");
+        }
+        tablinks = document.getElementsByClassName("tab-button");
+        for (i = 0; i < tablinks.length; i++) {
+            tablinks[i].className = tablinks[i].className.replace(" active", "");
+        }
+        document.getElementById(unitName).style.display = "flex";
+        evt.currentTarget.className += " active";
+    }
+</script>
+
+</body>
+</html>
