@@ -12,13 +12,18 @@
             --dark-black: #212121;
             --light-bg: #FFFFFF;
             --gray-bg: #F5F5F5;
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            box-sizing: border-box;
         }
 
         body {
             font-family: 'Inter', sans-serif;
             margin: 0;
             padding: 0;
-            background-color: var(--light-bg);
+            background-color: var(--gray-bg);
             color: var(--dark-black);
             line-height: 1.6;
         }
@@ -26,41 +31,57 @@
         header {
             background-color: var(--light-bg);
             border-bottom: 3px solid var(--primary-red);
-            padding: 20px;
+            padding: 30px 20px;
             text-align: center;
         }
 
         header h1 {
             margin: 0;
             color: var(--primary-red);
-            font-size: 1.8rem;
+            font-size: clamp(1.4rem, 5vw, 1.8rem);
             text-transform: uppercase;
+        }
+
+        header p {
+            margin-top: 5px;
+            font-size: 0.9rem;
+            opacity: 0.8;
         }
 
         .container {
             max-width: 1000px;
-            margin: 40px auto;
-            padding: 20px;
+            margin: 20px auto;
+            padding: 0 15px;
         }
 
-        /* Tabs Styling */
+        /* Tabs Styling - Improved for Mobile Scrolling */
         .tabs {
             display: flex;
-            justify-content: center;
+            justify-content: flex-start;
             gap: 10px;
-            margin-bottom: 30px;
-            flex-wrap: wrap;
+            margin-bottom: 20px;
+            overflow-x: auto;
+            padding-bottom: 10px;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none; /* Firefox */
+        }
+
+        .tabs::-webkit-scrollbar {
+            display: none; /* Chrome/Safari */
         }
 
         .tab-button {
-            padding: 12px 24px;
+            padding: 10px 18px;
             border: 2px solid var(--accent-brown);
-            background: transparent;
+            background: white;
             color: var(--accent-brown);
             cursor: pointer;
             font-weight: 600;
-            transition: all 0.3s;
+            transition: var(--transition);
             border-radius: 4px;
+            white-space: nowrap;
+            font-size: 0.9rem;
+            flex-shrink: 0;
         }
 
         .tab-button.active {
@@ -69,72 +90,101 @@
             color: white;
         }
 
-        /* Unit Content */
+        /* Unit Content Card */
         .unit-content {
             display: none;
             background: white;
-            border: 1px solid #ddd;
-            border-radius: 8px;
+            border-radius: 12px;
             overflow: hidden;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+            flex-direction: column; /* Stacked by default for mobile */
+            animation: fadeIn 0.4s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         .unit-content.active {
             display: flex;
-            flex-direction: row;
         }
 
         .unit-image {
-            flex: 1;
-            background-color: #000; /* Placeholder */
-            min-height: 400px;
-            aspect-ratio: 1 / 1;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            width: 100%;
+            background-color: #eee;
+            position: relative;
+            min-height: 250px;
+            max-height: 400px;
+        }
+
+        .unit-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        .unit-image span {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            background: rgba(0,0,0,0.5);
             color: white;
-            font-size: 0.8rem;
+            padding: 2px 8px;
+            font-size: 0.7rem;
+            border-radius: 4px;
         }
 
         .unit-details {
+            padding: 25px;
             flex: 1;
-            padding: 40px;
         }
 
         .unit-details h2 {
             color: var(--accent-brown);
-            margin-top: 0;
+            margin: 0 0 10px 0;
+            font-size: 1.5rem;
             border-bottom: 2px solid var(--primary-red);
             display: inline-block;
             padding-bottom: 5px;
         }
 
         .price-tag {
-            font-size: 2rem;
+            font-size: 1.8rem;
             font-weight: 700;
             color: var(--primary-red);
-            margin: 15px 0;
+            margin: 10px 0;
         }
 
         .info-grid {
             display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
+            grid-template-columns: 1fr; /* Single column mobile */
+            gap: 12px;
             margin-top: 20px;
+            background: #f9f9f9;
+            padding: 15px;
+            border-radius: 8px;
+        }
+
+        .info-item {
+            font-size: 0.95rem;
         }
 
         .info-item b {
             display: block;
             color: var(--accent-brown);
-            font-size: 0.85rem;
+            font-size: 0.75rem;
             text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 2px;
         }
 
         .status-badge {
             display: inline-block;
             padding: 4px 10px;
             border-radius: 4px;
-            font-size: 0.8rem;
+            font-size: 0.75rem;
             font-weight: bold;
         }
 
@@ -147,21 +197,50 @@
             text-align: center;
             background: var(--dark-black);
             color: white;
-            padding: 15px;
+            padding: 18px;
             text-decoration: none;
-            margin-top: 30px;
+            margin-top: 25px;
             font-weight: bold;
-            border-radius: 4px;
-            transition: background 0.3s;
+            border-radius: 8px;
+            transition: var(--transition);
         }
 
         .cta-button:hover {
             background: var(--primary-red);
+            transform: translateY(-2px);
         }
 
-        @media (max-width: 768px) {
-            .unit-content.active { flex-direction: column; }
-            .info-grid { grid-template-columns: 1fr; }
+        /* Desktop Layout Adjustments */
+        @media (min-width: 769px) {
+            .unit-content.active {
+                flex-direction: row; /* Side by side on desktop */
+                min-height: 500px;
+            }
+
+            .unit-image {
+                flex: 1;
+                max-height: none;
+            }
+
+            .unit-details {
+                flex: 1;
+                padding: 40px;
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+            }
+
+            .info-grid {
+                grid-template-columns: 1fr 1fr; /* Two columns on desktop */
+            }
+
+            .tabs {
+                justify-content: center;
+            }
+
+            .price-tag {
+                font-size: 2.2rem;
+            }
         }
     </style>
 </head>
@@ -181,13 +260,13 @@
 
     <div id="2br-a" class="unit-content active">
         <div class="unit-image">
-            <img src="" alt="2BR Type A Image Placeholder" style="width:100%; height:100%; object-fit: cover;">
-            <span>[ 1:1 Image URL Placeholder ]</span>
+            <img src="https://via.placeholder.com/600x600?text=2BR+Type+A" alt="2BR Type A">
+            <span>2BR - 36.34 sqm</span>
         </div>
         <div class="unit-details">
             <h2>2 Bedroom - Type A</h2>
             <div class="price-tag">₱2,454,785</div>
-            <p><strong>Monthly Amortization starts at:</strong> <span style="color:var(--primary-red); font-weight:bold;">₱15,114.53</span></p>
+            <p><strong>Monthly Amortization starts:</strong> <br><span style="color:var(--primary-red); font-weight:bold; font-size: 1.2rem;">₱15,114.53</span></p>
             
             <div class="info-grid">
                 <div class="info-item"><b>Floor Area</b> 36.34 sqm</div>
@@ -203,13 +282,13 @@
 
     <div id="3br-a" class="unit-content">
         <div class="unit-image">
-            <img src="" alt="3BR Type A Image Placeholder" style="width:100%; height:100%; object-fit: cover;">
-            <span>[ 1:1 Image URL Placeholder ]</span>
+            <img src="https://via.placeholder.com/600x600?text=3BR+Type+A" alt="3BR Type A">
+            <span>3BR - 44.85 sqm</span>
         </div>
         <div class="unit-details">
             <h2>3 Bedroom - Type A</h2>
             <div class="price-tag">₱3,083,000</div>
-            <p><strong>Monthly Amortization starts at:</strong> <span style="color:var(--primary-red); font-weight:bold;">₱18,472.03</span></p>
+            <p><strong>Monthly Amortization starts:</strong> <br><span style="color:var(--primary-red); font-weight:bold; font-size: 1.2rem;">₱18,472.03</span></p>
             
             <div class="info-grid">
                 <div class="info-item"><b>Floor Area</b> 44.85 sqm</div>
@@ -225,17 +304,17 @@
 
     <div id="3br-b" class="unit-content">
         <div class="unit-image">
-            <img src="" alt="3BR Type B Image Placeholder" style="width:100%; height:100%; object-fit: cover;">
-            <span>[ 1:1 Image URL Placeholder ]</span>
+            <img src="https://via.placeholder.com/600x600?text=3BR+Type+B" alt="3BR Type B">
+            <span>3BR - 53.64 sqm</span>
         </div>
         <div class="unit-details">
             <h2>3 Bedroom - Type B</h2>
             <div class="price-tag">₱3,587,079</div>
-            <p><strong>Monthly Amortization starts at:</strong> <span style="color:var(--primary-red); font-weight:bold;">₱22,086.26</span></p>
+            <p><strong>Monthly Amortization starts:</strong> <br><span style="color:var(--primary-red); font-weight:bold; font-size: 1.2rem;">₱22,086.26</span></p>
             
             <div class="info-grid">
                 <div class="info-item"><b>Floor Area</b> 53.64 sqm</div>
-                <div class="info-item"><b>Downpayment</b> ₱0</div>
+                <div class="info-item)<b>Downpayment</b> ₱0</div>
                 <div class="info-item"><b>RFO (Bldg U)</b> <span class="status-badge status-soldout">Sold Out</span></div>
                 <div class="info-item"><b>Pre-Selling (Bldg T)</b> <span class="status-badge status-available">Available</span></div>
                 <div class="info-item"><b>Financing</b> Pag-IBIG, Bank, In-House</div>
@@ -252,14 +331,21 @@
         tabcontent = document.getElementsByClassName("unit-content");
         for (i = 0; i < tabcontent.length; i++) {
             tabcontent[i].style.display = "none";
-            tabcontent[i].className = tabcontent[i].className.replace(" active", "");
+            tabcontent[i].classList.remove("active");
         }
         tablinks = document.getElementsByClassName("tab-button");
         for (i = 0; i < tablinks.length; i++) {
-            tablinks[i].className = tablinks[i].className.replace(" active", "");
+            tablinks[i].classList.remove("active");
         }
-        document.getElementById(unitName).style.display = "flex";
-        evt.currentTarget.className += " active";
+        
+        const activeUnit = document.getElementById(unitName);
+        activeUnit.style.display = "flex";
+        setTimeout(() => { activeUnit.classList.add("active"); }, 10);
+        
+        evt.currentTarget.classList.add("active");
+        
+        // Auto-scroll tab into view on mobile
+        evt.currentTarget.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
     }
 </script>
 
