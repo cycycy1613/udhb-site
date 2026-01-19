@@ -121,21 +121,21 @@
         width: 100%;
     }
 
-    /* Unique Style for Sellers Link */
-    .nav-menu .sellers-link a {
+    /* Unique Style for Prices Link */
+    .nav-menu .prices-link a {
         color: var(--secondary-color);
         font-weight: 700;
     }
 
-    .nav-menu .sellers-link a:hover {
+    .nav-menu .prices-link a:hover {
         color: var(--primary-color);
     }
 
-    .nav-menu .sellers-link a::after {
+    .nav-menu .prices-link a::after {
         background-color: var(--primary-color);
     }
 
-    .nav-menu .sellers-link a:hover::after {
+    .nav-menu .prices-link a:hover::after {
         background-color: var(--secondary-color);
     }
     
@@ -195,7 +195,6 @@
     .btn {
         padding: 0.8rem 1.8rem;
         border: none;
-        /* Updated: Changed from 50px to 8px for a rectangular shape */
         border-radius: 8px;
         font-size: 1rem;
         font-weight: 600;
@@ -218,26 +217,23 @@
     
     .btn-secondary {
         padding: 0.8rem 1.8rem;
-    background-color: transparent;
-    /* Updated: Changed from 50px to 8px for a rectangular shape */
-    border-radius: 8px;
-    font-size: 1rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    text-decoration: none;
-    display: inline-block;
-    
-    /* White Outline Specifics */
-    border: 2px solid var(--white);
-    color: var(--white);
+        background-color: transparent;
+        border-radius: 8px;
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        display: inline-block;
+        border: 2px solid var(--white);
+        color: var(--white);
     }
     
     .btn-secondary:hover {
         background-color: var(--white);
-    color: var(--primary-color); /* The dark color (#2C3E50) for contrast */
-    transform: translateY(-5px);
-    box-shadow: 0 8px 20px rgba(255, 255, 255, 0.4);
+        color: var(--primary-color);
+        transform: translateY(-5px);
+        box-shadow: 0 8px 20px rgba(255, 255, 255, 0.4);
     }
     
     /* Section Styles */
@@ -681,30 +677,29 @@
         background-color: var(--background-color);
     }
     
-    /* MODIFIED STYLES */
     .contact-container {
         display: flex;
-        justify-content: center; /* Center the contact info block */
+        justify-content: center;
         align-items: center;
         flex-wrap: wrap;
         gap: 2.5rem;
     }
     
     .contact-info {
-        flex: 0 0 100%; /* Make it take up the full width of the container */
-        max-width: 600px; /* Constrain the max width for better readability */
-        padding: 3rem; /* Added padding */
-        background-color: var(--white); /* Added background */
+        flex: 0 0 100%;
+        max-width: 600px;
+        padding: 3rem;
+        background-color: var(--white);
         border-radius: 12px;
-        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05); /* Added shadow */
-        margin: 0 auto; /* Center the block */
+        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
+        margin: 0 auto;
     }
     
     .contact-item {
         display: flex;
         align-items: flex-start;
         margin-bottom: 2rem;
-        text-align: left; /* Ensure text alignment is good */
+        text-align: left;
     }
     
     .contact-item i {
@@ -712,10 +707,8 @@
         color: var(--secondary-color);
         margin-right: 1.2rem;
         margin-top: 5px;
-        min-width: 25px; /* Added to keep icons aligned on different rows */
+        min-width: 25px;
     }
-
-    /* REMOVED .contact-form STYLES AND RELATED FORM STYLES */
 
     /* Footer */
     footer {
@@ -745,150 +738,7 @@
         color: var(--secondary-color);
     }
 
-    /* **NEW CSS FOR SELLERS PORTAL DIALOG BOX** */
-    .seller-modal-backdrop {
-        display: none; /* Hidden by default */
-        position: fixed;
-        z-index: 3000; /* Higher than other modals/header */
-        left: 0;
-        top: 0;
-        width: 100%;
-        height: 100%;
-        overflow: auto;
-        background-color: rgba(44, 62, 80, 0.85); /* Dark Slate Gray with opacity */
-        backdrop-filter: blur(5px);
-        transition: opacity 0.3s ease;
-        opacity: 0;
-        justify-content: center;
-        align-items: center;
-    }
-
-    .seller-modal-backdrop.show {
-        display: flex;
-        opacity: 1;
-    }
-
-    .seller-modal-content {
-        background-color: var(--white);
-        padding: 30px;
-        border-radius: 15px;
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
-        width: 90%;
-        max-width: 450px;
-        text-align: center;
-        position: relative;
-        animation: modalSlideIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    }
-
-    @keyframes modalSlideIn {
-        from {
-            transform: translateY(-50px) scale(0.9);
-            opacity: 0;
-        }
-        to {
-            transform: translateY(0) scale(1);
-            opacity: 1;
-        }
-    }
-
-    .seller-close-btn {
-        color: var(--light-gray);
-        position: absolute;
-        top: 15px;
-        right: 25px;
-        font-size: 30px;
-        font-weight: bold;
-        transition: color 0.3s;
-        cursor: pointer;
-    }
-
-    .seller-close-btn:hover {
-        color: var(--secondary-color);
-    }
-
-    .modal-header {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        margin-bottom: 20px;
-        color: var(--primary-color);
-    }
-
-    .modal-header i {
-        font-size: 2.2rem;
-        color: var(--secondary-color);
-        margin-right: 15px;
-    }
-
-    .modal-header h2 {
-        font-size: 1.8rem;
-        margin: 0;
-    }
-
-    .modal-hint {
-        margin-top: 15px;
-        color: var(--text-color);
-    }
-
-    .hint-text {
-        font-weight: 600;
-        color: var(--primary-color);
-        letter-spacing: 2px;
-    }
-
-    .code-input {
-        width: 100%;
-        padding: 12px;
-        margin: 20px 0;
-        border: 2px solid var(--light-gray);
-        border-radius: 8px;
-        font-size: 1.5rem;
-        text-align: center;
-        letter-spacing: 8px;
-        font-weight: 700;
-        color: var(--primary-color);
-        transition: border-color 0.3s;
-    }
-
-    .code-input:focus {
-        border-color: var(--secondary-color);
-        outline: none;
-        box-shadow: 0 0 0 3px rgba(231, 76, 60, 0.3);
-    }
-
-    .modal-btn {
-        width: 100%;
-        padding: 12px 1.8rem;
-        font-size: 1.1rem;
-    }
-
-    /* Toast Notification Styles */
-    .toast-error {
-        visibility: hidden;
-        min-width: 250px;
-        background-color: var(--secondary-color);
-        color: var(--white);
-        text-align: center;
-        border-radius: 6px;
-        padding: 16px;
-        position: absolute;
-        z-index: 4000;
-        bottom: 20px;
-        left: 50%;
-        transform: translateX(-50%);
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-        opacity: 0;
-        transition: opacity 0.5s, bottom 0.5s;
-    }
-
-    .toast-error.show {
-        visibility: visible;
-        opacity: 1;
-        bottom: 40px;
-    }
-    /* **END NEW CSS** */
-    
-    /* Responsive Styles - MOBILE MENU & FULL WIDTH ADJUSTMENTS */
+    /* Responsive Styles */
     @media (max-width: 768px) {
         .header-container {
             padding: 0 1rem;
@@ -922,8 +772,7 @@
             color: var(--primary-color);
         }
 
-        /* Ensure Sellers link maintains its unique color in mobile */
-        .nav-menu.active .sellers-link a {
+        .nav-menu.active .prices-link a {
             color: var(--secondary-color);
         }
 
@@ -933,6 +782,7 @@
         
         .nav-menu li {
             margin: 1rem 0;
+            margin-left: 0;
         }
         
         .hero h1 {
@@ -951,7 +801,6 @@
             padding: 4rem 1rem;
         }
 
-        /* MODIFIED RESPONSIVE STYLES */
         .contact-info {
             padding: 2rem 1.5rem;
         }
@@ -974,7 +823,7 @@
                 <li><a href="#amenities">Amenities</a></li>
                 <li><a href="#location">Location</a></li>
                 <li><a href="#contact">Contact</a></li>
-                <li class="sellers-link"><a href="#codeModal" data-modal-target="codeModal">Sellers</a></li>
+                <li class="prices-link"><a href="https://urbandecahomesbatangas.com/price" target="_blank" rel="noopener noreferrer">Prices</a></li>
             </ul>
         </div>
     </header>
@@ -1282,22 +1131,8 @@
         <img class="modal-content" id="modalImage">
     </div>
 
-    <div id="codeModal" class="seller-modal-backdrop">
-        <div class="seller-modal-content">
-            <span class="seller-close-btn">×</span>
-            <div class="modal-header">
-                <i class="fas fa-lock"></i>
-                <h2>Sellers Portal</h2>
-            </div>
-            <p>Please enter the **4-digit access code** to proceed.</p>
-            <p class="modal-hint">Hint: <span class="hint-text">_ _ _ _ Holdings Inc.</span></p>
-            <input type="text" id="codeInput" maxlength="4" placeholder="" class="code-input">
-            <button id="submitCodeBtn" class="btn btn-primary modal-btn">Enter</button>
-            <div id="toastNotification" class="toast-error"></div>
-        </div>
-    </div>
     <script>
-        // Mobile Navigation Toggle (Dropdown/Animation)
+        // Mobile Navigation Toggle
         document.querySelector('.sidebar-toggle').addEventListener('click', function() {
             document.querySelector('.nav-menu').classList.toggle('active');
         });
@@ -1305,7 +1140,6 @@
         // Close mobile menu when clicking on a link
         document.querySelectorAll('.nav-menu a').forEach(link => {
             link.addEventListener('click', function() {
-                // Wait for a small delay to allow smooth scroll to start
                 setTimeout(() => {
                     document.querySelector('.nav-menu').classList.remove('active');
                 }, 300); 
@@ -1317,7 +1151,6 @@
         const modalImg = document.getElementById('modalImage');
         const closeModal = document.querySelector('.close');
 
-        // Gallery images
         document.querySelectorAll('.gallery-item img, .specs-image img').forEach(img => {
             img.addEventListener('click', function() {
                 modal.style.display = 'block';
@@ -1325,12 +1158,10 @@
             });
         });
 
-        // Close modal
         closeModal.addEventListener('click', function() {
             modal.style.display = 'none';
         });
 
-        // Close modal when clicking outside the image
         window.addEventListener('click', function(event) {
             if (event.target === modal) {
                 modal.style.display = 'none';
@@ -1358,105 +1189,27 @@
             updateCarousel();
         });
 
-        // Auto-advance carousel
         setInterval(function() {
             currentIndex = (currentIndex < carouselItems.length - 1) ? currentIndex + 1 : 0;
             updateCarousel();
         }, 5000);
 
-        // Smooth scrolling for navigation links
+        // Smooth scrolling for internal navigation links only
         document.querySelectorAll('.nav-menu a[href^="#"]').forEach(anchor => {
             anchor.addEventListener('click', function(e) {
-                const targetId = this.getAttribute('href');
-                
-                // If the link points to the codeModal, handle it with the modal logic instead of scrolling
-                if (targetId === '#codeModal') {
-                    e.preventDefault(); // Stop default anchor behavior
-                    codeModal.classList.add('show');
-                    codeInput.value = ''; // Clear any previous input
-                    codeInput.focus();
-                    return; // Stop here for the modal logic
-                }
-
                 e.preventDefault();
+                const targetId = this.getAttribute('href');
                 if (targetId === '#') return;
                 
                 const targetElement = document.querySelector(targetId);
                 if (targetElement) {
                     window.scrollTo({
-                        top: targetElement.offsetTop - 70, /* Adjusted for fixed header */
+                        top: targetElement.offsetTop - 70,
                         behavior: 'smooth'
                     });
                 }
             });
         });
-
-
-        // **********************************************
-        // ** NEW JAVASCRIPT FOR SELLERS PORTAL MODAL **
-        // **********************************************
-
-        // Note: The sellersPortalLink logic has been moved into the smooth scrolling function.
-        const codeModal = document.getElementById('codeModal');
-        const closeModalBtn = codeModal.querySelector('.seller-close-btn');
-        const submitCodeBtn = document.getElementById('submitCodeBtn');
-        const codeInput = document.getElementById('codeInput');
-        const toastNotification = document.getElementById('toastNotification');
-        const CORRECT_CODE = '8990';
-        const DESTINATION_URL = 'https://urbandecahomesbatangas.com/members';
-
-        // 2. Close Modal functionality
-        function closeModalHandler() {
-            codeModal.classList.remove('show');
-        }
-        closeModalBtn.addEventListener('click', closeModalHandler);
-
-        // Close modal when clicking outside
-        window.addEventListener('click', function(event) {
-            if (event.target === codeModal) {
-                closeModalHandler();
-            }
-        });
-
-        // 3. Toast Error Handler
-        function showToast(message) {
-            toastNotification.textContent = message;
-            toastNotification.classList.add('show');
-            
-            // Hide toast after 3 seconds
-            setTimeout(() => {
-                toastNotification.classList.remove('show');
-            }, 3000);
-        }
-
-        // 4. Code Submission Logic
-        function handleCodeSubmission() {
-            // Ensure the input is treated as a string for comparison
-            const enteredCode = codeInput.value.trim();
-
-            if (enteredCode === CORRECT_CODE) {
-                // Success: Navigate to the portal
-                showToast('Success! Redirecting...');
-                setTimeout(() => {
-                    window.location.href = DESTINATION_URL;
-                }, 1000);
-            } else {
-                // Error: Show toast and clear input
-                showToast('Invalid Code. Please try again.');
-                codeInput.value = '';
-                codeInput.focus();
-            }
-        }
-
-        // Event listeners for submission
-        submitCodeBtn.addEventListener('click', handleCodeSubmission);
-        codeInput.addEventListener('keypress', function(e) {
-            // Submit on 'Enter' key press
-            if (e.key === 'Enter') {
-                handleCodeSubmission();
-            }
-        });
-
     </script>
 </body>
 </html>
