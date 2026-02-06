@@ -569,7 +569,7 @@
                 <button class="add-item-btn" id="addItemBtn"><i class="fas fa-plus"></i></button>
             </div>
             <div class="modal-footer">
-                <button class="btn btn-secondary" id="viewSummaryBtn">View Summary</button>
+                <button class="btn btn-secondary" style="display:none;" id="viewSummaryBtn">View Summary</button>
                 <button class="btn btn-primary" id="submitBtn">Submit to Database</button>
             </div>
         </div>
@@ -603,6 +603,8 @@
     </div>
 
     <script>
+        const REQUIRED_PASSCODE = "161316";
+
         const firebaseConfig = {
             apiKey: "AIzaSyCqcmiRVkCSvz87WBPQSGI7uMOmVlMN78k",
             authDomain: "visitors-entry.firebaseapp.com",
@@ -625,7 +627,6 @@
         // Globals
         let currentPeriod = 'monthly';
         let allSalesData = [];
-        let items = [];
 
         // Initialize Selectors
         const now = new Date();
@@ -647,7 +648,6 @@
                 tab.classList.add('active');
                 currentPeriod = tab.dataset.period;
                 
-                // Show/Hide month picker based on period
                 if(currentPeriod === 'monthly') {
                     monthSelectorContainer.style.display = 'flex';
                 } else {
@@ -659,7 +659,6 @@
             });
         });
 
-        // Trigger update on change
         selectMonth.addEventListener('change', calculateAndDisplayStats);
         selectYear.addEventListener('change', calculateAndDisplayStats);
 
@@ -678,7 +677,6 @@
             });
         }
 
-        // Logic to Load Data
         async function loadSalesData() {
             database.ref('sales').on('value', (snapshot) => {
                 const sales = snapshot.val();
@@ -723,7 +721,6 @@
             calculateTopPerformers(filteredData);
         }
 
-        // Original Helper Functions (Condensed)
         function calculateTopPerformers(salesData) {
             const realtyMap = {}, sellerMap = {}, coordMap = {};
             salesData.forEach(s => {
@@ -737,8 +734,8 @@
         }
 
         function updateLeaderboard(id, data) {
-            const items = document.getElementById(id).querySelectorAll('.leaderboard-item');
-            items.forEach((item, i) => {
+            const containerItems = document.getElementById(id).querySelectorAll('.leaderboard-item');
+            containerItems.forEach((item, i) => {
                 const name = item.querySelector('.leaderboard-name');
                 const amt = item.querySelector('.leaderboard-amount');
                 if (data[i]) {
@@ -750,13 +747,11 @@
             });
         }
 
-        // Standard Modal Handlers
         document.getElementById('encodeBtn').onclick = () => document.getElementById('encodeModal').style.display = 'flex';
         document.getElementById('closeEncodeModal').onclick = () => document.getElementById('encodeModal').style.display = 'none';
         document.getElementById('viewAllBtn').onclick = () => { loadAllReports(); document.getElementById('reportsModal').style.display = 'flex'; };
         document.getElementById('closeReportsModal').onclick = () => document.getElementById('reportsModal').style.display = 'none';
 
-        // Encoding & Dynamic Items
         document.getElementById('addItemBtn').onclick = () => {
             const id = Date.now();
             const html = `
@@ -803,10 +798,21 @@
 
             if(!sale.realtyName || !sale.dateEntry) return alert("Fill required fields");
             
+            // Passcode Check for Adding
+            const pass = prompt("Enter passcode to add data:");
+            if(pass !== REQUIRED_PASSCODE) {
+                alert("Incorrect passcode. Access denied.");
+                return;
+            }
+
             await database.ref('sales').push(sale);
-            alert("Saved!");
+            alert("Saved successfully!");
             document.getElementById('encodeModal').style.display = 'none';
+            // Reset form
             document.getElementById('realtyName').value = '';
+            document.getElementById('sellerName').value = '';
+            document.getElementById('coordinatorName').value = '';
+            document.getElementById('dateEntry').value = '';
             document.getElementById('itemsContainer').innerHTML = '';
         };
 
@@ -815,8 +821,14 @@
             const data = snapshot.val();
             const tbody = document.getElementById('reportsTableBody');
             tbody.innerHTML = '';
+            
             if(data) {
-                Object.entries(data).forEach(([key, s]) => {
+                // Convert to array and sort latest to oldest
+                const sortedData = Object.entries(data).sort((a, b) => {
+                    return new Date(b[1].dateEntry) - new Date(a[1].dateEntry);
+                });
+
+                sortedData.forEach(([key, s]) => {
                     tbody.innerHTML += `<tr>
                         <td>${s.dateEntry}</td><td>${s.realtyName}</td><td>${s.sellerName}</td>
                         <td>${s.coordinatorName}</td><td>${s.totalUnits}</td><td>${s.totalParking}</td>
@@ -828,13 +840,18 @@
         }
 
         window.deleteSale = async (id) => {
-            if(confirm("Delete this?")) {
+            const pass = prompt("Enter passcode to delete this row:");
+            if(pass !== REQUIRED_PASSCODE) {
+                alert("Incorrect passcode. Row not deleted.");
+                return;
+            }
+
+            if(confirm("Are you sure you want to delete this report?")) {
                 await database.ref(`sales/${id}`).remove();
                 loadAllReports();
             }
         };
 
-        // Init
         document.addEventListener('DOMContentLoaded', loadSalesData);
     </script>
 </body>
