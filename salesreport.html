@@ -1,0 +1,1407 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sales Report Dashboard</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
+    <style>
+        :root {
+            --primary-red: #8B0000;
+            --light-red: #FF5252;
+            --dark-red: #5A0000;
+            --light-bg: #f8f9fa;
+            --card-bg: #ffffff;
+            --text-dark: #333333;
+            --text-light: #666666;
+            --border-color: #e0e0e0;
+            --success-color: #28a745;
+            --warning-color: #ffc107;
+            --shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            --shadow-hover: 0 8px 24px rgba(0, 0, 0, 0.12);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--light-bg);
+            color: var(--text-dark);
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Header Styles */
+        header {
+            background-color: var(--card-bg);
+            box-shadow: var(--shadow);
+            padding: 20px 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .logo-icon {
+            background-color: var(--primary-red);
+            color: white;
+            width: 50px;
+            height: 50px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+        }
+
+        .logo-text h1 {
+            font-size: 28px;
+            color: var(--primary-red);
+        }
+
+        .logo-text p {
+            font-size: 14px;
+            color: var(--text-light);
+        }
+
+        .encode-btn {
+            background-color: var(--primary-red);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px rgba(139, 0, 0, 0.2);
+        }
+
+        .encode-btn:hover {
+            background-color: var(--dark-red);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(139, 0, 0, 0.3);
+        }
+
+        /* Period Selector */
+        .period-selector {
+            display: flex;
+            justify-content: center;
+            margin: 30px 0;
+        }
+
+        .period-tabs {
+            display: flex;
+            background-color: white;
+            border-radius: 10px;
+            padding: 5px;
+            box-shadow: var(--shadow);
+        }
+
+        .period-tab {
+            padding: 12px 30px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            border: none;
+            background-color: transparent;
+            color: var(--text-light);
+        }
+
+        .period-tab.active {
+            background-color: var(--primary-red);
+            color: white;
+        }
+
+        /* Dashboard Cards */
+        .dashboard {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+
+        .card {
+            background-color: var(--card-bg);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: var(--shadow);
+            transition: all 0.3s ease;
+            border-top: 5px solid var(--primary-red);
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-hover);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .card-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text-dark);
+        }
+
+        .card-icon {
+            background-color: rgba(139, 0, 0, 0.1);
+            color: var(--primary-red);
+            width: 50px;
+            height: 50px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+        }
+
+        .card-value {
+            font-size: 32px;
+            font-weight: 700;
+            color: var(--primary-red);
+            margin-bottom: 10px;
+        }
+
+        .card-subtitle {
+            font-size: 14px;
+            color: var(--text-light);
+        }
+
+        /* Leaderboard Cards */
+        .leaderboard {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 25px;
+            margin-bottom: 50px;
+        }
+
+        .leaderboard-card {
+            background-color: var(--card-bg);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: var(--shadow);
+            transition: all 0.3s ease;
+        }
+
+        .leaderboard-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-hover);
+        }
+
+        .leaderboard-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--primary-red);
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .leaderboard-list {
+            list-style-type: none;
+        }
+
+        .leaderboard-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 15px 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .leaderboard-item:last-child {
+            border-bottom: none;
+        }
+
+        .leaderboard-rank {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            color: white;
+            margin-right: 15px;
+        }
+
+        .rank-1 {
+            background-color: #FFD700;
+        }
+
+        .rank-2 {
+            background-color: #C0C0C0;
+        }
+
+        .rank-3 {
+            background-color: #CD7F32;
+        }
+
+        .leaderboard-info {
+            flex-grow: 1;
+        }
+
+        .leaderboard-name {
+            font-weight: 600;
+            color: var(--text-dark);
+        }
+
+        .leaderboard-amount {
+            font-weight: 700;
+            color: var(--primary-red);
+        }
+
+        /* View All Reports Button */
+        .view-all-container {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 50px;
+        }
+
+        .view-all-btn {
+            background-color: var(--primary-red);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 10px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px rgba(139, 0, 0, 0.2);
+        }
+
+        .view-all-btn:hover {
+            background-color: var(--dark-red);
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(139, 0, 0, 0.3);
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .modal-content {
+            background-color: white;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 800px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            animation: slideUp 0.4s ease;
+        }
+
+        .modal-header {
+            background-color: var(--primary-red);
+            color: white;
+            padding: 25px;
+            border-radius: 15px 15px 0 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-title {
+            font-size: 24px;
+            font-weight: 600;
+        }
+
+        .close-modal {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 28px;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+
+        .close-modal:hover {
+            transform: rotate(90deg);
+        }
+
+        .modal-body {
+            padding: 30px;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--text-dark);
+        }
+
+        .form-input, .form-select {
+            width: 100%;
+            padding: 14px;
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-input:focus, .form-select:focus {
+            border-color: var(--primary-red);
+            outline: none;
+        }
+
+        .add-item-btn {
+            background-color: var(--light-red);
+            color: white;
+            border: none;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            font-size: 24px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 20px 0;
+            transition: all 0.3s ease;
+        }
+
+        .add-item-btn:hover {
+            background-color: var(--primary-red);
+            transform: rotate(90deg);
+        }
+
+        .item-section {
+            border: 2px dashed var(--border-color);
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            background-color: #f9f9f9;
+        }
+
+        .item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .remove-item {
+            background-color: #ff6b6b;
+            color: white;
+            border: none;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .modal-footer {
+            display: flex;
+            justify-content: space-between;
+            padding: 20px 30px;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .btn {
+            padding: 14px 28px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+        }
+
+        .btn-secondary {
+            background-color: #f1f1f1;
+            color: var(--text-dark);
+        }
+
+        .btn-secondary:hover {
+            background-color: #e0e0e0;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-red);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--dark-red);
+        }
+
+        /* Reports Table */
+        .reports-modal .modal-content {
+            max-width: 1200px;
+        }
+
+        .table-container {
+            overflow-x: auto;
+            margin-top: 20px;
+        }
+
+        .reports-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .reports-table th {
+            background-color: var(--primary-red);
+            color: white;
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+        }
+
+        .reports-table td {
+            padding: 15px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .reports-table tr:hover {
+            background-color: #f9f9f9;
+        }
+
+        .delete-btn {
+            background-color: #ff6b6b;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .delete-btn:hover {
+            background-color: #ff5252;
+        }
+
+        /* Summary Modal */
+        .summary-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 15px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .summary-item:last-child {
+            border-bottom: none;
+        }
+
+        .summary-label {
+            font-weight: 600;
+        }
+
+        .summary-value {
+            color: var(--primary-red);
+            font-weight: 700;
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        @keyframes fadeInUp {
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .fade-in {
+            animation: fadeInUp 0.6s ease;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1024px) {
+            .dashboard {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .leaderboard {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .dashboard {
+                grid-template-columns: 1fr;
+            }
+            
+            .row {
+                grid-template-columns: 1fr;
+            }
+            
+            .modal-footer {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .btn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <div class="container header-content">
+            <div class="logo">
+                <div class="logo-icon">
+                    <i class="fas fa-chart-line"></i>
+                </div>
+                <div class="logo-text">
+                    <h1>Sales Report</h1>
+                    <p>Real-Time Sales Monitoring Dashboard</p>
+                </div>
+            </div>
+            <button class="encode-btn" id="encodeBtn">
+                <i class="fas fa-plus-circle"></i> Encode Sales
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container">
+        <!-- Period Selector -->
+        <div class="period-selector">
+            <div class="period-tabs">
+                <button class="period-tab active" data-period="monthly">Monthly</button>
+                <button class="period-tab" data-period="yearly">Yearly</button>
+            </div>
+        </div>
+
+        <!-- Dashboard Cards -->
+        <div class="dashboard">
+            <div class="card fade-in" style="animation-delay: 0.1s">
+                <div class="card-header">
+                    <h3 class="card-title">Total TOO Sales</h3>
+                    <div class="card-icon">
+                        <i class="fas fa-dollar-sign"></i>
+                    </div>
+                </div>
+                <div class="card-value" id="totalSales">₱0.00</div>
+                <p class="card-subtitle">This <span id="periodLabel">Month</span></p>
+            </div>
+
+            <div class="card fade-in" style="animation-delay: 0.2s">
+                <div class="card-header">
+                    <h3 class="card-title">Total Units Sold</h3>
+                    <div class="card-icon">
+                        <i class="fas fa-building"></i>
+                    </div>
+                </div>
+                <div class="card-value" id="totalUnits">0</div>
+                <p class="card-subtitle">This <span id="periodLabel2">Month</span></p>
+            </div>
+
+            <div class="card fade-in" style="animation-delay: 0.3s">
+                <div class="card-header">
+                    <h3 class="card-title">Total Parking Sold</h3>
+                    <div class="card-icon">
+                        <i class="fas fa-car"></i>
+                    </div>
+                </div>
+                <div class="card-value" id="totalParking">0</div>
+                <p class="card-subtitle">This <span id="periodLabel3">Month</span></p>
+            </div>
+        </div>
+
+        <!-- Leaderboard Section -->
+        <div class="leaderboard">
+            <div class="leaderboard-card fade-in" style="animation-delay: 0.4s">
+                <h3 class="leaderboard-title">
+                    <i class="fas fa-trophy"></i> Top 3 Realty
+                </h3>
+                <ul class="leaderboard-list" id="topRealty">
+                    <li class="leaderboard-item">
+                        <div class="leaderboard-rank rank-1">1</div>
+                        <div class="leaderboard-info">
+                            <div class="leaderboard-name">No data yet</div>
+                        </div>
+                        <div class="leaderboard-amount">₱0</div>
+                    </li>
+                    <li class="leaderboard-item">
+                        <div class="leaderboard-rank rank-2">2</div>
+                        <div class="leaderboard-info">
+                            <div class="leaderboard-name">No data yet</div>
+                        </div>
+                        <div class="leaderboard-amount">₱0</div>
+                    </li>
+                    <li class="leaderboard-item">
+                        <div class="leaderboard-rank rank-3">3</div>
+                        <div class="leaderboard-info">
+                            <div class="leaderboard-name">No data yet</div>
+                        </div>
+                        <div class="leaderboard-amount">₱0</div>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="leaderboard-card fade-in" style="animation-delay: 0.5s">
+                <h3 class="leaderboard-title">
+                    <i class="fas fa-user-tie"></i> Top 3 Sellers
+                </h3>
+                <ul class="leaderboard-list" id="topSellers">
+                    <li class="leaderboard-item">
+                        <div class="leaderboard-rank rank-1">1</div>
+                        <div class="leaderboard-info">
+                            <div class="leaderboard-name">No data yet</div>
+                        </div>
+                        <div class="leaderboard-amount">₱0</div>
+                    </li>
+                    <li class="leaderboard-item">
+                        <div class="leaderboard-rank rank-2">2</div>
+                        <div class="leaderboard-info">
+                            <div class="leaderboard-name">No data yet</div>
+                        </div>
+                        <div class="leaderboard-amount">₱0</div>
+                    </li>
+                    <li class="leaderboard-item">
+                        <div class="leaderboard-rank rank-3">3</div>
+                        <div class="leaderboard-info">
+                            <div class="leaderboard-name">No data yet</div>
+                        </div>
+                        <div class="leaderboard-amount">₱0</div>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="leaderboard-card fade-in" style="animation-delay: 0.6s">
+                <h3 class="leaderboard-title">
+                    <i class="fas fa-star"></i> Top Sales Coordinator
+                </h3>
+                <ul class="leaderboard-list" id="topCoordinator">
+                    <li class="leaderboard-item">
+                        <div class="leaderboard-rank rank-1">1</div>
+                        <div class="leaderboard-info">
+                            <div class="leaderboard-name">No data yet</div>
+                        </div>
+                        <div class="leaderboard-amount">₱0</div>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- View All Reports Button -->
+        <div class="view-all-container">
+            <button class="view-all-btn" id="viewAllBtn">
+                <i class="fas fa-file-excel"></i> View All Reports
+            </button>
+        </div>
+    </main>
+
+    <!-- Encode Modal -->
+    <div class="modal" id="encodeModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Encode Sales Data</h2>
+                <button class="close-modal" id="closeEncodeModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label class="form-label">Realty Name</label>
+                    <input type="text" class="form-input" id="realtyName" placeholder="Enter realty name">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Seller's Name</label>
+                    <input type="text" class="form-input" id="sellerName" placeholder="Enter seller's name">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Sales Coordinator</label>
+                    <input type="text" class="form-input" id="coordinatorName" placeholder="Enter sales coordinator name">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Date Entry</label>
+                    <input type="date" class="form-input" id="dateEntry">
+                </div>
+                
+                <h3 style="margin: 25px 0 15px 0; color: var(--primary-red);">Sales Items</h3>
+                
+                <div id="itemsContainer">
+                    <!-- Items will be added here dynamically -->
+                </div>
+                
+                <div class="text-center">
+                    <button class="add-item-btn" id="addItemBtn">
+                        <i class="fas fa-plus"></i>
+                    </button>
+                    <p style="color: var(--text-light); margin-top: 10px;">Click to add Unit or Parking</p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" id="viewSummaryBtn">View Summary</button>
+                <button class="btn btn-primary" id="submitBtn">Submit to Database</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Summary Modal -->
+    <div class="modal" id="summaryModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Summary of Sales Entry</h2>
+                <button class="close-modal" id="closeSummaryModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div id="summaryContent">
+                    <!-- Summary will be populated here -->
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" id="backToEditBtn">Back to Edit</button>
+                <button class="btn btn-primary" id="confirmSubmitBtn">Confirm & Submit</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Reports Modal -->
+    <div class="modal reports-modal" id="reportsModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">All Sales Reports</h2>
+                <button class="close-modal" id="closeReportsModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="table-container">
+                    <table class="reports-table">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Realty Name</th>
+                                <th>Seller's Name</th>
+                                <th>Sales Coordinator</th>
+                                <th>Units Sold</th>
+                                <th>Parking Sold</th>
+                                <th>Total Amount</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="reportsTableBody">
+                            <!-- Reports will be populated here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Firebase Configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyCqcmiRVkCSvz87WBPQSGI7uMOmVlMN78k",
+            authDomain: "visitors-entry.firebaseapp.com",
+            databaseURL: "https://visitors-entry-default-rtdb.europe-west1.firebasedatabase.app",
+            projectId: "visitors-entry",
+            storageBucket: "visitors-entry.firebasestorage.app",
+            messagingSenderId: "239213604796",
+            appId: "1:239213604796:web:5e4dfa84b59e3d2b1f45b9"
+        };
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+
+        // DOM Elements
+        const encodeBtn = document.getElementById('encodeBtn');
+        const encodeModal = document.getElementById('encodeModal');
+        const closeEncodeModal = document.getElementById('closeEncodeModal');
+        const periodTabs = document.querySelectorAll('.period-tab');
+        const viewAllBtn = document.getElementById('viewAllBtn');
+        const reportsModal = document.getElementById('reportsModal');
+        const closeReportsModal = document.getElementById('closeReportsModal');
+        const addItemBtn = document.getElementById('addItemBtn');
+        const itemsContainer = document.getElementById('itemsContainer');
+        const viewSummaryBtn = document.getElementById('viewSummaryBtn');
+        const summaryModal = document.getElementById('summaryModal');
+        const closeSummaryModal = document.getElementById('closeSummaryModal');
+        const backToEditBtn = document.getElementById('backToEditBtn');
+        const confirmSubmitBtn = document.getElementById('confirmSubmitBtn');
+        const submitBtn = document.getElementById('submitBtn');
+        const reportsTableBody = document.getElementById('reportsTableBody');
+
+        // Global Variables
+        let currentPeriod = 'monthly';
+        let items = [];
+        let allSalesData = [];
+
+        // Initialize Date
+        document.getElementById('dateEntry').valueAsDate = new Date();
+
+        // Modal Functions
+        encodeBtn.addEventListener('click', () => {
+            encodeModal.style.display = 'flex';
+        });
+
+        closeEncodeModal.addEventListener('click', () => {
+            encodeModal.style.display = 'none';
+            resetForm();
+        });
+
+        viewAllBtn.addEventListener('click', () => {
+            loadAllReports();
+            reportsModal.style.display = 'flex';
+        });
+
+        closeReportsModal.addEventListener('click', () => {
+            reportsModal.style.display = 'none';
+        });
+
+        // Period Tabs
+        periodTabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                periodTabs.forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+                currentPeriod = tab.dataset.period;
+                updatePeriodLabels();
+                calculateAndDisplayStats();
+            });
+        });
+
+        function updatePeriodLabels() {
+            const labels = document.querySelectorAll('#periodLabel, #periodLabel2, #periodLabel3');
+            labels.forEach(label => {
+                label.textContent = currentPeriod === 'monthly' ? 'Month' : 'Year';
+            });
+        }
+
+        // Add Item Functionality
+        addItemBtn.addEventListener('click', () => {
+            addItem();
+        });
+
+        function addItem() {
+            const itemId = Date.now();
+            const itemHtml = `
+                <div class="item-section" data-id="${itemId}">
+                    <div class="item-header">
+                        <select class="form-select item-type" onchange="updateItemFields(${itemId})">
+                            <option value="">Select Item Type</option>
+                            <option value="unit">Unit</option>
+                            <option value="parking">Parking</option>
+                        </select>
+                        <button type="button" class="remove-item" onclick="removeItem(${itemId})">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                    <div class="item-fields" id="fields-${itemId}">
+                        <!-- Fields will be added here based on selection -->
+                    </div>
+                </div>
+            `;
+            itemsContainer.insertAdjacentHTML('beforeend', itemHtml);
+            items.push({ id: itemId, type: '', details: {} });
+        }
+
+        window.updateItemFields = function(itemId) {
+            const itemType = document.querySelector(`[data-id="${itemId}"] .item-type`).value;
+            const fieldsDiv = document.getElementById(`fields-${itemId}`);
+            const itemIndex = items.findIndex(item => item.id === itemId);
+            
+            if (itemIndex !== -1) {
+                items[itemIndex].type = itemType;
+                items[itemIndex].details = {};
+            }
+            
+            let fieldsHtml = '';
+            if (itemType === 'unit') {
+                fieldsHtml = `
+                    <div class="row">
+                        <div class="form-group">
+                            <label class="form-label">No. of Units</label>
+                            <input type="number" class="form-input unit-count" 
+                                   placeholder="Enter number of units" 
+                                   onchange="updateItemDetail(${itemId}, 'unitCount', this.value)">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Total TOO Amount</label>
+                            <input type="number" class="form-input unit-amount" 
+                                   placeholder="Enter total amount" 
+                                   onchange="updateItemDetail(${itemId}, 'unitAmount', this.value)">
+                        </div>
+                    </div>
+                `;
+            } else if (itemType === 'parking') {
+                fieldsHtml = `
+                    <div class="row">
+                        <div class="form-group">
+                            <label class="form-label">No. of Parking</label>
+                            <input type="number" class="form-input parking-count" 
+                                   placeholder="Enter number of parking" 
+                                   onchange="updateItemDetail(${itemId}, 'parkingCount', this.value)">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Total TOO Amount</label>
+                            <input type="number" class="form-input parking-amount" 
+                                   placeholder="Enter total amount" 
+                                   onchange="updateItemDetail(${itemId}, 'parkingAmount', this.value)">
+                        </div>
+                    </div>
+                `;
+            }
+            
+            fieldsDiv.innerHTML = fieldsHtml;
+        }
+
+        window.updateItemDetail = function(itemId, field, value) {
+            const itemIndex = items.findIndex(item => item.id === itemId);
+            if (itemIndex !== -1) {
+                items[itemIndex].details[field] = parseFloat(value) || 0;
+            }
+        }
+
+        window.removeItem = function(itemId) {
+            const itemElement = document.querySelector(`[data-id="${itemId}"]`);
+            if (itemElement) {
+                itemElement.remove();
+            }
+            items = items.filter(item => item.id !== itemId);
+        }
+
+        // Summary and Submission
+        viewSummaryBtn.addEventListener('click', showSummary);
+        submitBtn.addEventListener('click', showSummary);
+
+        function showSummary() {
+            const realtyName = document.getElementById('realtyName').value;
+            const sellerName = document.getElementById('sellerName').value;
+            const coordinatorName = document.getElementById('coordinatorName').value;
+            const dateEntry = document.getElementById('dateEntry').value;
+            
+            // Validate form
+            if (!realtyName || !sellerName || !coordinatorName || !dateEntry || items.length === 0) {
+                alert('Please fill all required fields and add at least one item');
+                return;
+            }
+            
+            // Calculate totals
+            let totalUnits = 0;
+            let totalParking = 0;
+            let totalAmount = 0;
+            
+            items.forEach(item => {
+                if (item.type === 'unit') {
+                    totalUnits += item.details.unitCount || 0;
+                    totalAmount += item.details.unitAmount || 0;
+                } else if (item.type === 'parking') {
+                    totalParking += item.details.parkingCount || 0;
+                    totalAmount += item.details.parkingAmount || 0;
+                }
+            });
+            
+            // Create summary HTML
+            const summaryHtml = `
+                <div class="summary-item">
+                    <span class="summary-label">Realty Name:</span>
+                    <span class="summary-value">${realtyName}</span>
+                </div>
+                <div class="summary-item">
+                    <span class="summary-label">Seller's Name:</span>
+                    <span class="summary-value">${sellerName}</span>
+                </div>
+                <div class="summary-item">
+                    <span class="summary-label">Sales Coordinator:</span>
+                    <span class="summary-value">${coordinatorName}</span>
+                </div>
+                <div class="summary-item">
+                    <span class="summary-label">Date Entry:</span>
+                    <span class="summary-value">${new Date(dateEntry).toLocaleDateString()}</span>
+                </div>
+                <div class="summary-item">
+                    <span class="summary-label">Total Units:</span>
+                    <span class="summary-value">${totalUnits}</span>
+                </div>
+                <div class="summary-item">
+                    <span class="summary-label">Total Parking:</span>
+                    <span class="summary-value">${totalParking}</span>
+                </div>
+                <div class="summary-item">
+                    <span class="summary-label">Total TOO Amount:</span>
+                    <span class="summary-value">₱${totalAmount.toLocaleString()}</span>
+                </div>
+                <div class="summary-item">
+                    <span class="summary-label">Number of Items:</span>
+                    <span class="summary-value">${items.length}</span>
+                </div>
+            `;
+            
+            document.getElementById('summaryContent').innerHTML = summaryHtml;
+            encodeModal.style.display = 'none';
+            summaryModal.style.display = 'flex';
+        }
+
+        backToEditBtn.addEventListener('click', () => {
+            summaryModal.style.display = 'none';
+            encodeModal.style.display = 'flex';
+        });
+
+        confirmSubmitBtn.addEventListener('click', submitToFirebase);
+
+        async function submitToFirebase() {
+            const realtyName = document.getElementById('realtyName').value;
+            const sellerName = document.getElementById('sellerName').value;
+            const coordinatorName = document.getElementById('coordinatorName').value;
+            const dateEntry = document.getElementById('dateEntry').value;
+            
+            // Calculate totals
+            let totalUnits = 0;
+            let totalParking = 0;
+            let totalAmount = 0;
+            
+            items.forEach(item => {
+                if (item.type === 'unit') {
+                    totalUnits += item.details.unitCount || 0;
+                    totalAmount += item.details.unitAmount || 0;
+                } else if (item.type === 'parking') {
+                    totalParking += item.details.parkingCount || 0;
+                    totalAmount += item.details.parkingAmount || 0;
+                }
+            });
+            
+            const saleData = {
+                realtyName,
+                sellerName,
+                coordinatorName,
+                dateEntry,
+                totalUnits,
+                totalParking,
+                totalAmount,
+                items: items.map(item => ({
+                    type: item.type,
+                    details: item.details
+                })),
+                timestamp: new Date().toISOString(),
+                month: new Date(dateEntry).getMonth() + 1,
+                year: new Date(dateEntry).getFullYear()
+            };
+            
+            try {
+                // Push data to Firebase
+                const newSaleRef = database.ref('sales').push();
+                await newSaleRef.set(saleData);
+                
+                alert('Sales data submitted successfully!');
+                resetForm();
+                summaryModal.style.display = 'none';
+                
+                // Refresh dashboard
+                loadSalesData();
+            } catch (error) {
+                console.error('Error submitting data:', error);
+                alert('Error submitting data. Please try again.');
+            }
+        }
+
+        function resetForm() {
+            document.getElementById('realtyName').value = '';
+            document.getElementById('sellerName').value = '';
+            document.getElementById('coordinatorName').value = '';
+            document.getElementById('dateEntry').valueAsDate = new Date();
+            itemsContainer.innerHTML = '';
+            items = [];
+        }
+
+        // Load and Display Sales Data
+        async function loadSalesData() {
+            try {
+                const snapshot = await database.ref('sales').once('value');
+                const sales = snapshot.val();
+                allSalesData = [];
+                
+                if (sales) {
+                    Object.keys(sales).forEach(key => {
+                        allSalesData.push({
+                            id: key,
+                            ...sales[key]
+                        });
+                    });
+                }
+                
+                calculateAndDisplayStats();
+            } catch (error) {
+                console.error('Error loading sales data:', error);
+            }
+        }
+
+        function calculateAndDisplayStats() {
+            if (allSalesData.length === 0) {
+                // Display zeros if no data
+                document.getElementById('totalSales').textContent = '₱0.00';
+                document.getElementById('totalUnits').textContent = '0';
+                document.getElementById('totalParking').textContent = '0';
+                return;
+            }
+            
+            const now = new Date();
+            const currentYear = now.getFullYear();
+            const currentMonth = now.getMonth() + 1;
+            
+            // Filter data based on current period
+            const filteredData = allSalesData.filter(sale => {
+                const saleDate = new Date(sale.dateEntry);
+                const saleYear = saleDate.getFullYear();
+                const saleMonth = saleDate.getMonth() + 1;
+                
+                if (currentPeriod === 'monthly') {
+                    return saleYear === currentYear && saleMonth === currentMonth;
+                } else {
+                    return saleYear === currentYear;
+                }
+            });
+            
+            // Calculate totals
+            let totalSales = 0;
+            let totalUnits = 0;
+            let totalParking = 0;
+            
+            filteredData.forEach(sale => {
+                totalSales += sale.totalAmount || 0;
+                totalUnits += sale.totalUnits || 0;
+                totalParking += sale.totalParking || 0;
+            });
+            
+            // Update dashboard
+            document.getElementById('totalSales').textContent = `₱${totalSales.toLocaleString()}`;
+            document.getElementById('totalUnits').textContent = totalUnits.toLocaleString();
+            document.getElementById('totalParking').textContent = totalParking.toLocaleString();
+            
+            // Calculate top performers
+            calculateTopPerformers(filteredData);
+        }
+
+        function calculateTopPerformers(salesData) {
+            if (salesData.length === 0) {
+                // Display empty state
+                const topRealty = document.getElementById('topRealty');
+                const topSellers = document.getElementById('topSellers');
+                const topCoordinator = document.getElementById('topCoordinator');
+                
+                [topRealty, topSellers, topCoordinator].forEach(element => {
+                    const items = element.querySelectorAll('.leaderboard-item');
+                    items.forEach(item => {
+                        const nameElement = item.querySelector('.leaderboard-name');
+                        const amountElement = item.querySelector('.leaderboard-amount');
+                        nameElement.textContent = 'No data yet';
+                        amountElement.textContent = '₱0';
+                    });
+                });
+                return;
+            }
+            
+            // Calculate top realty
+            const realtyMap = {};
+            const sellerMap = {};
+            const coordinatorMap = {};
+            
+            salesData.forEach(sale => {
+                // Realty
+                if (sale.realtyName) {
+                    if (!realtyMap[sale.realtyName]) {
+                        realtyMap[sale.realtyName] = 0;
+                    }
+                    realtyMap[sale.realtyName] += sale.totalAmount || 0;
+                }
+                
+                // Seller
+                if (sale.sellerName) {
+                    if (!sellerMap[sale.sellerName]) {
+                        sellerMap[sale.sellerName] = 0;
+                    }
+                    sellerMap[sale.sellerName] += sale.totalAmount || 0;
+                }
+                
+                // Coordinator
+                if (sale.coordinatorName) {
+                    if (!coordinatorMap[sale.coordinatorName]) {
+                        coordinatorMap[sale.coordinatorName] = 0;
+                    }
+                    coordinatorMap[sale.coordinatorName] += sale.totalAmount || 0;
+                }
+            });
+            
+            // Sort and get top 3
+            const topRealty = Object.entries(realtyMap)
+                .sort((a, b) => b[1] - a[1])
+                .slice(0, 3);
+            
+            const topSellers = Object.entries(sellerMap)
+                .sort((a, b) => b[1] - a[1])
+                .slice(0, 3);
+            
+            const topCoordinator = Object.entries(coordinatorMap)
+                .sort((a, b) => b[1] - a[1])
+                .slice(0, 1);
+            
+            // Update UI
+            updateLeaderboard('topRealty', topRealty);
+            updateLeaderboard('topSellers', topSellers);
+            updateLeaderboard('topCoordinator', topCoordinator);
+        }
+
+        function updateLeaderboard(elementId, data) {
+            const element = document.getElementById(elementId);
+            const items = element.querySelectorAll('.leaderboard-item');
+            
+            items.forEach((item, index) => {
+                const nameElement = item.querySelector('.leaderboard-name');
+                const amountElement = item.querySelector('.leaderboard-amount');
+                
+                if (data[index]) {
+                    nameElement.textContent = data[index][0];
+                    amountElement.textContent = `₱${data[index][1].toLocaleString()}`;
+                } else {
+                    nameElement.textContent = 'No data yet';
+                    amountElement.textContent = '₱0';
+                }
+            });
+        }
+
+        // Load All Reports
+        async function loadAllReports() {
+            try {
+                const snapshot = await database.ref('sales').once('value');
+                const sales = snapshot.val();
+                reportsTableBody.innerHTML = '';
+                
+                if (!sales) {
+                    reportsTableBody.innerHTML = `
+                        <tr>
+                            <td colspan="8" style="text-align: center; padding: 40px;">
+                                No sales data available. Add your first sale!
+                            </td>
+                        </tr>
+                    `;
+                    return;
+                }
+                
+                // Convert to array and sort by date (newest first)
+                const salesArray = Object.keys(sales).map(key => ({
+                    id: key,
+                    ...sales[key]
+                })).sort((a, b) => new Date(b.dateEntry) - new Date(a.dateEntry));
+                
+                // Populate table
+                salesArray.forEach(sale => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${new Date(sale.dateEntry).toLocaleDateString()}</td>
+                        <td>${sale.realtyName || '-'}</td>
+                        <td>${sale.sellerName || '-'}</td>
+                        <td>${sale.coordinatorName || '-'}</td>
+                        <td>${sale.totalUnits || 0}</td>
+                        <td>${sale.totalParking || 0}</td>
+                        <td>₱${(sale.totalAmount || 0).toLocaleString()}</td>
+                        <td>
+                            <button class="delete-btn" onclick="deleteSale('${sale.id}')">
+                                <i class="fas fa-trash"></i> Delete
+                            </button>
+                        </td>
+                    `;
+                    reportsTableBody.appendChild(row);
+                });
+            } catch (error) {
+                console.error('Error loading reports:', error);
+            }
+        }
+
+        window.deleteSale = async function(saleId) {
+            if (confirm('Are you sure you want to delete this sale record? This action cannot be undone.')) {
+                try {
+                    await database.ref(`sales/${saleId}`).remove();
+                    alert('Sale record deleted successfully!');
+                    loadAllReports();
+                    loadSalesData(); // Refresh dashboard
+                } catch (error) {
+                    console.error('Error deleting sale:', error);
+                    alert('Error deleting sale. Please try again.');
+                }
+            }
+        }
+
+        // Close modals when clicking outside
+        window.addEventListener('click', (event) => {
+            if (event.target === encodeModal) {
+                encodeModal.style.display = 'none';
+                resetForm();
+            }
+            if (event.target === summaryModal) {
+                summaryModal.style.display = 'none';
+            }
+            if (event.target === reportsModal) {
+                reportsModal.style.display = 'none';
+            }
+        });
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            loadSalesData();
+            updatePeriodLabels();
+        });
+    </script>
+</body>
+</html>
