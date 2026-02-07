@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root {
             --primary-red: #8B0000;
@@ -86,23 +87,29 @@
             color: var(--text-light);
         }
 
-        .encode-btn {
+        /* Header Actions - Modified as requested */
+        .header-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .icon-btn {
             background-color: var(--primary-red);
             color: white;
             border: none;
-            padding: 12px 24px;
+            width: 45px;
+            height: 45px;
             border-radius: 8px;
-            font-size: 16px;
-            font-weight: 600;
+            font-size: 18px;
             cursor: pointer;
             display: flex;
             align-items: center;
-            gap: 10px;
+            justify-content: center;
             transition: all 0.3s ease;
             box-shadow: 0 4px 6px rgba(139, 0, 0, 0.2);
         }
 
-        .encode-btn:hover {
+        .icon-btn:hover {
             background-color: var(--dark-red);
             transform: translateY(-2px);
             box-shadow: 0 6px 12px rgba(139, 0, 0, 0.3);
@@ -126,7 +133,7 @@
         }
 
         .period-tab {
-            padding: 12px 30px;
+            padding: 12px 25px;
             border-radius: 8px;
             cursor: pointer;
             font-weight: 600;
@@ -141,8 +148,8 @@
             color: white;
         }
 
-        /* Month Picker Styling */
-        .month-picker-container {
+        /* Selectors Styling */
+        .selectors-row {
             display: flex;
             gap: 10px;
             align-items: center;
@@ -153,7 +160,7 @@
             animation: fadeIn 0.3s ease;
         }
 
-        .month-picker-container label {
+        .selectors-row label {
             font-weight: 600;
             color: var(--text-dark);
             font-size: 14px;
@@ -173,7 +180,7 @@
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
             gap: 25px;
-            margin-bottom: 40px;
+            margin-bottom: 25px;
         }
 
         .card {
@@ -225,6 +232,17 @@
         .card-subtitle {
             font-size: 14px;
             color: var(--text-light);
+        }
+
+        /* Chart Section */
+        .chart-container {
+            background-color: var(--card-bg);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: var(--shadow);
+            margin-bottom: 40px;
+            height: 400px;
+            position: relative;
         }
 
         /* Leaderboard Cards */
@@ -293,35 +311,6 @@
         .leaderboard-info { flex-grow: 1; }
         .leaderboard-name { font-weight: 600; color: var(--text-dark); }
         .leaderboard-amount { font-weight: 700; color: var(--primary-red); }
-
-        /* View All Reports Button */
-        .view-all-container {
-            display: flex;
-            justify-content: center;
-            margin-bottom: 50px;
-        }
-
-        .view-all-btn {
-            background-color: var(--primary-red);
-            color: white;
-            border: none;
-            padding: 15px 30px;
-            border-radius: 10px;
-            font-size: 18px;
-            font-weight: 600;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 6px rgba(139, 0, 0, 0.2);
-        }
-
-        .view-all-btn:hover {
-            background-color: var(--dark-red);
-            transform: translateY(-3px);
-            box-shadow: 0 6px 12px rgba(139, 0, 0, 0.3);
-        }
 
         /* Modals */
         .modal {
@@ -403,10 +392,6 @@
 
         .delete-btn { background-color: #ff6b6b; color: white; border: none; padding: 8px 15px; border-radius: 5px; cursor: pointer; }
 
-        .summary-item { display: flex; justify-content: space-between; padding: 15px; border-bottom: 1px solid var(--border-color); }
-        .summary-label { font-weight: 600; }
-        .summary-value { color: var(--primary-red); font-weight: 700; }
-
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
         @keyframes slideUp { from { transform: translateY(50px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
 
@@ -431,9 +416,14 @@
                     <p>Real-Time Sales Monitoring Dashboard</p>
                 </div>
             </div>
-            <button class="encode-btn" id="encodeBtn">
-                <i class="fas fa-plus-circle"></i> Encode Sales
-            </button>
+            <div class="header-actions">
+                <button class="icon-btn" id="encodeBtn" title="Encode Sales">
+                    <i class="fas fa-plus"></i>
+                </button>
+                <button class="icon-btn" id="viewAllBtn" title="Entries Folder">
+                    <i class="fas fa-list"></i>
+                </button>
+            </div>
         </div>
     </header>
 
@@ -441,27 +431,41 @@
         <div class="period-selector">
             <div class="period-tabs">
                 <button class="period-tab active" data-period="monthly">Monthly</button>
+                <button class="period-tab" data-period="quarterly">Quarterly</button>
                 <button class="period-tab" data-period="yearly">Yearly</button>
             </div>
 
-            <div id="monthSelectorContainer" class="month-picker-container">
-                <label for="selectMonth"><i class="fas fa-calendar-alt"></i> Select Month:</label>
-                <select id="selectMonth" class="filter-select">
-                    <option value="1">January</option>
-                    <option value="2">February</option>
-                    <option value="3">March</option>
-                    <option value="4">April</option>
-                    <option value="5">May</option>
-                    <option value="6">June</option>
-                    <option value="7">July</option>
-                    <option value="8">August</option>
-                    <option value="9">September</option>
-                    <option value="10">October</option>
-                    <option value="11">November</option>
-                    <option value="12">December</option>
-                </select>
-                <select id="selectYear" class="filter-select">
+            <div class="selectors-row">
+                <div id="monthSelectorContainer" style="display: flex; align-items: center; gap: 10px;">
+                    <label for="selectMonth"><i class="fas fa-calendar-alt"></i> Month:</label>
+                    <select id="selectMonth" class="filter-select">
+                        <option value="1">January</option>
+                        <option value="2">February</option>
+                        <option value="3">March</option>
+                        <option value="4">April</option>
+                        <option value="5">May</option>
+                        <option value="6">June</option>
+                        <option value="7">July</option>
+                        <option value="8">August</option>
+                        <option value="9">September</option>
+                        <option value="10">October</option>
+                        <option value="11">November</option>
+                        <option value="12">December</option>
                     </select>
+                </div>
+
+                <div id="quarterSelectorContainer" style="display: none; align-items: center; gap: 10px;">
+                    <label for="selectQuarter"><i class="fas fa-chart-pie"></i> Quarter:</label>
+                    <select id="selectQuarter" class="filter-select">
+                        <option value="1">Q1 (Jan-Mar)</option>
+                        <option value="2">Q2 (Apr-Jun)</option>
+                        <option value="3">Q3 (Jul-Sep)</option>
+                        <option value="4">Q4 (Oct-Dec)</option>
+                    </select>
+                </div>
+
+                <label for="selectYear">Year:</label>
+                <select id="selectYear" class="filter-select"></select>
             </div>
         </div>
 
@@ -472,7 +476,7 @@
                     <div class="card-icon"><i class="fas fa-dollar-sign"></i></div>
                 </div>
                 <div class="card-value" id="totalSales">₱0.00</div>
-                <p class="card-subtitle">For <span id="periodLabel">Month</span></p>
+                <p class="card-subtitle">For <span class="periodLabel">Month</span></p>
             </div>
 
             <div class="card">
@@ -481,7 +485,7 @@
                     <div class="card-icon"><i class="fas fa-building"></i></div>
                 </div>
                 <div class="card-value" id="totalUnits">0</div>
-                <p class="card-subtitle">For <span id="periodLabel2">Month</span></p>
+                <p class="card-subtitle">For <span class="periodLabel">Month</span></p>
             </div>
 
             <div class="card">
@@ -490,8 +494,12 @@
                     <div class="card-icon"><i class="fas fa-car"></i></div>
                 </div>
                 <div class="card-value" id="totalParking">0</div>
-                <p class="card-subtitle">For <span id="periodLabel3">Month</span></p>
+                <p class="card-subtitle">For <span class="periodLabel">Month</span></p>
             </div>
+        </div>
+
+        <div class="chart-container">
+            <canvas id="salesChart"></canvas>
         </div>
 
         <div class="leaderboard">
@@ -548,10 +556,6 @@
                 </ul>
             </div>
         </div>
-
-        <div class="view-all-container">
-            <button class="view-all-btn" id="viewAllBtn"><i class="fas fa-file-excel"></i> Entries Folder</button>
-        </div>
     </main>
 
     <div class="modal" id="encodeModal">
@@ -569,19 +573,8 @@
                 <button class="add-item-btn" id="addItemBtn"><i class="fas fa-plus"></i></button>
             </div>
             <div class="modal-footer">
-                <button class="btn btn-secondary" style="display:none;" id="viewSummaryBtn">View Summary</button>
+                <button class="btn btn-secondary" id="cancelBtn">Cancel</button>
                 <button class="btn btn-primary" id="submitBtn">Submit to Database</button>
-            </div>
-        </div>
-    </div>
-
-    <div class="modal" id="summaryModal">
-        <div class="modal-content">
-            <div class="modal-header"><h2>Summary of Sales</h2><button class="close-modal" id="closeSummaryModal">&times;</button></div>
-            <div class="modal-body" id="summaryContent"></div>
-            <div class="modal-footer">
-                <button class="btn btn-secondary" id="backToEditBtn">Back to Edit</button>
-                <button class="btn btn-primary" id="confirmSubmitBtn">Confirm & Submit</button>
             </div>
         </div>
     </div>
@@ -620,24 +613,27 @@
 
         // Elements
         const selectMonth = document.getElementById('selectMonth');
+        const selectQuarter = document.getElementById('selectQuarter');
         const selectYear = document.getElementById('selectYear');
         const monthSelectorContainer = document.getElementById('monthSelectorContainer');
+        const quarterSelectorContainer = document.getElementById('quarterSelectorContainer');
         const periodTabs = document.querySelectorAll('.period-tab');
         
         // Globals
         let currentPeriod = 'monthly';
         let allSalesData = [];
+        let salesChart = null;
 
         // Initialize Selectors
         const now = new Date();
         selectMonth.value = now.getMonth() + 1;
+        selectQuarter.value = Math.floor(now.getMonth() / 3) + 1;
         
-        // Populate Years (Current Year +/- 5)
-        const currentYear = now.getFullYear();
-        for(let i = currentYear - 2; i <= currentYear + 2; i++) {
+        const currentYearValue = now.getFullYear();
+        for(let i = currentYearValue - 2; i <= currentYearValue + 2; i++) {
             const opt = document.createElement('option');
             opt.value = i; opt.textContent = i;
-            if(i === currentYear) opt.selected = true;
+            if(i === currentYearValue) opt.selected = true;
             selectYear.appendChild(opt);
         }
 
@@ -648,33 +644,30 @@
                 tab.classList.add('active');
                 currentPeriod = tab.dataset.period;
                 
-                if(currentPeriod === 'monthly') {
-                    monthSelectorContainer.style.display = 'flex';
-                } else {
-                    monthSelectorContainer.style.display = 'none';
-                }
+                monthSelectorContainer.style.display = (currentPeriod === 'monthly') ? 'flex' : 'none';
+                quarterSelectorContainer.style.display = (currentPeriod === 'quarterly') ? 'flex' : 'none';
                 
                 updatePeriodLabels();
                 calculateAndDisplayStats();
             });
         });
 
-        selectMonth.addEventListener('change', calculateAndDisplayStats);
-        selectYear.addEventListener('change', calculateAndDisplayStats);
+        [selectMonth, selectQuarter, selectYear].forEach(el => el.addEventListener('change', calculateAndDisplayStats));
 
         function updatePeriodLabels() {
-            const labels = ['periodLabel', 'periodLabel2', 'periodLabel3'];
-            const monthName = selectMonth.options[selectMonth.selectedIndex].text;
+            const labels = document.querySelectorAll('.periodLabel');
+            let text = "";
             const yearVal = selectYear.value;
+
+            if(currentPeriod === 'monthly') {
+                text = `${selectMonth.options[selectMonth.selectedIndex].text} ${yearVal}`;
+            } else if(currentPeriod === 'quarterly') {
+                text = `${selectQuarter.options[selectQuarter.selectedIndex].text} ${yearVal}`;
+            } else {
+                text = `Year ${yearVal}`;
+            }
             
-            labels.forEach(id => {
-                const el = document.getElementById(id);
-                if(currentPeriod === 'monthly') {
-                    el.textContent = `${monthName} ${yearVal}`;
-                } else {
-                    el.textContent = `Year ${yearVal}`;
-                }
-            });
+            labels.forEach(el => el.textContent = text);
         }
 
         async function loadSalesData() {
@@ -691,19 +684,19 @@
         }
 
         function calculateAndDisplayStats() {
-            const selectedMonth = parseInt(selectMonth.value);
-            const selectedYear = parseInt(selectYear.value);
+            const sMonth = parseInt(selectMonth.value);
+            const sQuarter = parseInt(selectQuarter.value);
+            const sYear = parseInt(selectYear.value);
             
             const filteredData = allSalesData.filter(sale => {
                 const saleDate = new Date(sale.dateEntry);
                 const m = saleDate.getMonth() + 1;
                 const y = saleDate.getFullYear();
+                const q = Math.floor((m - 1) / 3) + 1;
                 
-                if (currentPeriod === 'monthly') {
-                    return m === selectedMonth && y === selectedYear;
-                } else {
-                    return y === selectedYear;
-                }
+                if (currentPeriod === 'monthly') return m === sMonth && y === sYear;
+                if (currentPeriod === 'quarterly') return q === sQuarter && y === sYear;
+                return y === sYear;
             });
 
             let totalSales = 0, totalUnits = 0, totalParking = 0;
@@ -719,14 +712,59 @@
             
             updatePeriodLabels();
             calculateTopPerformers(filteredData);
+            updateChart(filteredData);
+        }
+
+        // New Chart Function
+        function updateChart(filteredData) {
+            const ctx = document.getElementById('salesChart').getContext('2d');
+            
+            // Group data by date for the chart
+            const chartGroups = {};
+            filteredData.forEach(sale => {
+                const date = sale.dateEntry;
+                chartGroups[date] = (chartGroups[date] || 0) + sale.totalAmount;
+            });
+
+            const labels = Object.keys(chartGroups).sort();
+            const values = labels.map(l => chartGroups[l]);
+
+            if (salesChart) salesChart.destroy();
+
+            salesChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Sales Amount (₱)',
+                        data: values,
+                        borderColor: '#8B0000',
+                        backgroundColor: 'rgba(139, 0, 0, 0.1)',
+                        borderWidth: 3,
+                        fill: true,
+                        tension: 0.3
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'top' },
+                        title: { display: true, text: 'Sales Performance Over Filtered Period' }
+                    },
+                    scales: {
+                        y: { beginAtZero: true, ticks: { callback: value => '₱' + value.toLocaleString() } }
+                    }
+                }
+            });
         }
 
         function calculateTopPerformers(salesData) {
             const realtyMap = {}, sellerMap = {}, coordMap = {};
             salesData.forEach(s => {
-                realtyMap[s.realtyName] = (realtyMap[s.realtyName] || 0) + s.totalAmount;
-                sellerMap[s.sellerName] = (sellerMap[s.sellerName] || 0) + s.totalAmount;
-                coordMap[s.coordinatorName] = (coordMap[s.coordinatorName] || 0) + s.totalAmount;
+                if(s.realtyName) realtyMap[s.realtyName] = (realtyMap[s.realtyName] || 0) + s.totalAmount;
+                if(s.sellerName) sellerMap[s.sellerName] = (sellerMap[s.sellerName] || 0) + s.totalAmount;
+                if(s.coordinatorName) coordMap[s.coordinatorName] = (coordMap[s.coordinatorName] || 0) + s.totalAmount;
             });
             updateLeaderboard('topRealty', Object.entries(realtyMap).sort((a,b)=>b[1]-a[1]).slice(0,3));
             updateLeaderboard('topSellers', Object.entries(sellerMap).sort((a,b)=>b[1]-a[1]).slice(0,3));
@@ -747,8 +785,11 @@
             });
         }
 
+        // Modal Controls
         document.getElementById('encodeBtn').onclick = () => document.getElementById('encodeModal').style.display = 'flex';
         document.getElementById('closeEncodeModal').onclick = () => document.getElementById('encodeModal').style.display = 'none';
+        document.getElementById('cancelBtn').onclick = () => document.getElementById('encodeModal').style.display = 'none';
+        
         document.getElementById('viewAllBtn').onclick = () => { loadAllReports(); document.getElementById('reportsModal').style.display = 'flex'; };
         document.getElementById('closeReportsModal').onclick = () => document.getElementById('reportsModal').style.display = 'none';
 
@@ -798,17 +839,13 @@
 
             if(!sale.realtyName || !sale.dateEntry) return alert("Fill required fields");
             
-            // Passcode Check for Adding
             const pass = prompt("Enter passcode to add data:");
-            if(pass !== REQUIRED_PASSCODE) {
-                alert("Incorrect passcode. Access denied.");
-                return;
-            }
+            if(pass !== REQUIRED_PASSCODE) return alert("Incorrect passcode.");
 
             await database.ref('sales').push(sale);
             alert("Saved successfully!");
             document.getElementById('encodeModal').style.display = 'none';
-            // Reset form
+            // Reset
             document.getElementById('realtyName').value = '';
             document.getElementById('sellerName').value = '';
             document.getElementById('coordinatorName').value = '';
@@ -823,10 +860,7 @@
             tbody.innerHTML = '';
             
             if(data) {
-                // Convert to array and sort latest to oldest
-                const sortedData = Object.entries(data).sort((a, b) => {
-                    return new Date(b[1].dateEntry) - new Date(a[1].dateEntry);
-                });
+                const sortedData = Object.entries(data).sort((a, b) => new Date(b[1].dateEntry) - new Date(a[1].dateEntry));
 
                 sortedData.forEach(([key, s]) => {
                     tbody.innerHTML += `<tr>
@@ -841,10 +875,7 @@
 
         window.deleteSale = async (id) => {
             const pass = prompt("Enter passcode to delete this row:");
-            if(pass !== REQUIRED_PASSCODE) {
-                alert("Incorrect passcode. Row not deleted.");
-                return;
-            }
+            if(pass !== REQUIRED_PASSCODE) return alert("Incorrect passcode.");
 
             if(confirm("Are you sure you want to delete this report?")) {
                 await database.ref(`sales/${id}`).remove();
