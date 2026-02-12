@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Loan E-Cal | Professional Edition</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+    
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+    <style>
+        :root {
+            --dark-red: #8b0000;
+            --crimson: #dc143c;
+            --charcoal: #212529;
+            --soft-gray: #f4f4f4;
+        }
+
+        body {
+            background-color: #fcfcfc;
+            font-family: 'Inter', 'Segoe UI', sans-serif;
+            color: var(--charcoal);
+        }
+
+        .header {
+            background: linear-gradient(135deg, var(--dark-red) 0%, #4a0000 100%);
+            color: white;
+            padding: 3rem 1rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        .card {
+            border: none;
+            border-radius: 12px;
+            box-shadow: 0 6px 12px rgba(0,0,0,0.08);
+            margin-bottom: 24px;
+            overflow: hidden;
+            transition: transform 0.2s;
+        }
+
+        .card-header {
+            background-color: var(--charcoal);
+            color: white;
+            font-weight: 600;
+            padding: 1rem 1.25rem;
+            border-bottom: none;
+        }
+
+        .btn-primary {
+            background: var(--crimson);
+            border: none;
+            padding: 10px 20px;
+            font-weight: 600;
+        }
+
+        .btn-primary:hover {
+            background: var(--dark-red);
+        }
+
+        .btn-outline-danger {
+            color: var(--crimson);
+            border-color: var(--crimson);
+        }
+
+        .btn-outline-danger:hover {
+            background-color: var(--crimson);
+            color: white;
+        }
+
+        .section-title {
+            color: var(--dark-red);
+            border-left: 5px solid var(--dark-red);
+            padding-left: 15px;
+            margin: 30px 0 20px 0;
+            font-weight: 700;
+        }
+
+        .result-table thead {
+            background-color: var(--charcoal);
+            color: white;
+        }
+
+        .highlight {
+            background-color: #fff5f5;
+            font-weight: 700;
+            color: var(--dark-red);
+        }
+
+        .age-highlight {
+            color: var(--crimson);
+            font-weight: bold;
+            font-size: 0.9em;
+        }
+
+        .calculation-formula {
+            background-color: #f8f9fa;
+            border-left: 4px solid #dee2e6;
+            padding: 20px;
+            font-size: 0.9rem;
+        }
+
+        #capture-area {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+        }
+
+        .financing-list-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            border-bottom: 1px solid #eee;
+        }
+
+        /* Mobile Adjustments */
+        @media (max-width: 768px) {
+            .header { padding: 2rem 1rem; }
+            .btn-download { width: 100%; margin-top: 10px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header text-center">
+        <h1 class="display-5 fw-bold"><i class="bi bi-calculator-fill me-2"></i>Loan E-Cal</h1>
+        <p class="lead opacity-75">Professional Financial Planning & Estimation</p>
+    </div>
+
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-6">
+                <div class="card">
+                    <div class="card-header">
+                        <i class="bi bi-person-fill-gear me-2"></i>Loan Application
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label class="form-label">Full Name</label>
+                            <input type="text" class="form-control" id="name" placeholder="Juan Dela Cruz">
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Age</label>
+                                <input type="number" class="form-control" id="age" placeholder="25">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Downpayment (₱)</label>
+                                <input type="number" class="form-control" id="downpayment" placeholder="50000">
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Loanable Amount (₱)</label>
+                            <input type="number" class="form-control" id="loanAmount" placeholder="1000000">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Financing Option</label>
+                            <select class="form-select" id="financingOption">
+                                <option value="" selected disabled>Choose option...</option>
+                            </select>
+                        </div>
+                        <button class="btn btn-primary w-100 mt-2" id="calculateBtn">
+                            <i class="bi bi-lightning-charge-fill me-1"></i> Calculate Loan
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-6">
+                <div class="card mb-4">
+                    <div class="card-header bg-dark">
+                        <i class="bi bi-plus-circle-fill me-2"></i>Add Financing Option
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6 mb-2">
+                                <input type="text" class="form-control form-control-sm" id="optionName" placeholder="Option Name">
+                            </div>
+                            <div class="col-md-3 mb-2">
+                                <input type="number" class="form-control form-control-sm" id="maxLoanTerm" placeholder="Term">
+                            </div>
+                            <div class="col-md-3 mb-2">
+                                <input type="number" class="form-control form-control-sm" id="interestRate" step="0.01" placeholder="Rate%">
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-2">
+                                <input type="number" class="form-control form-control-sm" id="margin" placeholder="Margin (Yrs)">
+                            </div>
+                            <div class="col-md-6 mb-2">
+                                <input type="number" class="form-control form-control-sm" id="mirf" step="0.01" placeholder="MIRF (e.g. 0.3)">
+                            </div>
+                        </div>
+                        <button class="btn btn-dark btn-sm w-100 mt-2" id="saveFinancingOption">Save Option</button>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header bg-secondary">
+                        <i class="bi bi-trash3-fill me-2"></i>Manage Existing Options
+                    </div>
+                    <div class="card-body p-0" id="manageOptionsList" style="max-height: 200px; overflow-y: auto;">
+                        <div class="p-3 text-center text-muted">Loading options...</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="d-flex justify-content-between align-items-center">
+            <h4 class="section-title">Loan Calculation Results</h4>
+            <button class="btn btn-success btn-sm btn-download" id="downloadImg" style="display:none;">
+                <i class="bi bi-download me-1"></i> Save as JPEG
+            </button>
+        </div>
+
+        <div class="card" id="capture-area">
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover result-table mb-0" id="resultsTable">
+                        <thead>
+                            <tr>
+                                <th>Client (End Age)</th>
+                                <th>Principal (₱)</th>
+                                <th>Type / Rate</th>
+                                <th>Term (Yrs)</th>
+                                <th>Amortization (₱)</th>
+                                <th>Required Income (₱)</th>
+                            </tr>
+                        </thead>
+                        <tbody id="resultsBody">
+                            <tr>
+                                <td colspan="6" class="text-center py-4 text-muted">No calculations performed yet.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="calculation-formula rounded shadow-sm">
+            <h6 class="fw-bold text-uppercase small text-muted mb-3">Formula Reference:</h6>
+            <div class="row">
+                <div class="col-md-6">
+                    <code>Monthly Payment = P × r × (1+r)ⁿ / ((1+r)ⁿ - 1)</code>
+                </div>
+                <div class="col-md-6">
+                    <code>Min. Income = Payment / MIRF</code>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="text-center mt-5 mb-4 text-muted">
+        <hr class="w-25 mx-auto">
+        <p class="small">Loan E-Cal System &bull; Precise Financial Solutions</p>
+    </footer>
+
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+    <script>
+        const ADMIN_CODE = "001122";
+
+        function formatPHP(number) {
+            return "₱" + Number(number).toLocaleString('en-PH', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+        }
+
+        function showToast(message, type = 'success') {
+            const colors = {
+                success: 'linear-gradient(135deg, #1e7e34, #28a745)',
+                error: 'linear-gradient(135deg, #8b0000, #dc143c)',
+                info: 'linear-gradient(135deg, #212529, #495057)'
+            };
+            Toastify({
+                text: message,
+                duration: 3000,
+                gravity: "top",
+                position: "right",
+                style: { background: colors[type] }
+            }).showToast();
+        }
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyBOm4XyjvLoe2MR0_bWT_zHS4CkdYXt5M4",
+            authDomain: "btb-inventory.firebaseapp.com",
+            projectId: "btb-inventory",
+            storageBucket: "btb-inventory.firebasestorage.app",
+            messagingSenderId: "635532868561",
+            appId: "1:635532868561:web:b7bee31c83f6f4ceb63ef0",
+            measurementId: "G-C8DV3NBLCP"
+        };
+
+        // Init
+        document.addEventListener('DOMContentLoaded', function() {
+            try {
+                firebase.initializeApp(firebaseConfig);
+                loadFinancingOptions();
+            } catch (error) {
+                console.error('Firebase Error:', error);
+                showToast('Offline Mode: Using sample data', 'info');
+                loadSampleData();
+            }
+        });
+
+        function loadFinancingOptions() {
+            const db = firebase.firestore();
+            const select = document.getElementById('financingOption');
+            const manageList = document.getElementById('manageOptionsList');
+            
+            while (select.options.length > 1) select.remove(1);
+            manageList.innerHTML = '';
+            
+            db.collection("financingOptions").get().then((querySnapshot) => {
+                if (querySnapshot.empty) {
+                    manageList.innerHTML = '<div class="p-3 text-center text-muted">No options saved.</div>';
+                    return;
+                }
+
+                querySnapshot.forEach((doc) => {
+                    const data = doc.data();
+                    
+                    // Add to dropdown
+                    const opt = document.createElement('option');
+                    opt.value = doc.id;
+                    opt.textContent = `${data.name} (${data.interestRate}%)`;
+                    select.appendChild(opt);
+
+                    // Add to manage list
+                    const div = document.createElement('div');
+                    div.className = 'financing-list-item';
+                    div.innerHTML = `
+                        <div>
+                            <span class="fw-bold">${data.name}</span>
+                            <div class="small text-muted">${data.interestRate}% | ${data.maxLoanTerm}yrs</div>
+                        </div>
+                        <button class="btn btn-sm btn-outline-danger" onclick="deleteOption('${doc.id}', '${data.name}')">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                    `;
+                    manageList.appendChild(div);
+                });
+            });
+        }
+
+        function deleteOption(id, name) {
+            const code = prompt(`Enter Admin Code to delete "${name}":`);
+            if (code !== ADMIN_CODE) {
+                showToast('Unauthorized!', 'error');
+                return;
+            }
+
+            firebase.firestore().collection("financingOptions").doc(id).delete()
+            .then(() => {
+                showToast('Option deleted.', 'success');
+                loadFinancingOptions();
+            })
+            .catch(err => showToast('Delete failed: ' + err.message, 'error'));
+        }
+
+        document.getElementById('saveFinancingOption').addEventListener('click', function() {
+            const adminCode = prompt("Enter Admin Code:");
+            if (adminCode !== ADMIN_CODE) {
+                showToast('Invalid Code', 'error');
+                return;
+            }
+
+            const payload = {
+                name: document.getElementById('optionName').value,
+                maxLoanTerm: parseInt(document.getElementById('maxLoanTerm').value),
+                margin: parseInt(document.getElementById('margin').value),
+                interestRate: parseFloat(document.getElementById('interestRate').value),
+                mirf: parseFloat(document.getElementById('mirf').value)
+            };
+
+            if (!payload.name || isNaN(payload.interestRate)) {
+                showToast('Please fill all fields correctly', 'error');
+                return;
+            }
+
+            firebase.firestore().collection("financingOptions").add(payload)
+            .then(() => {
+                showToast('Saved successfully');
+                loadFinancingOptions();
+                ['optionName','maxLoanTerm','margin','interestRate','mirf'].forEach(id => document.getElementById(id).value = '');
+            });
+        });
+
+        document.getElementById('calculateBtn').addEventListener('click', function() {
+            const name = document.getElementById('name').value;
+            const age = parseInt(document.getElementById('age').value);
+            const down = parseFloat(document.getElementById('downpayment').value) || 0;
+            const loan = parseFloat(document.getElementById('loanAmount').value);
+            const optId = document.getElementById('financingOption').value;
+
+            if (!name || !age || !loan || !optId) {
+                showToast('Please complete the application form', 'info');
+                return;
+            }
+
+            firebase.firestore().collection("financingOptions").doc(optId).get().then(doc => {
+                if(doc.exists) calculateLoan(name, age, loan, down, doc.data());
+            });
+        });
+
+        function calculateLoan(name, age, totalLoan, downpayment, option) {
+            const principal = totalLoan - downpayment;
+            const rate = (option.interestRate / 100) / 12;
+            const maturityAge = 70;
+            const maxAllowedTerm = maturityAge - age - (option.margin || 0);
+            const actualMaxTerm = Math.min(maxAllowedTerm, option.maxLoanTerm);
+
+            const standardTerms = [30, 25, 20, 15, 10, 5].filter(t => t <= actualMaxTerm);
+            if (actualMaxTerm > 0 && !standardTerms.includes(actualMaxTerm)) {
+                standardTerms.push(actualMaxTerm);
+                standardTerms.sort((a,b) => b-a);
+            }
+
+            let html = '';
+            if (standardTerms.length > 0) {
+                standardTerms.forEach(term => {
+                    const n = term * 12;
+                    const x = Math.pow(1 + rate, n);
+                    const amort = (principal * rate * x) / (x - 1);
+                    const income = amort / option.mirf;
+
+                    html += `
+                        <tr>
+                            <td>${name} <span class="age-highlight">(${age + term} yrs)</span></td>
+                            <td>${formatPHP(principal)}</td>
+                            <td><span class="text-danger fw-bold">${option.name}</span> <br><small>${option.interestRate}%</small></td>
+                            <td>${term} yrs</td>
+                            <td class="highlight">${formatPHP(amort)}</td>
+                            <td class="highlight">${formatPHP(income)}</td>
+                        </tr>
+                    `;
+                });
+                document.getElementById('downloadImg').style.display = 'block';
+                showToast('Calculation complete');
+            } else {
+                html = '<tr><td colspan="6" class="text-center text-danger">Age exceeds financing limits.</td></tr>';
+                document.getElementById('downloadImg').style.display = 'none';
+            }
+            document.getElementById('resultsBody').innerHTML = html;
+        }
+
+        // JPEG Download Function
+        document.getElementById('downloadImg').addEventListener('click', function() {
+            const area = document.getElementById('capture-area');
+            html2canvas(area, { backgroundColor: "#ffffff", scale: 2 }).then(canvas => {
+                const link = document.createElement('a');
+                link.download = `Loan_Result_${Date.now()}.jpg`;
+                link.href = canvas.toDataURL("image/jpeg", 0.9);
+                link.click();
+            });
+        });
+
+        function loadSampleData() {
+            const select = document.getElementById('financingOption');
+            const samples = [{id:'s1', name:'PAG-IBIG Sample', interestRate: 6.25, maxLoanTerm: 30, margin: 0, mirf: 0.35}];
+            samples.forEach(s => {
+                const opt = document.createElement('option');
+                opt.value = s.id;
+                opt.textContent = s.name;
+                select.appendChild(opt);
+            });
+        }
+    </script>
+</body>
+</html>
