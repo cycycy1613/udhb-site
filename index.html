@@ -57,12 +57,20 @@
         margin: 0 auto;
         padding: 0 1rem;
     }
+
+    /* Left Side Header Wrapper */
+    .header-left {
+        display: flex;
+        align-items: center;
+        gap: 20px;
+    }
     
     .logo {
         font-size: 1.8rem;
         font-weight: 700;
         display: flex;
         align-items: center;
+        white-space: nowrap;
     }
     
     .logo i {
@@ -73,6 +81,58 @@
 
     .logo span {
         color: var(--primary-color);
+    }
+
+    /* Search Bar Styles */
+    .search-container {
+        position: relative;
+        display: flex;
+        align-items: center;
+    }
+
+    .search-container input {
+        padding: 8px 15px;
+        border: 1px solid var(--light-gray);
+        border-radius: 20px;
+        outline: none;
+        font-family: 'Poppins', sans-serif;
+        width: 180px;
+        transition: width 0.3s ease;
+    }
+
+    .search-container input:focus {
+        border-color: var(--secondary-color);
+        width: 220px;
+    }
+
+    .search-results {
+        position: absolute;
+        top: 45px;
+        left: 0;
+        width: 100%;
+        background: var(--white);
+        border-radius: 8px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        display: none;
+        z-index: 1001;
+        overflow: hidden;
+    }
+
+    .search-results div {
+        padding: 10px 15px;
+        cursor: pointer;
+        font-size: 0.9rem;
+        transition: background 0.2s;
+        border-bottom: 1px solid #f1f1f1;
+    }
+
+    .search-results div:last-child {
+        border-bottom: none;
+    }
+
+    .search-results div:hover {
+        background-color: var(--background-color);
+        color: var(--secondary-color);
     }
     
     /* Sidebar/Navigation */
@@ -121,7 +181,6 @@
         width: 100%;
     }
 
-    /* Unique Style for Prices Link */
     .nav-menu .prices-link a {
         color: var(--secondary-color);
         font-weight: 700;
@@ -419,7 +478,7 @@
         top: -4px;
     }
     
-    /* Unit Photos Carousel */
+    /* Carousel */
     .carousel {
         position: relative;
         max-width: 700px;
@@ -740,8 +799,16 @@
 
     /* Responsive Styles */
     @media (max-width: 768px) {
-        .header-container {
-            padding: 0 1rem;
+        .header-left {
+            gap: 10px;
+        }
+
+        .search-container input {
+            width: 100px;
+        }
+
+        .search-container input:focus {
+            width: 130px;
         }
 
         .sidebar-toggle {
@@ -768,41 +835,9 @@
             padding: 2rem;
         }
 
-        .nav-menu.active li a {
-            color: var(--primary-color);
-        }
-
-        .nav-menu.active .prices-link a {
-            color: var(--secondary-color);
-        }
-
-        .nav-menu li a::after {
-            background-color: var(--secondary-color);
-        }
-        
         .nav-menu li {
             margin: 1rem 0;
             margin-left: 0;
-        }
-        
-        .hero h1 {
-            font-size: 2.5rem;
-        }
-        
-        .hero p {
-            font-size: 1rem;
-        }
-        
-        .section-title h2 {
-            font-size: 2rem;
-        }
-        
-        section {
-            padding: 4rem 1rem;
-        }
-
-        .contact-info {
-            padding: 2rem 1.5rem;
         }
     }
 </style>
@@ -810,10 +845,17 @@
 <body>
     <header>
         <div class="header-container">
-            <div class="logo">
-                <i class="fas fa-home"></i>
-                <span>UDHB</span>
+            <div class="header-left">
+                <div class="logo">
+                    <i class="fas fa-home"></i>
+                    <span>UDHB</span>
+                </div>
+                <div class="search-container">
+                    <input type="text" id="headerSearch" placeholder="enter keywords" autocomplete="off">
+                    <div id="searchResults" class="search-results"></div>
+                </div>
             </div>
+
             <button class="sidebar-toggle">
                 <i class="fas fa-bars"></i>
             </button>
@@ -1138,6 +1180,58 @@
     </div>
 
     <script>
+        // --- UPDATED SEARCH BAR LOGIC ---
+        const searchInput = document.getElementById('headerSearch');
+        const searchResults = document.getElementById('searchResults');
+        
+        const links = [
+            { keyword: "PL", name: "DS Pricelist", url: "https://urbandecahomesbatangas.com/pl" },
+            { keyword: "EC", name: "E-Calculator", url: "https://urbandecahomesbatangas.com/ecal" },
+            { keyword: "SR", name: "Sales Report", url: "https://urbandecahomesbatangas.com/salesreport" },
+            { keyword: "IM", name: "Inventory Monitoring", url: "https://script.google.com/macros/s/AKfycbwKjQjx6l50go3vdrhHCjqjC7e9j8nQtb_ZFic5QWfiE5Iq9cpI41hSXg1TcYt8Oea7/exec" },
+            { keyword: "IH", name: "Inventory Host", url: "https://docs.google.com/spreadsheets/d/1oc4VaogQ_50WeGWiUd0U9c8pMBT-LyWaC8IboNFPr5k/edit?gid=1669256709#gid=1669256709" }
+        ];
+
+        searchInput.addEventListener('input', function() {
+            const val = this.value.toUpperCase();
+            searchResults.innerHTML = '';
+            
+            if (!val) {
+                searchResults.style.display = 'none';
+                return;
+            }
+
+            // MODIFIED FILTER: Only show the item if the input exactly matches the keyword
+            const filtered = links.filter(item => 
+                item.keyword === val
+            );
+
+            if (filtered.length > 0) {
+                filtered.forEach(item => {
+                    const div = document.createElement('div');
+                    div.textContent = item.name;
+                    div.onclick = () => {
+                        window.open(item.url, '_blank');
+                        searchResults.style.display = 'none';
+                        searchInput.value = '';
+                    };
+                    searchResults.appendChild(div);
+                });
+                searchResults.style.display = 'block';
+            } else {
+                searchResults.style.display = 'none';
+            }
+        });
+
+        // Close search when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!searchInput.contains(e.target) && !searchResults.contains(e.target)) {
+                searchResults.style.display = 'none';
+            }
+        });
+
+        // --- ORIGINAL SITE LOGIC ---
+
         // Mobile Navigation Toggle
         document.querySelector('.sidebar-toggle').addEventListener('click', function() {
             document.querySelector('.nav-menu').classList.toggle('active');
@@ -1200,7 +1294,7 @@
             updateCarousel();
         }, 5000);
 
-        // Smooth scrolling for internal navigation links only
+        // Smooth scrolling
         document.querySelectorAll('.nav-menu a[href^="#"]').forEach(anchor => {
             anchor.addEventListener('click', function(e) {
                 e.preventDefault();
