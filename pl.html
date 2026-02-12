@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Building U & T PL</title>
+    <!-- Professional design system · muted elegance, refined spacing, premium data presentation -->
+    <style>
+        /* ---------- design system: pro, calm, executive ---------- */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@350;400;450;500;600&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background: #f5f3f0;  /* soft greige */
+            color: #2c2824;
+            line-height: 1.5;
+            padding: 40px 24px;
+            font-weight: 400;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .container {
+            max-width: 1040px;
+            margin: 0 auto;
+            background: #ffffff;
+            border-radius: 32px;
+            box-shadow: 0 20px 35px -8px rgba(0,0,0,0.03), 0 8px 16px -6px rgba(0,0,0,0.01);
+            padding: 40px 44px;
+            border: 1px solid rgba(226, 216, 206, 0.6);
+        }
+
+        /* header refined */
+        h1 {
+            font-size: 1.8rem;
+            font-weight: 480;
+            letter-spacing: -0.03em;
+            color: #1e1b18;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            border-bottom: 1px solid #eae5df;
+            padding-bottom: 24px;
+            margin-bottom: 24px;
+        }
+
+        h1::before {
+            content: "■";
+            font-size: 1.6rem;
+            color: #9d8d7c;
+            font-weight: 350;
+            opacity: 0.7;
+        }
+
+        h2 {
+            font-size: 1.24rem;
+            font-weight: 500;
+            color: #3d3732;
+            letter-spacing: -0.01em;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+        }
+
+        h2 span {
+            background: #e8e2db;
+            padding: 4px 12px;
+            border-radius: 40px;
+            font-size: 0.8rem;
+            font-weight: 520;
+            color: #5a4f47;
+            margin-left: 16px;
+            letter-spacing: 0.3px;
+            text-transform: uppercase;
+        }
+
+        section {
+            margin-bottom: 56px;
+            position: relative;
+        }
+
+        section:last-of-type {
+            margin-bottom: 8px;
+        }
+
+        /* form controls – elevated, minimalist */
+        .field-group {
+            background: #fcfbf9;
+            border-radius: 20px;
+            padding: 16px 20px 20px;
+            margin-top: 4px;
+            border: 1px solid #f0eae4;
+            transition: 0.2s ease;
+        }
+
+        label {
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: #786e64;
+            display: block;
+            margin-bottom: 6px;
+        }
+
+        select {
+            font-family: 'Inter', sans-serif;
+            font-size: 0.95rem;
+            padding: 12px 18px;
+            border-radius: 16px;
+            border: 1.5px solid #e1d9d1;
+            background: white;
+            width: 100%;
+            max-width: 360px;
+            color: #2c2722;
+            font-weight: 420;
+            appearance: none;
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="%236e6258" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>');
+            background-repeat: no-repeat;
+            background-position: right 18px center;
+            background-size: 18px;
+            transition: border 0.15s, box-shadow 0.15s;
+        }
+
+        select:hover {
+            border-color: #b9aca0;
+            background-color: #fffefe;
+        }
+
+        select:focus {
+            outline: none;
+            border-color: #928677;
+            box-shadow: 0 0 0 3px rgba(146, 134, 119, 0.08);
+        }
+
+        /* primary button — subtle, confident */
+        button {
+            background: #ffffff;
+            border: 1.5px solid #d6cdc2;
+            padding: 12px 30px;
+            border-radius: 40px;
+            font-size: 0.95rem;
+            font-weight: 520;
+            color: #3d3730;
+            letter-spacing: 0.02em;
+            margin-top: 24px;
+            margin-bottom: 12px;
+            cursor: pointer;
+            transition: all 0.2s cubic-bezier(0.23, 1, 0.32, 1);
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background: #faf8f6;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.01);
+        }
+
+        button:hover {
+            background: #f3efea;
+            border-color: #b7aa9c;
+            color: #1f1c18;
+            box-shadow: 0 8px 14px -10px rgba(78, 66, 56, 0.15);
+        }
+
+        button:active {
+            background: #eae3db;
+            border-color: #a49486;
+            transform: scale(0.98);
+        }
+
+        /* table — like a pro financial schedule */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 32px;
+            border-radius: 20px;
+            overflow: hidden;
+            display: none;
+            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.02);
+            border: 1px solid #ece6df;
+            background: white;
+            font-size: 0.92rem;
+        }
+
+        th {
+            background-color: #f4f1ed;
+            color: #4c443e;
+            font-weight: 540;
+            font-size: 0.78rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            padding: 18px 14px;
+            border-bottom: 1px solid #e3dbd2;
+            text-align: left;
+        }
+
+        td {
+            padding: 16px 14px;
+            background-color: white;
+            border-bottom: 1px solid #f0eae4;
+            color: #3c3631;
+            font-weight: 410;
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        /* currency styling — clean, monospace */
+        td {
+            font-family: 'Inter', 'SF Mono', 'Roboto Mono', monospace;
+            font-weight: 430;
+            letter-spacing: 0.01em;
+        }
+
+        /* subtle area hint – sqm indicator */
+        .area-badge {
+            display: inline-block;
+            background: #eeebe7;
+            padding: 2px 14px;
+            border-radius: 100px;
+            font-size: 0.75rem;
+            font-weight: 540;
+            color: #625a52;
+            margin-left: 12px;
+            letter-spacing: 0.4px;
+        }
+
+        .pro-note {
+            color: #968c81;
+            font-size: 0.78rem;
+            margin-top: 12px;
+            font-weight: 390;
+            border-top: 1px solid #ece7e1;
+            padding-top: 24px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        /* mini table spacing */
+        .table-wrapper {
+            transition: all 0.2s;
+        }
+
+        /* price prefix ₱ */
+        .price-prefix {
+            font-weight: 450;
+        }
+
+        /* parking & unit separation fine tuning */
+        .selector-sub {
+            color: #7e7268;
+            font-size: 0.8rem;
+            margin-left: 6px;
+        }
+
+        /* modern, airy */
+        .empty-state {
+            color: #9a9086;
+            font-style: italic;
+            font-weight: 380;
+        }
+
+        /* pro micro-interaction */
+        select option {
+            padding: 10px;
+        }
+
+        /* all texts use – sqm (exact) */
+        .sqm-marker {
+            font-feature-settings: "tnum";
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+
+    <h1>Building U & T · PL</h1>
+
+    <!-- =========== RESIDENTIAL =========== -->
+    <section>
+        <div style="display: flex; align-items: baseline; justify-content: space-between;">
+            <h2>Residential offerings <span>floor‑specific</span></h2>
+            <span class="area-badge">– sqm indicator</span>
+        </div>
+
+        <div class="field-group">
+            <label for="floor">Floor band</label>
+            <select id="floor" onchange="updateUnitTypes()">
+                <option value="">— select level —</option>
+                <option value="2ND FLOOR">2nd floor</option>
+                <option value="3RD-4TH FLOOR">3rd–4th floor</option>
+                <option value="5TH-6TH FLOOR">5th–6th floor</option>
+            </select>
+
+            <label for="unitType" style="margin-top: 24px;">Unit type & area</label>
+            <select id="unitType">
+                <option value="">— choose floor first —</option>
+            </select>
+
+            <button onclick="displayUnitData()">
+                <span style="font-size: 1.2rem;">→</span> Load unit pricing
+            </button>
+        </div>
+
+        <!-- table: AREA COLUMN REMOVED. Pro presentation: discount, dp, rf, equity, loan -->
+        <div class="table-wrapper">
+            <table id="unitTable">
+                <thead>
+                    <tr>
+                        <th>Total discount (₱)</th>
+                        <th>Down payment (₱)</th>
+                        <th>Reservation fee (₱)</th>
+                        <th>Equity promo (₱)</th>
+                        <th>Loan amount (₱)</th>
+                    </tr>
+                </thead>
+                <tbody id="unitBody">
+                    <!-- dynamic rows -->
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <!-- =========== PARKING =========== -->
+    <section style="margin-bottom: 16px;">
+        <div style="display: flex; align-items: baseline; justify-content: space-between;">
+            <h2>Parking allocations <span>covered & tandem</span></h2>
+            <span class="area-badge">– sqm</span>
+        </div>
+
+        <div class="field-group">
+            <label for="parkingType">Parking category</label>
+            <select id="parkingType">
+                <!-- dynamically filled with – sqm -->
+            </select>
+
+            <button onclick="displayParkingData()">
+                <span style="font-size: 1.2rem;">→</span> View parking figures
+            </button>
+        </div>
+
+        <!-- table: NO AREA COLUMN (DP, RF, equity, loan) professional -->
+        <div class="table-wrapper">
+            <table id="parkingTable">
+                <thead>
+                    <tr>
+                        <th>Down payment (₱)</th>
+                        <th>Reservation fee (₱)</th>
+                        <th>Equity promo (₱)</th>
+                        <th>Loan amount (₱)</th>
+                    </tr>
+                </thead>
+                <tbody id="parkingBody"></tbody>
+            </table>
+        </div>
+    </section>
+
+    <div class="pro-note">
+        <span>◈ all figures in PHP · net effective pricing</span>
+        <span style="font-weight: 450;">– sqm suffix · area integrated</span>
+    </div>
+</div>
+
+<!-- PROFESSIONAL SCRIPT – clean, typed, precise -->
+<script>
+    (function() {
+        "use strict";
+
+        // ---------- RESIDENTIAL DATA – verified source [2] ----------
+        const unitData = {
+            "2ND FLOOR": {
+                "2BR-A": { area: "36.34", discount: "115,000.00", dp: "129,199.22", rf: "10,000.00", equity: "119,199.22", loan: "2,454,785.20" },
+                "2BR-B": { area: "36.91", discount: "115,000.00", dp: "131,202.62", rf: "10,000.00", equity: "121,202.62", loan: "2,492,849.80" },
+                "2BR-D": { area: "37.11", discount: "115,000.00", dp: "131,905.57", rf: "10,000.00", equity: "121,905.57", loan: "2,506,205.80" },
+                "3BR-A": { area: "44.85", discount: "115,000.00", dp: "157,899.11", rf: "15,000.00", equity: "142,899.11", loan: "3,000,083.00" },
+                "3BR-B": { area: "53.64", discount: "115,000.00", dp: "188,793.64", rf: "15,000.00", equity: "173,793.64", loan: "3,587,079.20" }
+            },
+            "3RD-4TH FLOOR": {
+                "2BR-A": { area: "36.34", discount: "115,000.00", dp: "130,315.01", rf: "10,000.00", equity: "120,315.01", loan: "2,475,985.20" },
+                "2BR-B": { area: "36.91", discount: "115,000.00", dp: "132,318.41", rf: "10,000.00", equity: "122,318.41", loan: "2,514,049.80" },
+                "2BR-D": { area: "37.11", discount: "115,000.00", dp: "133,021.36", rf: "10,000.00", equity: "123,021.36", loan: "2,527,405.80" },
+                "3BR-A": { area: "44.85", discount: "115,000.00", dp: "159,014.89", rf: "15,000.00", equity: "144,014.89", loan: "3,021,283.00" },
+                "3BR-B": { area: "53.64", discount: "115,000.00", dp: "189,909.43", rf: "15,000.00", equity: "174,909.43", loan: "3,608,279.20" }
+            },
+            "5TH-6TH FLOOR": {
+                "2BR-A": { area: "36.34", discount: "115,000.00", dp: "131,430.80", rf: "10,000.00", equity: "121,430.80", loan: "2,497,185.20" },
+                "2BR-B": { area: "36.91", discount: "115,000.00", dp: "133,434.20", rf: "10,000.00", equity: "123,434.20", loan: "2,535,249.80" },
+                "2BR-D": { area: "37.11", discount: "115,000.00", dp: "134,137.15", rf: "10,000.00", equity: "124,137.15", loan: "2,548,605.80" },
+                "3BR-A": { area: "44.85", discount: "115,000.00", dp: "160,130.68", rf: "15,000.00", equity: "145,130.68", loan: "3,042,483.00" },
+                "3BR-B": { area: "53.64", discount: "115,000.00", dp: "191,025.22", rf: "15,000.00", equity: "176,025.22", loan: "3,629,479.20" }
+            }
+        };
+
+        // ---------- PARKING DATA – source [4] ----------
+        const parkingData = {
+            "CP-SINGLE":  { area: "12.5", dp: "30,289.47", rf: "10,000.00", equity: "20,289.47", loan: "575,500.00" },
+            "MP-SINGLE":  { area: "3.00", dp: "10,000.00", rf: "10,000.00", equity: "0.00", loan: "88,500.00" },
+            "MP-TANDEM":  { area: "6.00", dp: "10,000.00", rf: "10,000.00", equity: "0.00", loan: "154,875.00" }
+        };
+
+        // --- update residential types: "2BR-A 36.34 – sqm" (professional, clean) ---
+        window.updateUnitTypes = function() {
+            const floor = document.getElementById('floor').value;
+            const unitSelect = document.getElementById('unitType');
+            unitSelect.innerHTML = '<option value="">— select unit type —</option>';
+
+            if (floor && unitData[floor]) {
+                Object.keys(unitData[floor]).forEach(type => {
+                    const opt = document.createElement('option');
+                    opt.value = type;
+                    const areaValue = unitData[floor][type].area;
+                    // EXACT: "2BR-A 36.34 – sqm"   (en dash + sqm)
+                    opt.innerHTML = `${type} ${areaValue} – sqm`;
+                    unitSelect.appendChild(opt);
+                });
+            }
+        };
+
+        // --- display unit data – AREA COLUMN REMOVED. ₱ prefix added ---
+        window.displayUnitData = function() {
+            const floor = document.getElementById('floor').value;
+            const type = document.getElementById('unitType').value;
+            const table = document.getElementById('unitTable');
+            const body = document.getElementById('unitBody');
+
+            if (!floor || !type) {
+                alert("Please select floor and unit type");
+                return;
+            }
+
+            const data = unitData[floor]?.[type];
+            if (!data) return;
+
+            body.innerHTML = `<tr>
+                <td>₱${data.discount}</td>
+                <td>₱${data.dp}</td>
+                <td>₱${data.rf}</td>
+                <td>₱${data.equity}</td>
+                <td>₱${data.loan}</td>
+            </tr>`;
+            table.style.display = 'table';
+        };
+
+        // --- PARKING dropdown init: "CP-SINGLE 12.5 – sqm" ---
+        window.initParkingDropdown = function() {
+            const parkingSelect = document.getElementById('parkingType');
+            parkingSelect.innerHTML = '<option value="">— select parking type —</option>';
+
+            Object.keys(parkingData).forEach(key => {
+                const opt = document.createElement('option');
+                opt.value = key;
+                const areaVal = parkingData[key].area;
+                opt.innerHTML = `${key} ${areaVal} – sqm`;
+                parkingSelect.appendChild(opt);
+            });
+        };
+
+        // --- display parking data – AREA COLUMN REMOVED (DP, RF, equity, loan) ---
+        window.displayParkingData = function() {
+            const type = document.getElementById('parkingType').value;
+            const table = document.getElementById('parkingTable');
+            const body = document.getElementById('parkingBody');
+
+            if (!type) {
+                alert("Please select a parking type");
+                return;
+            }
+
+            const data = parkingData[type];
+            body.innerHTML = `<tr>
+                <td>₱${data.dp}</td>
+                <td>₱${data.rf}</td>
+                <td>₱${data.equity}</td>
+                <td>₱${data.loan}</td>
+            </tr>`;
+            table.style.display = 'table';
+        };
+
+        // --- initialize everything when DOM ready ---
+        window.addEventListener('DOMContentLoaded', function() {
+            initParkingDropdown();
+            const floorEl = document.getElementById('floor');
+            if (floorEl.value) updateUnitTypes();
+
+            // add small visual polish: all tables hidden by default, but we keep style.
+        });
+    })();
+</script>
+
+<!-- subtle design: all unit displays carry exact "– sqm" — both residential and parking -->
+<!-- AREA COLUMN TOTALLY REMOVED FROM TABLES — consistent premium layout -->
+</body>
+</html>
