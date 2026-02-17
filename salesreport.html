@@ -3,11 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sales Report Dashboard</title>
+    <title>Sales Report Dashboard v2.0</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
         :root {
             --primary-red: #8B0000;
@@ -18,411 +19,92 @@
             --text-dark: #333333;
             --text-light: #666666;
             --border-color: #e0e0e0;
-            --success-color: #28a745;
-            --warning-color: #ffc107;
             --shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-            --shadow-hover: 0 8px 24px rgba(0, 0, 0, 0.12);
         }
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
+        body { background-color: var(--light-bg); color: var(--text-dark); }
+        .container { max-width: 1300px; margin: 0 auto; padding: 0 20px; }
 
-        body {
-            background-color: var(--light-bg);
-            color: var(--text-dark);
-            min-height: 100vh;
-        }
-
-        .container {
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 0 20px;
-        }
-
-        /* Header Styles */
-        header {
-            background-color: var(--card-bg);
-            box-shadow: var(--shadow);
-            padding: 20px 0;
-            position: sticky;
-            top: 0;
-            z-index: 100;
-        }
-
-        .header-content {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .logo {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-
-        .logo-icon {
-            background-color: var(--primary-red);
-            color: white;
-            width: 50px;
-            height: 50px;
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 24px;
-        }
-
-        .logo-text h1 {
-            font-size: 28px;
-            color: var(--primary-red);
-        }
-
-        .logo-text p {
-            font-size: 14px;
-            color: var(--text-light);
-        }
-
-        /* Header Actions - Modified as requested */
-        .header-actions {
-            display: flex;
-            gap: 10px;
-        }
-
-        .icon-btn {
-            background-color: var(--primary-red);
-            color: white;
-            border: none;
-            width: 45px;
-            height: 45px;
-            border-radius: 8px;
-            font-size: 18px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 6px rgba(139, 0, 0, 0.2);
-        }
-
-        .icon-btn:hover {
-            background-color: var(--dark-red);
-            transform: translateY(-2px);
-            box-shadow: 0 6px 12px rgba(139, 0, 0, 0.3);
-        }
-
-        /* Period Selector */
-        .period-selector {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            margin: 30px 0;
-            gap: 15px;
-        }
-
-        .period-tabs {
-            display: flex;
-            background-color: white;
-            border-radius: 10px;
-            padding: 5px;
-            box-shadow: var(--shadow);
-        }
-
-        .period-tab {
-            padding: 12px 25px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: 600;
-            transition: all 0.3s ease;
-            border: none;
-            background-color: transparent;
-            color: var(--text-light);
-        }
-
-        .period-tab.active {
-            background-color: var(--primary-red);
-            color: white;
-        }
-
-        /* Selectors Styling */
-        .selectors-row {
-            display: flex;
-            gap: 10px;
-            align-items: center;
-            background: white;
-            padding: 10px 20px;
-            border-radius: 10px;
-            box-shadow: var(--shadow);
-            animation: fadeIn 0.3s ease;
-        }
-
-        .selectors-row label {
-            font-weight: 600;
-            color: var(--text-dark);
-            font-size: 14px;
-        }
-
-        .filter-select {
-            padding: 8px 12px;
-            border-radius: 6px;
-            border: 1px solid var(--border-color);
-            outline: none;
-            font-weight: 600;
-            color: var(--primary-red);
-        }
-
-        /* Dashboard Cards */
-        .dashboard {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 25px;
-            margin-bottom: 25px;
-        }
-
-        .card {
-            background-color: var(--card-bg);
-            border-radius: 15px;
-            padding: 25px;
-            box-shadow: var(--shadow);
-            transition: all 0.3s ease;
-            border-top: 5px solid var(--primary-red);
-        }
-
-        .card:hover {
-            transform: translateY(-5px);
-            box-shadow: var(--shadow-hover);
-        }
-
-        .card-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-        }
-
-        .card-title {
-            font-size: 18px;
-            font-weight: 600;
-            color: var(--text-dark);
-        }
-
-        .card-icon {
-            background-color: rgba(139, 0, 0, 0.1);
-            color: var(--primary-red);
-            width: 50px;
-            height: 50px;
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 24px;
-        }
-
-        .card-value {
-            font-size: 32px;
-            font-weight: 700;
-            color: var(--primary-red);
-            margin-bottom: 10px;
-        }
-
-        .card-subtitle {
-            font-size: 14px;
-            color: var(--text-light);
-        }
-
-        /* Chart Section */
-        .chart-container {
-            background-color: var(--card-bg);
-            border-radius: 15px;
-            padding: 25px;
-            box-shadow: var(--shadow);
-            margin-bottom: 40px;
-            height: 400px;
-            position: relative;
-        }
-
-        /* Leaderboard Cards */
-        .leaderboard {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 25px;
-            margin-bottom: 50px;
-        }
-
-        .leaderboard-card {
-            background-color: var(--card-bg);
-            border-radius: 15px;
-            padding: 25px;
-            box-shadow: var(--shadow);
-            transition: all 0.3s ease;
-        }
-
-        .leaderboard-card:hover {
-            transform: translateY(-5px);
-            box-shadow: var(--shadow-hover);
-        }
-
-        .leaderboard-title {
-            font-size: 20px;
-            font-weight: 600;
-            color: var(--primary-red);
-            margin-bottom: 20px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .leaderboard-list {
-            list-style-type: none;
-        }
-
-        .leaderboard-item {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 15px 0;
-            border-bottom: 1px solid var(--border-color);
-        }
-
-        .leaderboard-item:last-child {
-            border-bottom: none;
-        }
-
-        .leaderboard-rank {
-            width: 30px;
-            height: 30px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 700;
-            color: white;
-            margin-right: 15px;
-        }
-
-        .rank-1 { background-color: #FFD700; }
-        .rank-2 { background-color: #C0C0C0; }
-        .rank-3 { background-color: #CD7F32; }
-
-        .leaderboard-info { flex-grow: 1; }
-        .leaderboard-name { font-weight: 600; color: var(--text-dark); }
-        .leaderboard-amount { font-weight: 700; color: var(--primary-red); }
-
-        /* Modals */
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            background-color: rgba(0, 0, 0, 0.7);
-            z-index: 1000;
-            align-items: center;
-            justify-content: center;
-            animation: fadeIn 0.3s ease;
-        }
-
-        .modal-content {
-            background-color: white;
-            border-radius: 15px;
-            width: 90%;
-            max-width: 800px;
-            max-height: 90vh;
-            overflow-y: auto;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-            animation: slideUp 0.4s ease;
-        }
-
-        .modal-header {
-            background-color: var(--primary-red);
-            color: white;
-            padding: 25px;
-            border-radius: 15px 15px 0 0;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .modal-title { font-size: 24px; font-weight: 600; }
-        .close-modal { background: none; border: none; color: white; font-size: 28px; cursor: pointer; }
-        .modal-body { padding: 30px; }
-        .form-group { margin-bottom: 25px; }
-        .form-label { display: block; margin-bottom: 8px; font-weight: 600; color: var(--text-dark); }
-        .form-input, .form-select { width: 100%; padding: 14px; border: 2px solid var(--border-color); border-radius: 8px; font-size: 16px; }
+        /* Header (Kept original TOP section) */
+        header { background-color: var(--card-bg); box-shadow: var(--shadow); padding: 15px 0; position: sticky; top: 0; z-index: 100; }
+        .header-content { display: flex; justify-content: space-between; align-items: center; }
+        .logo { display: flex; align-items: center; gap: 10px; }
+        .logo-icon { background: var(--primary-red); color: white; width: 40px; height: 40px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 20px; }
+        .logo h1 { font-size: 22px; color: var(--primary-red); }
+        .header-actions { display: flex; gap: 10px; }
         
-        .add-item-btn {
-            background-color: var(--light-red);
-            color: white; border: none;
-            width: 50px; height: 50px;
-            border-radius: 50%; font-size: 24px;
-            cursor: pointer; display: flex;
-            align-items: center; justify-content: center;
-            margin: 20px auto; transition: all 0.3s ease;
-        }
+        .icon-btn { background: var(--primary-red); color: white; border: none; padding: 10px 15px; border-radius: 6px; cursor: pointer; transition: 0.3s; }
+        .icon-btn:hover { background: var(--dark-red); }
 
-        .item-section {
-            border: 2px dashed var(--border-color);
-            border-radius: 10px;
-            padding: 20px;
-            margin-bottom: 20px;
-            background-color: #f9f9f9;
-        }
+        /* Period Controls */
+        .period-selector { display: flex; flex-direction: column; align-items: center; margin: 25px 0; gap: 10px; }
+        .period-tabs { display: flex; background: #ddd; border-radius: 8px; padding: 4px; }
+        .period-tab { padding: 8px 16px; border-radius: 6px; border: none; cursor: pointer; font-weight: 600; color: #555; background: transparent; }
+        .period-tab.active { background: white; color: var(--primary-red); box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        .selectors-row { display: flex; gap: 10px; }
+        .filter-select { padding: 8px; border-radius: 6px; border: 1px solid #ccc; outline: none; }
 
-        .row { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        /* Dashboard Metrics */
+        .dashboard { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; margin-bottom: 25px; }
+        .card { background: white; border-radius: 12px; padding: 20px; box-shadow: var(--shadow); border-top: 4px solid var(--primary-red); }
+        .card-header { display: flex; justify-content: space-between; color: var(--text-light); margin-bottom: 10px; font-size: 14px; text-transform: uppercase; }
+        .card-value { font-size: 26px; font-weight: 700; color: var(--primary-red); }
 
-        .modal-footer {
-            display: flex;
-            justify-content: space-between;
-            padding: 20px 30px;
-            border-top: 1px solid var(--border-color);
-        }
+        /* Chart */
+        .chart-container { background: white; border-radius: 12px; padding: 20px; box-shadow: var(--shadow); margin-bottom: 25px; height: 350px; }
 
-        .btn { padding: 14px 28px; border-radius: 8px; font-size: 16px; font-weight: 600; cursor: pointer; border: none; }
-        .btn-secondary { background-color: #f1f1f1; color: var(--text-dark); }
-        .btn-primary { background-color: var(--primary-red); color: white; }
+        /* Leaderboard */
+        .leaderboard { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom: 25px; }
+        .leaderboard-card { background: white; border-radius: 12px; padding: 15px; box-shadow: var(--shadow); }
+        .leaderboard-title { color: var(--primary-red); border-bottom: 1px solid #eee; padding-bottom: 10px; margin-bottom: 10px; font-size: 16px; }
+        .leader-item { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px dashed #eee; font-size: 14px; }
 
-        .reports-modal .modal-content { max-width: 1200px; }
-        .table-container { overflow-x: auto; margin-top: 20px; }
-        .reports-table { width: 100%; border-collapse: collapse; }
-        .reports-table th { background-color: var(--primary-red); color: white; padding: 15px; text-align: left; }
-        .reports-table td { padding: 15px; border-bottom: 1px solid var(--border-color); }
+        /* Inactivity Section (Scrollable List View) */
+        .inactivity-section { background: white; border-radius: 12px; padding: 20px; box-shadow: var(--shadow); margin-bottom: 40px; }
+        .scroll-list { max-height: 250px; overflow-y: auto; margin-top: 15px; border: 1px solid #eee; border-radius: 8px; }
+        .inactivity-item { display: flex; justify-content: space-between; padding: 12px 15px; border-bottom: 1px solid #f9f9f9; align-items: center; }
+        .inactivity-item:hover { background: #fff8f8; }
+        .days-tag { background: #ffebeb; color: var(--primary-red); padding: 4px 10px; border-radius: 20px; font-weight: bold; font-size: 12px; }
 
-        .delete-btn { background-color: #ff6b6b; color: white; border: none; padding: 8px 15px; border-radius: 5px; cursor: pointer; }
+        /* Tables & Action Dropdown */
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center; }
+        .modal-content { background: white; border-radius: 12px; width: 90%; max-width: 1000px; max-height: 90vh; overflow-y: auto; padding: 25px; position: relative; }
+        
+        .reports-table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        .reports-table th { text-align: left; padding: 12px; background: #f4f4f4; position: sticky; top: 0; }
+        .reports-table td { padding: 12px; border-bottom: 1px solid #eee; }
+        
+        .editable-cell { padding: 4px 8px; border-radius: 4px; transition: 0.2s; outline: none; }
+        .editable-cell:focus { background: #fff9f9; box-shadow: inset 0 0 0 1px var(--primary-red); }
 
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-        @keyframes slideUp { from { transform: translateY(50px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        .action-cell { position: relative; width: 50px; text-align: center; }
+        .dots-btn { background: none; border: none; cursor: pointer; font-size: 18px; color: #888; padding: 5px; }
+        .action-menu { display: none; position: absolute; right: 0; top: 30px; background: white; box-shadow: 0 5px 15px rgba(0,0,0,0.2); border-radius: 6px; z-index: 100; min-width: 120px; overflow: hidden; }
+        .action-menu button { display: block; width: 100%; padding: 10px; border: none; background: none; text-align: left; cursor: pointer; font-size: 14px; }
+        .action-menu button:hover { background: #f4f4f4; color: var(--primary-red); }
+        
+        .save-icon { color: #28a745; cursor: pointer; display: none; margin-right: 10px; font-size: 18px; }
 
-        @media (max-width: 1024px) {
-            .dashboard { grid-template-columns: repeat(2, 1fr); }
-            .leaderboard { grid-template-columns: 1fr; }
-        }
+        /* Forms */
+        .form-group { margin-bottom: 15px; }
+        .form-label { display: block; margin-bottom: 5px; font-weight: 600; font-size: 14px; }
+        .form-input { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; }
 
-        @media (max-width: 768px) {
-            .dashboard { grid-template-columns: 1fr; }
-            .row { grid-template-columns: 1fr; }
-        }
+        @media (max-width: 900px) { .leaderboard { grid-template-columns: 1fr; } }
     </style>
 </head>
 <body>
+
     <header>
         <div class="container header-content">
             <div class="logo">
                 <div class="logo-icon"><i class="fas fa-chart-line"></i></div>
-                <div class="logo-text">
-                    <h1>Sales Report</h1>
-                    <p>Real-Time Sales Monitoring Dashboard</p>
-                </div>
+                <h1>Sales Tracker</h1>
             </div>
             <div class="header-actions">
-                <button class="icon-btn" id="encodeBtn" title="Encode Sales">
-                    <i class="fas fa-plus"></i>
-                </button>
-                <button class="icon-btn" id="viewAllBtn" title="Entries Folder">
-                    <i class="fas fa-list"></i>
-                </button>
+                <button class="icon-btn" onclick="openModal('encodeModal')"><i class="fas fa-plus"></i> Encode</button>
+                <button class="icon-btn" onclick="openModal('reportsModal'); renderTable();"><i class="fas fa-file-invoice"></i> Reports</button>
             </div>
         </div>
     </header>
@@ -434,67 +116,33 @@
                 <button class="period-tab" data-period="quarterly">Quarterly</button>
                 <button class="period-tab" data-period="yearly">Yearly</button>
             </div>
-
             <div class="selectors-row">
-                <div id="monthSelectorContainer" style="display: flex; align-items: center; gap: 10px;">
-                    <label for="selectMonth"><i class="fas fa-calendar-alt"></i> Month:</label>
-                    <select id="selectMonth" class="filter-select">
-                        <option value="1">January</option>
-                        <option value="2">February</option>
-                        <option value="3">March</option>
-                        <option value="4">April</option>
-                        <option value="5">May</option>
-                        <option value="6">June</option>
-                        <option value="7">July</option>
-                        <option value="8">August</option>
-                        <option value="9">September</option>
-                        <option value="10">October</option>
-                        <option value="11">November</option>
-                        <option value="12">December</option>
-                    </select>
-                </div>
-
-                <div id="quarterSelectorContainer" style="display: none; align-items: center; gap: 10px;">
-                    <label for="selectQuarter"><i class="fas fa-chart-pie"></i> Quarter:</label>
-                    <select id="selectQuarter" class="filter-select">
-                        <option value="1">Q1 (Jan-Mar)</option>
-                        <option value="2">Q2 (Apr-Jun)</option>
-                        <option value="3">Q3 (Jul-Sep)</option>
-                        <option value="4">Q4 (Oct-Dec)</option>
-                    </select>
-                </div>
-
-                <label for="selectYear">Year:</label>
+                <select id="selectMonth" class="filter-select">
+                    <option value="1">January</option><option value="2">February</option><option value="3">March</option>
+                    <option value="4">April</option><option value="5">May</option><option value="6">June</option>
+                    <option value="7">July</option><option value="8">August</option><option value="9">September</option>
+                    <option value="10">October</option><option value="11">November</option><option value="12">December</option>
+                </select>
+                <select id="selectQuarter" class="filter-select" style="display:none;">
+                    <option value="1">Q1 (Jan-Mar)</option><option value="2">Q2 (Apr-Jun)</option>
+                    <option value="3">Q3 (Jul-Sep)</option><option value="4">Q4 (Oct-Dec)</option>
+                </select>
                 <select id="selectYear" class="filter-select"></select>
             </div>
         </div>
 
         <div class="dashboard">
             <div class="card">
-                <div class="card-header">
-                    <h3 class="card-title">Total Net-TOO Sales</h3>
-                    <div class="card-icon"><i class="fas fa-peso-sign"></i></div>
-                </div>
-                <div class="card-value" id="totalSales">₱0.00</div>
-                <p class="card-subtitle">For <span class="periodLabel">Month</span></p>
+                <div class="card-header"><span>Net Sales</span><i class="fas fa-peso-sign"></i></div>
+                <div class="card-value" id="statSales">₱0.00</div>
             </div>
-
             <div class="card">
-                <div class="card-header">
-                    <h3 class="card-title">Total Units Sold</h3>
-                    <div class="card-icon"><i class="fas fa-building"></i></div>
-                </div>
-                <div class="card-value" id="totalUnits">0</div>
-                <p class="card-subtitle">For <span class="periodLabel">Month</span></p>
+                <div class="card-header"><span>Units Sold</span><i class="fas fa-building"></i></div>
+                <div class="card-value" id="statUnits">0</div>
             </div>
-
             <div class="card">
-                <div class="card-header">
-                    <h3 class="card-title">Total Parking Sold</h3>
-                    <div class="card-icon"><i class="fas fa-car"></i></div>
-                </div>
-                <div class="card-value" id="totalParking">0</div>
-                <p class="card-subtitle">For <span class="periodLabel">Month</span></p>
+                <div class="card-header"><span>Parking Slots</span><i class="fas fa-car"></i></div>
+                <div class="card-value" id="statParking">0</div>
             </div>
         </div>
 
@@ -504,100 +152,90 @@
 
         <div class="leaderboard">
             <div class="leaderboard-card">
-                <h3 class="leaderboard-title"><i class="fas fa-trophy"></i> Top 3 Realty</h3>
-                <ul class="leaderboard-list" id="topRealty">
-                    <li class="leaderboard-item">
-                        <div class="leaderboard-rank rank-1">1</div>
-                        <div class="leaderboard-info"><div class="leaderboard-name">No data yet</div></div>
-                        <div class="leaderboard-amount">₱0</div>
-                    </li>
-                    <li class="leaderboard-item">
-                        <div class="leaderboard-rank rank-2">2</div>
-                        <div class="leaderboard-info"><div class="leaderboard-name">No data yet</div></div>
-                        <div class="leaderboard-amount">₱0</div>
-                    </li>
-                    <li class="leaderboard-item">
-                        <div class="leaderboard-rank rank-3">3</div>
-                        <div class="leaderboard-info"><div class="leaderboard-name">No data yet</div></div>
-                        <div class="leaderboard-amount">₱0</div>
-                    </li>
-                </ul>
+                <h3 class="leaderboard-title">Top Realty</h3>
+                <div id="listRealty"></div>
             </div>
-
             <div class="leaderboard-card">
-                <h3 class="leaderboard-title"><i class="fas fa-user-tie"></i> Top 3 Sellers</h3>
-                <ul class="leaderboard-list" id="topSellers">
-                    <li class="leaderboard-item">
-                        <div class="leaderboard-rank rank-1">1</div>
-                        <div class="leaderboard-info"><div class="leaderboard-name">No data yet</div></div>
-                        <div class="leaderboard-amount">₱0</div>
-                    </li>
-                    <li class="leaderboard-item">
-                        <div class="leaderboard-rank rank-2">2</div>
-                        <div class="leaderboard-info"><div class="leaderboard-name">No data yet</div></div>
-                        <div class="leaderboard-amount">₱0</div>
-                    </li>
-                    <li class="leaderboard-item">
-                        <div class="leaderboard-rank rank-3">3</div>
-                        <div class="leaderboard-info"><div class="leaderboard-name">No data yet</div></div>
-                        <div class="leaderboard-amount">₱0</div>
-                    </li>
-                </ul>
+                <h3 class="leaderboard-title">Top Sellers</h3>
+                <div id="listSellers"></div>
             </div>
-
             <div class="leaderboard-card">
-                <h3 class="leaderboard-title"><i class="fas fa-star"></i> Top Sales Coordinator</h3>
-                <ul class="leaderboard-list" id="topCoordinator">
-                    <li class="leaderboard-item">
-                        <div class="leaderboard-rank rank-1">1</div>
-                        <div class="leaderboard-info"><div class="leaderboard-name">No data yet</div></div>
-                        <div class="leaderboard-amount">₱0</div>
-                    </li>
-                </ul>
+                <h3 class="leaderboard-title">Coordinator Leader</h3>
+                <div id="listCoords"></div>
             </div>
+        </div>
+
+        <div class="inactivity-section">
+            <h3 class="leaderboard-title"><i class="fas fa-clock"></i> Inactivity Tracker (Days since last Sale)</h3>
+            <div class="scroll-list" id="inactivityList">
+                </div>
         </div>
     </main>
 
     <div class="modal" id="encodeModal">
         <div class="modal-content">
-            <div class="modal-header">
-                <h2 class="modal-title">Encode Sales Data</h2>
-                <button class="close-modal" id="closeEncodeModal">&times;</button>
+            <h2 style="margin-bottom:20px; color:var(--primary-red);">Encode New Sale</h2>
+            <div class="form-group">
+                <label class="form-label">Realty Name</label>
+                <input type="text" id="inpRealty" class="form-input" list="dlRealty">
+                <datalist id="dlRealty"></datalist>
             </div>
-            <div class="modal-body">
-                <div class="form-group"><label class="form-label">Realty Name</label><input type="text" class="form-input" id="realtyName"></div>
-                <div class="form-group"><label class="form-label">Seller's Name</label><input type="text" class="form-input" id="sellerName"></div>
-                <div class="form-group"><label class="form-label">Sales Coordinator</label><input type="text" class="form-input" id="coordinatorName"></div>
-                <div class="form-group"><label class="form-label">Date Entry</label><input type="date" class="form-input" id="dateEntry"></div>
-                <div id="itemsContainer"></div>
-                <button class="add-item-btn" id="addItemBtn"><i class="fas fa-plus"></i></button>
+            <div class="form-group">
+                <label class="form-label">Seller Name</label>
+                <input type="text" id="inpSeller" class="form-input" list="dlSeller">
+                <datalist id="dlSeller"></datalist>
             </div>
-            <div class="modal-footer">
-                <button class="btn btn-secondary" id="cancelBtn">Cancel</button>
-                <button class="btn btn-primary" id="submitBtn">Submit to Database</button>
+            <div class="form-group">
+                <label class="form-label">Coordinator Name</label>
+                <input type="text" id="inpCoord" class="form-input" list="dlCoord">
+                <datalist id="dlCoord"></datalist>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Date of Sale</label>
+                <input type="date" id="inpDate" class="form-input">
+            </div>
+            <div style="display:grid; grid-template-columns: 1fr 1fr 1fr; gap:10px;">
+                <div class="form-group"><label class="form-label">Units</label><input type="number" id="inpUnits" class="form-input" value="0"></div>
+                <div class="form-group"><label class="form-label">Parking</label><input type="number" id="inpParking" class="form-input" value="0"></div>
+                <div class="form-group"><label class="form-label">Total Amount</label><input type="number" id="inpAmount" class="form-input" placeholder="₱"></div>
+            </div>
+            <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:20px;">
+                <button onclick="closeModal('encodeModal')" style="padding:10px 20px; border:none; cursor:pointer;">Cancel</button>
+                <button class="icon-btn" onclick="saveNewSale()">Submit Entry</button>
             </div>
         </div>
     </div>
 
-    <div class="modal reports-modal" id="reportsModal">
-        <div class="modal-content">
-            <div class="modal-header"><h2>All Sales Reports</h2><button class="close-modal" id="closeReportsModal">&times;</button></div>
-            <div class="modal-body">
-                <div class="table-container">
-                    <table class="reports-table">
-                        <thead>
-                            <tr><th>Date</th><th>Realty</th><th>Seller</th><th>Coordinator</th><th>Units</th><th>Parking</th><th>Amount</th><th>Action</th></tr>
-                        </thead>
-                        <tbody id="reportsTableBody"></tbody>
-                    </table>
-                </div>
+    <div class="modal" id="reportsModal">
+        <div class="modal-content" style="max-width:1200px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+                <h2 style="color:var(--primary-red);">All Sales Report</h2>
+                <button onclick="closeModal('reportsModal')" style="background:none; border:none; font-size:24px; cursor:pointer;">&times;</button>
+            </div>
+            <div style="overflow-x:auto;">
+                <table class="reports-table">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Realty</th>
+                            <th>Seller</th>
+                            <th>Coordinator</th>
+                            <th>Units</th>
+                            <th>Parking</th>
+                            <th>Amount</th>
+                            <th style="width:80px;"></th>
+                        </tr>
+                    </thead>
+                    <tbody id="reportsTbody"></tbody>
+                </table>
             </div>
         </div>
     </div>
 
     <script>
-        const REQUIRED_PASSCODE = "161316";
+        const PASSCODE = "161316";
 
+        // Initialize Firebase
         const firebaseConfig = {
             apiKey: "AIzaSyCqcmiRVkCSvz87WBPQSGI7uMOmVlMN78k",
             authDomain: "visitors-entry.firebaseapp.com",
@@ -607,140 +245,116 @@
             messagingSenderId: "239213604796",
             appId: "1:239213604796:web:5e4dfa84b59e3d2b1f45b9"
         };
-
         firebase.initializeApp(firebaseConfig);
-        const database = firebase.database();
+        const db = firebase.database();
 
-        // Elements
-        const selectMonth = document.getElementById('selectMonth');
-        const selectQuarter = document.getElementById('selectQuarter');
-        const selectYear = document.getElementById('selectYear');
-        const monthSelectorContainer = document.getElementById('monthSelectorContainer');
-        const quarterSelectorContainer = document.getElementById('quarterSelectorContainer');
-        const periodTabs = document.querySelectorAll('.period-tab');
-        
-        // Globals
-        let currentPeriod = 'monthly';
-        let allSalesData = [];
-        let salesChart = null;
+        let allSales = [];
+        let chartObj = null;
+        let activePeriod = 'monthly';
 
-        // Initialize Selectors
-        const now = new Date();
-        selectMonth.value = now.getMonth() + 1;
-        selectQuarter.value = Math.floor(now.getMonth() / 3) + 1;
-        
-        const currentYearValue = now.getFullYear();
-        for(let i = currentYearValue - 2; i <= currentYearValue + 2; i++) {
-            const opt = document.createElement('option');
-            opt.value = i; opt.textContent = i;
-            if(i === currentYearValue) opt.selected = true;
-            selectYear.appendChild(opt);
-        }
-
-        // Period Switching logic
-        periodTabs.forEach(tab => {
-            tab.addEventListener('click', () => {
-                periodTabs.forEach(t => t.classList.remove('active'));
-                tab.classList.add('active');
-                currentPeriod = tab.dataset.period;
-                
-                monthSelectorContainer.style.display = (currentPeriod === 'monthly') ? 'flex' : 'none';
-                quarterSelectorContainer.style.display = (currentPeriod === 'quarterly') ? 'flex' : 'none';
-                
-                updatePeriodLabels();
-                calculateAndDisplayStats();
-            });
+        // Startup
+        document.addEventListener('DOMContentLoaded', () => {
+            initDates();
+            fetchData();
+            setupEvents();
         });
 
-        [selectMonth, selectQuarter, selectYear].forEach(el => el.addEventListener('change', calculateAndDisplayStats));
-
-        function updatePeriodLabels() {
-            const labels = document.querySelectorAll('.periodLabel');
-            let text = "";
-            const yearVal = selectYear.value;
-
-            if(currentPeriod === 'monthly') {
-                text = `${selectMonth.options[selectMonth.selectedIndex].text} ${yearVal}`;
-            } else if(currentPeriod === 'quarterly') {
-                text = `${selectQuarter.options[selectQuarter.selectedIndex].text} ${yearVal}`;
-            } else {
-                text = `Year ${yearVal}`;
+        function initDates() {
+            const now = new Date();
+            document.getElementById('selectMonth').value = now.getMonth() + 1;
+            const yearSelect = document.getElementById('selectYear');
+            for(let i = now.getFullYear()-2; i <= now.getFullYear()+2; i++){
+                const opt = document.createElement('option');
+                opt.value = i; opt.textContent = i;
+                if(i === now.getFullYear()) opt.selected = true;
+                yearSelect.appendChild(opt);
             }
-            
-            labels.forEach(el => el.textContent = text);
         }
 
-        async function loadSalesData() {
-            database.ref('sales').on('value', (snapshot) => {
-                const sales = snapshot.val();
-                allSalesData = [];
-                if (sales) {
-                    Object.keys(sales).forEach(key => {
-                        allSalesData.push({ id: key, ...sales[key] });
-                    });
-                }
-                calculateAndDisplayStats();
+        function setupEvents() {
+            document.querySelectorAll('.period-tab').forEach(btn => {
+                btn.onclick = (e) => {
+                    document.querySelectorAll('.period-tab').forEach(b => b.classList.remove('active'));
+                    e.target.classList.add('active');
+                    activePeriod = e.target.dataset.period;
+                    document.getElementById('selectMonth').style.display = activePeriod === 'monthly' ? 'block' : 'none';
+                    document.getElementById('selectQuarter').style.display = activePeriod === 'quarterly' ? 'block' : 'none';
+                    refreshUI();
+                };
+            });
+            document.querySelectorAll('.filter-select').forEach(s => s.onchange = refreshUI);
+        }
+
+        function fetchData() {
+            db.ref('sales').on('value', snap => {
+                const data = snap.val() || {};
+                allSales = Object.keys(data).map(k => ({ id: k, ...data[k] }));
+                updateDatalists();
+                refreshUI();
             });
         }
 
-        function calculateAndDisplayStats() {
-            const sMonth = parseInt(selectMonth.value);
-            const sQuarter = parseInt(selectQuarter.value);
-            const sYear = parseInt(selectYear.value);
-            
-            const filteredData = allSalesData.filter(sale => {
-                const saleDate = new Date(sale.dateEntry);
-                const m = saleDate.getMonth() + 1;
-                const y = saleDate.getFullYear();
-                const q = Math.floor((m - 1) / 3) + 1;
-                
-                if (currentPeriod === 'monthly') return m === sMonth && y === sYear;
-                if (currentPeriod === 'quarterly') return q === sQuarter && y === sYear;
-                return y === sYear;
+        function updateDatalists() {
+            const keys = ['Realty', 'Seller', 'Coord'];
+            keys.forEach(k => {
+                const set = [...new Set(allSales.map(s => s[k.toLowerCase() + 'Name']))].sort();
+                const dl = document.getElementById(`dl${k}`);
+                dl.innerHTML = set.map(v => `<option value="${v}">`).join('');
             });
-
-            let totalSales = 0, totalUnits = 0, totalParking = 0;
-            filteredData.forEach(sale => {
-                totalSales += (sale.totalAmount || 0);
-                totalUnits += (sale.totalUnits || 0);
-                totalParking += (sale.totalParking || 0);
-            });
-
-            document.getElementById('totalSales').textContent = `₱${totalSales.toLocaleString()}`;
-            document.getElementById('totalUnits').textContent = totalUnits.toLocaleString();
-            document.getElementById('totalParking').textContent = totalParking.toLocaleString();
-            
-            updatePeriodLabels();
-            calculateTopPerformers(filteredData);
-            updateChart(filteredData);
         }
 
-        // New Chart Function
-        function updateChart(filteredData) {
+        function refreshUI() {
+            const m = parseInt(document.getElementById('selectMonth').value);
+            const q = parseInt(document.getElementById('selectQuarter').value);
+            const y = parseInt(document.getElementById('selectYear').value);
+
+            const filtered = allSales.filter(s => {
+                const d = new Date(s.dateEntry);
+                const sm = d.getMonth() + 1;
+                const sy = d.getFullYear();
+                if(activePeriod === 'monthly') return sm === m && sy === y;
+                if(activePeriod === 'quarterly') return Math.ceil(sm/3) === q && sy === y;
+                return sy === y;
+            });
+
+            updateStats(filtered);
+            updateChart(filtered);
+            updateLists(filtered);
+            updateInactivity();
+        }
+
+        function updateStats(data) {
+            const totals = data.reduce((acc, c) => {
+                acc.s += (parseFloat(c.totalAmount) || 0);
+                acc.u += (parseInt(c.totalUnits) || 0);
+                acc.p += (parseInt(c.totalParking) || 0);
+                return acc;
+            }, {s:0, u:0, p:0});
+
+            document.getElementById('statSales').textContent = '₱' + totals.s.toLocaleString(undefined, {minimumFractionDigits: 2});
+            document.getElementById('statUnits').textContent = totals.u;
+            document.getElementById('statParking').textContent = totals.p;
+        }
+
+        function updateChart(data) {
             const ctx = document.getElementById('salesChart').getContext('2d');
-            
-            // Group data by date for the chart
-            const chartGroups = {};
-            filteredData.forEach(sale => {
-                const date = sale.dateEntry;
-                chartGroups[date] = (chartGroups[date] || 0) + sale.totalAmount;
-            });
+            const grouped = data.reduce((acc, c) => {
+                acc[c.dateEntry] = (acc[c.dateEntry] || 0) + c.totalAmount;
+                return acc;
+            }, {});
+            const labels = Object.keys(grouped).sort();
+            const values = labels.map(l => grouped[l]);
 
-            const labels = Object.keys(chartGroups).sort();
-            const values = labels.map(l => chartGroups[l]);
-
-            if (salesChart) salesChart.destroy();
-
-            salesChart = new Chart(ctx, {
+            if(chartObj) chartObj.destroy();
+            chartObj = new Chart(ctx, {
                 type: 'line',
                 data: {
-                    labels: labels,
+                    labels,
                     datasets: [{
-                        label: 'Sales Amount (₱)',
+                        label: 'Sales Revenue',
                         data: values,
                         borderColor: '#8B0000',
                         backgroundColor: 'rgba(139, 0, 0, 0.1)',
-                        borderWidth: 3,
                         fill: true,
                         tension: 0.3
                     }]
@@ -749,141 +363,149 @@
                     responsive: true,
                     maintainAspectRatio: false,
                     plugins: {
-                        legend: { position: 'top' },
-                        title: { display: true, text: 'Sales Performance Over Filtered Period' }
-                    },
-                    scales: {
-                        y: { beginAtZero: true, ticks: { callback: value => '₱' + value.toLocaleString() } }
+                        tooltip: { enabled: true, mode: 'index', intersect: false }
                     }
                 }
             });
         }
 
-        function calculateTopPerformers(salesData) {
-            const realtyMap = {}, sellerMap = {}, coordMap = {};
-            salesData.forEach(s => {
-                if(s.realtyName) realtyMap[s.realtyName] = (realtyMap[s.realtyName] || 0) + s.totalAmount;
-                if(s.sellerName) sellerMap[s.sellerName] = (sellerMap[s.sellerName] || 0) + s.totalAmount;
-                if(s.coordinatorName) coordMap[s.coordinatorName] = (coordMap[s.coordinatorName] || 0) + s.totalAmount;
-            });
-            updateLeaderboard('topRealty', Object.entries(realtyMap).sort((a,b)=>b[1]-a[1]).slice(0,3));
-            updateLeaderboard('topSellers', Object.entries(sellerMap).sort((a,b)=>b[1]-a[1]).slice(0,3));
-            updateLeaderboard('topCoordinator', Object.entries(coordMap).sort((a,b)=>b[1]-a[1]).slice(0,1));
-        }
-
-        function updateLeaderboard(id, data) {
-            const containerItems = document.getElementById(id).querySelectorAll('.leaderboard-item');
-            containerItems.forEach((item, i) => {
-                const name = item.querySelector('.leaderboard-name');
-                const amt = item.querySelector('.leaderboard-amount');
-                if (data[i]) {
-                    name.textContent = data[i][0];
-                    amt.textContent = `₱${data[i][1].toLocaleString()}`;
-                } else {
-                    name.textContent = 'No data yet'; amt.textContent = '₱0';
-                }
-            });
-        }
-
-        // Modal Controls
-        document.getElementById('encodeBtn').onclick = () => document.getElementById('encodeModal').style.display = 'flex';
-        document.getElementById('closeEncodeModal').onclick = () => document.getElementById('encodeModal').style.display = 'none';
-        document.getElementById('cancelBtn').onclick = () => document.getElementById('encodeModal').style.display = 'none';
-        
-        document.getElementById('viewAllBtn').onclick = () => { loadAllReports(); document.getElementById('reportsModal').style.display = 'flex'; };
-        document.getElementById('closeReportsModal').onclick = () => document.getElementById('reportsModal').style.display = 'none';
-
-        document.getElementById('addItemBtn').onclick = () => {
-            const id = Date.now();
-            const html = `
-                <div class="item-section" data-id="${id}">
-                    <div class="row">
-                        <select class="form-select item-type" onchange="updateFields(${id})">
-                            <option value="">Select Type</option>
-                            <option value="unit">Unit</option>
-                            <option value="parking">Parking</option>
-                        </select>
-                        <button class="delete-btn" onclick="this.parentElement.parentElement.remove()">X</button>
-                    </div>
-                    <div id="fields-${id}" class="row" style="margin-top:10px"></div>
-                </div>`;
-            document.getElementById('itemsContainer').insertAdjacentHTML('beforeend', html);
-        };
-
-        window.updateFields = (id) => {
-            const type = document.querySelector(`[data-id="${id}"] .item-type`).value;
-            const container = document.getElementById(`fields-${id}`);
-            container.innerHTML = type ? `
-                <input type="number" class="form-input count" placeholder="Count">
-                <input type="number" class="form-input amount" placeholder="Amount">
-            ` : '';
-        };
-
-        document.getElementById('submitBtn').onclick = async () => {
-            const sale = {
-                realtyName: document.getElementById('realtyName').value,
-                sellerName: document.getElementById('sellerName').value,
-                coordinatorName: document.getElementById('coordinatorName').value,
-                dateEntry: document.getElementById('dateEntry').value,
-                totalUnits: 0, totalParking: 0, totalAmount: 0
+        function updateLists(data) {
+            const mapper = (key) => {
+                const map = data.reduce((acc, c) => {
+                    acc[c[key]] = (acc[c[key]] || 0) + c.totalAmount;
+                    return acc;
+                }, {});
+                return Object.entries(map).sort((a,b) => b[1]-a[1]).slice(0, 5);
             };
 
-            document.querySelectorAll('.item-section').forEach(sec => {
-                const type = sec.querySelector('.item-type').value;
-                const count = parseFloat(sec.querySelector('.count')?.value || 0);
-                const amt = parseFloat(sec.querySelector('.amount')?.value || 0);
-                if(type === 'unit') sale.totalUnits += count;
-                if(type === 'parking') sale.totalParking += count;
-                sale.totalAmount += amt;
-            });
+            const render = (id, items) => {
+                const el = document.getElementById(id);
+                el.innerHTML = items.length ? items.map(([n, v]) => 
+                    `<div class="leader-item"><span>${n}</span><b>₱${v.toLocaleString()}</b></div>`
+                ).join('') : '<p style="font-size:12px;color:#999">No data for this period</p>';
+            };
 
-            if(!sale.realtyName || !sale.dateEntry) return alert("Fill required fields");
-            
-            const pass = prompt("Enter passcode to add data:");
-            if(pass !== REQUIRED_PASSCODE) return alert("Incorrect passcode.");
+            render('listRealty', mapper('realtyName'));
+            render('listSellers', mapper('sellerName'));
+            render('listCoords', mapper('coordinatorName'));
+        }
 
-            await database.ref('sales').push(sale);
-            alert("Saved successfully!");
-            document.getElementById('encodeModal').style.display = 'none';
-            // Reset
-            document.getElementById('realtyName').value = '';
-            document.getElementById('sellerName').value = '';
-            document.getElementById('coordinatorName').value = '';
-            document.getElementById('dateEntry').value = '';
-            document.getElementById('itemsContainer').innerHTML = '';
-        };
+        function updateInactivity() {
+            const realties = [...new Set(allSales.map(s => s.realtyName))];
+            const tracker = realties.map(name => {
+                const last = allSales.filter(s => s.realtyName === name)
+                                     .map(s => new Date(s.dateEntry))
+                                     .sort((a,b) => b-a)[0];
+                const days = Math.floor((new Date() - last) / (1000 * 60 * 60 * 24));
+                return { name, days };
+            }).sort((a,b) => b.days - a.days);
 
-        async function loadAllReports() {
-            const snapshot = await database.ref('sales').once('value');
-            const data = snapshot.val();
-            const tbody = document.getElementById('reportsTableBody');
-            tbody.innerHTML = '';
-            
-            if(data) {
-                const sortedData = Object.entries(data).sort((a, b) => new Date(b[1].dateEntry) - new Date(a[1].dateEntry));
+            document.getElementById('inactivityList').innerHTML = tracker.map(t => `
+                <div class="inactivity-item">
+                    <span>${t.name}</span>
+                    <span class="days-tag">${t.days} days since last sale</span>
+                </div>
+            `).join('');
+        }
 
-                sortedData.forEach(([key, s]) => {
-                    tbody.innerHTML += `<tr>
-                        <td>${s.dateEntry}</td><td>${s.realtyName}</td><td>${s.sellerName}</td>
-                        <td>${s.coordinatorName}</td><td>${s.totalUnits}</td><td>${s.totalParking}</td>
-                        <td>₱${s.totalAmount.toLocaleString()}</td>
-                        <td><button class="delete-btn" onclick="deleteSale('${key}')">Delete</button></td>
-                    </tr>`;
-                });
+        async function saveNewSale() {
+            const sale = {
+                realtyName: document.getElementById('inpRealty').value,
+                sellerName: document.getElementById('inpSeller').value,
+                coordinatorName: document.getElementById('inpCoord').value,
+                dateEntry: document.getElementById('inpDate').value,
+                totalUnits: parseInt(document.getElementById('inpUnits').value || 0),
+                totalParking: parseInt(document.getElementById('inpParking').value || 0),
+                totalAmount: parseFloat(document.getElementById('inpAmount').value || 0)
+            };
+
+            if(!sale.realtyName || !sale.dateEntry) return Swal.fire('Error', 'Please fill Realty and Date', 'error');
+
+            const { value: pass } = await Swal.fire({ title: 'Passcode Required', input: 'password', showCancelButton: true });
+            if(pass === PASSCODE) {
+                await db.ref('sales').push(sale);
+                Swal.fire('Saved!', 'Entry recorded successfully', 'success');
+                closeModal('encodeModal');
+                resetForm();
+            } else if(pass) {
+                Swal.fire('Denied', 'Wrong passcode', 'error');
             }
         }
 
-        window.deleteSale = async (id) => {
-            const pass = prompt("Enter passcode to delete this row:");
-            if(pass !== REQUIRED_PASSCODE) return alert("Incorrect passcode.");
+        function renderTable() {
+            const tbody = document.getElementById('reportsTbody');
+            tbody.innerHTML = '';
+            
+            allSales.sort((a,b) => new Date(b.dateEntry) - new Date(a.dateEntry)).forEach(s => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td><div class="editable-cell" contenteditable="true" oninput="showSave('${s.id}')" data-f="dateEntry">${s.dateEntry}</div></td>
+                    <td><div class="editable-cell" contenteditable="true" oninput="showSave('${s.id}')" data-f="realtyName">${s.realtyName}</div></td>
+                    <td><div class="editable-cell" contenteditable="true" oninput="showSave('${s.id}')" data-f="sellerName">${s.sellerName}</div></td>
+                    <td><div class="editable-cell" contenteditable="true" oninput="showSave('${s.id}')" data-f="coordinatorName">${s.coordinatorName}</div></td>
+                    <td><div class="editable-cell" contenteditable="true" oninput="showSave('${s.id}')" data-f="totalUnits">${s.totalUnits}</div></td>
+                    <td><div class="editable-cell" contenteditable="true" oninput="showSave('${s.id}')" data-f="totalParking">${s.totalParking}</div></td>
+                    <td>
+                        <span style="color:var(--primary-red)">₱</span>
+                        <span class="editable-cell" contenteditable="true" oninput="showSave('${s.id}')" data-f="totalAmount">${(s.totalAmount || 0).toLocaleString()}</span>
+                    </td>
+                    <td class="action-cell">
+                        <i class="fas fa-save save-icon" id="saveIcon-${s.id}" onclick="saveEdit('${s.id}')"></i>
+                        <button class="dots-btn" onclick="toggleActionMenu(event, '${s.id}')"><i class="fas fa-ellipsis-v"></i></button>
+                        <div class="action-menu" id="menu-${s.id}">
+                            <button onclick="saveEdit('${s.id}')"><i class="fas fa-save"></i> Save</button>
+                            <button onclick="deleteRecord('${s.id}')" style="color:red;"><i class="fas fa-trash"></i> Delete</button>
+                        </div>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
 
-            if(confirm("Are you sure you want to delete this report?")) {
-                await database.ref(`sales/${id}`).remove();
-                loadAllReports();
+        function showSave(id) {
+            document.getElementById(`saveIcon-${id}`).style.display = 'inline-block';
+        }
+
+        function toggleActionMenu(e, id) {
+            e.stopPropagation();
+            document.querySelectorAll('.action-menu').forEach(m => m.style.display = 'none');
+            document.getElementById(`menu-${id}`).style.display = 'block';
+            window.onclick = () => document.querySelectorAll('.action-menu').forEach(m => m.style.display = 'none');
+        }
+
+        async function saveEdit(id) {
+            const { value: pass } = await Swal.fire({ title: 'Enter Passcode to Update', input: 'password', showCancelButton: true });
+            if(pass !== PASSCODE) return pass && Swal.fire('Error', 'Incorrect Passcode', 'error');
+
+            const row = document.getElementById(`saveIcon-${id}`).closest('tr');
+            const updates = {};
+            row.querySelectorAll('.editable-cell').forEach(cell => {
+                let val = cell.innerText.replace(/,/g, '');
+                let field = cell.dataset.f;
+                updates[field] = (field.includes('total')) ? parseFloat(val) || 0 : val;
+            });
+
+            await db.ref(`sales/${id}`).update(updates);
+            Swal.fire('Updated', 'Record saved to database', 'success');
+            document.getElementById(`saveIcon-${id}`).style.display = 'none';
+        }
+
+        async function deleteRecord(id) {
+            const { value: pass } = await Swal.fire({ title: 'Enter Passcode to Delete', input: 'password', showCancelButton: true });
+            if(pass === PASSCODE) {
+                await db.ref(`sales/${id}`).remove();
+                Swal.fire('Deleted', 'Record removed', 'success');
+                renderTable();
+            } else if(pass) {
+                Swal.fire('Error', 'Incorrect Passcode', 'error');
             }
-        };
+        }
 
-        document.addEventListener('DOMContentLoaded', loadSalesData);
+        function openModal(id) { document.getElementById(id).style.display = 'flex'; }
+        function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+        function resetForm() {
+            ['inpRealty', 'inpSeller', 'inpCoord', 'inpDate', 'inpUnits', 'inpParking', 'inpAmount'].forEach(i => document.getElementById(i).value = (i.includes('Units') || i.includes('Parking')) ? 0 : '');
+        }
     </script>
 </body>
 </html>
