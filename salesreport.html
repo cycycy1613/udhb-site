@@ -26,15 +26,16 @@
         body { background-color: var(--light-bg); color: var(--text-dark); }
         .container { max-width: 1300px; margin: 0 auto; padding: 0 20px; }
 
-        /* Header (Kept original TOP section) */
+        /* Header (Updated) */
         header { background-color: var(--card-bg); box-shadow: var(--shadow); padding: 15px 0; position: sticky; top: 0; z-index: 100; }
         .header-content { display: flex; justify-content: space-between; align-items: center; }
         .logo { display: flex; align-items: center; gap: 10px; }
         .logo-icon { background: var(--primary-red); color: white; width: 40px; height: 40px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 20px; }
-        .logo h1 { font-size: 22px; color: var(--primary-red); }
+        .logo h1 { font-size: 22px; color: var(--primary-red); line-height: 1; }
+        .logo span { font-size: 10px; text-transform: uppercase; letter-spacing: 1px; color: var(--text-light); display: block; }
         .header-actions { display: flex; gap: 10px; }
         
-        .icon-btn { background: var(--primary-red); color: white; border: none; padding: 10px 15px; border-radius: 6px; cursor: pointer; transition: 0.3s; }
+        .icon-btn { background: var(--primary-red); color: white; border: none; width: 40px; height: 40px; border-radius: 6px; cursor: pointer; transition: 0.3s; display: flex; align-items: center; justify-content: center; }
         .icon-btn:hover { background: var(--dark-red); }
 
         /* Period Controls */
@@ -60,7 +61,7 @@
         .leaderboard-title { color: var(--primary-red); border-bottom: 1px solid #eee; padding-bottom: 10px; margin-bottom: 10px; font-size: 16px; }
         .leader-item { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px dashed #eee; font-size: 14px; }
 
-        /* Inactivity Section (Scrollable List View) */
+        /* Inactivity Section */
         .inactivity-section { background: white; border-radius: 12px; padding: 20px; box-shadow: var(--shadow); margin-bottom: 40px; }
         .scroll-list { max-height: 250px; overflow-y: auto; margin-top: 15px; border: 1px solid #eee; border-radius: 8px; }
         .inactivity-item { display: flex; justify-content: space-between; padding: 12px 15px; border-bottom: 1px solid #f9f9f9; align-items: center; }
@@ -76,17 +77,16 @@
         .reports-table td { padding: 12px; border-bottom: 1px solid #eee; }
         
         .editable-cell { padding: 4px 8px; border-radius: 4px; transition: 0.2s; outline: none; }
-        .editable-cell:focus { background: #fff9f9; box-shadow: inset 0 0 0 1px var(--primary-red); }
+        .editing .editable-cell { background: #fff9f9; box-shadow: inset 0 0 0 1px #ffc1c1; cursor: text; }
 
         .action-cell { position: relative; width: 50px; text-align: center; }
         .dots-btn { background: none; border: none; cursor: pointer; font-size: 18px; color: #888; padding: 5px; }
-        .action-menu { display: none; position: absolute; right: 0; top: 30px; background: white; box-shadow: 0 5px 15px rgba(0,0,0,0.2); border-radius: 6px; z-index: 100; min-width: 120px; overflow: hidden; }
+        .action-menu { display: none; position: absolute; right: 0; top: 30px; background: white; box-shadow: 0 5px 15px rgba(0,0,0,0.2); border-radius: 6px; z-index: 100; min-width: 140px; overflow: hidden; }
         .action-menu button { display: block; width: 100%; padding: 10px; border: none; background: none; text-align: left; cursor: pointer; font-size: 14px; }
         .action-menu button:hover { background: #f4f4f4; color: var(--primary-red); }
         
         .save-icon { color: #28a745; cursor: pointer; display: none; margin-right: 10px; font-size: 18px; }
 
-        /* Forms */
         .form-group { margin-bottom: 15px; }
         .form-label { display: block; margin-bottom: 5px; font-weight: 600; font-size: 14px; }
         .form-input { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; }
@@ -100,11 +100,14 @@
         <div class="container header-content">
             <div class="logo">
                 <div class="logo-icon"><i class="fas fa-chart-line"></i></div>
-                <h1>UDHB-DSR</h1>
+                <div>
+                    <h1>UDHB-DSR</h1>
+                    <span>Realtime Data</span>
+                </div>
             </div>
             <div class="header-actions">
-                <button class="icon-btn" onclick="openModal('encodeModal')"><i class="fas fa-plus"></i> Encode</button>
-                <button class="icon-btn" onclick="openModal('reportsModal'); renderTable();"><i class="fas fa-file-invoice"></i> Reports</button>
+                <button class="icon-btn" title="Encode New Sale" onclick="openModal('encodeModal')"><i class="fas fa-plus"></i></button>
+                <button class="icon-btn" title="Reports" onclick="openModal('reportsModal'); renderTable();"><i class="fas fa-file-invoice"></i></button>
             </div>
         </div>
     </header>
@@ -167,8 +170,7 @@
 
         <div class="inactivity-section">
             <h3 class="leaderboard-title"><i class="fas fa-clock"></i> Realty Tracker (Days since last Sales)</h3>
-            <div class="scroll-list" id="inactivityList">
-                </div>
+            <div class="scroll-list" id="inactivityList"></div>
         </div>
     </main>
 
@@ -201,7 +203,7 @@
             </div>
             <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:20px;">
                 <button onclick="closeModal('encodeModal')" style="padding:10px 20px; border:none; cursor:pointer;">Cancel</button>
-                <button class="icon-btn" onclick="saveNewSale()">Submit Entry</button>
+                <button class="icon-btn" style="width:auto; padding:0 20px;" onclick="saveNewSale()">Submit Entry</button>
             </div>
         </div>
     </div>
@@ -235,7 +237,6 @@
     <script>
         const PASSCODE = "161316";
 
-        // Initialize Firebase
         const firebaseConfig = {
             apiKey: "AIzaSyCqcmiRVkCSvz87WBPQSGI7uMOmVlMN78k",
             authDomain: "visitors-entry.firebaseapp.com",
@@ -252,7 +253,6 @@
         let chartObj = null;
         let activePeriod = 'monthly';
 
-        // Startup
         document.addEventListener('DOMContentLoaded', () => {
             initDates();
             fetchData();
@@ -295,10 +295,14 @@
         }
 
         function updateDatalists() {
-            const keys = ['Realty', 'Seller', 'Coord'];
+            const keys = [
+                { id: 'dlRealty', field: 'realtyName' },
+                { id: 'dlSeller', field: 'sellerName' },
+                { id: 'dlCoord', field: 'coordinatorName' } // Fixed Coord field
+            ];
             keys.forEach(k => {
-                const set = [...new Set(allSales.map(s => s[k.toLowerCase() + 'Name']))].sort();
-                const dl = document.getElementById(`dl${k}`);
+                const set = [...new Set(allSales.map(s => s[k.field]))].filter(v => v).sort();
+                const dl = document.getElementById(k.id);
                 dl.innerHTML = set.map(v => `<option value="${v}">`).join('');
             });
         }
@@ -362,9 +366,7 @@
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
-                    plugins: {
-                        tooltip: { enabled: true, mode: 'index', intersect: false }
-                    }
+                    plugins: { tooltip: { enabled: true, mode: 'index', intersect: false } }
                 }
             });
         }
@@ -382,7 +384,7 @@
                 const el = document.getElementById(id);
                 el.innerHTML = items.length ? items.map(([n, v]) => 
                     `<div class="leader-item"><span>${n}</span><b>₱${v.toLocaleString()}</b></div>`
-                ).join('') : '<p style="font-size:12px;color:#999">No data for this period</p>';
+                ).join('') : '<p style="font-size:12px;color:#999">No data</p>';
             };
 
             render('listRealty', mapper('realtyName'));
@@ -424,7 +426,7 @@
             const { value: pass } = await Swal.fire({ title: 'Passcode Required', input: 'password', showCancelButton: true });
             if(pass === PASSCODE) {
                 await db.ref('sales').push(sale);
-                Swal.fire('Saved!', 'Entry recorded successfully', 'success');
+                Swal.fire('Saved!', 'Entry recorded', 'success');
                 closeModal('encodeModal');
                 resetForm();
             } else if(pass) {
@@ -438,22 +440,23 @@
             
             allSales.sort((a,b) => new Date(b.dateEntry) - new Date(a.dateEntry)).forEach(s => {
                 const tr = document.createElement('tr');
+                tr.id = `row-${s.id}`;
                 tr.innerHTML = `
-                    <td><div class="editable-cell" contenteditable="true" oninput="showSave('${s.id}')" data-f="dateEntry">${s.dateEntry}</div></td>
-                    <td><div class="editable-cell" contenteditable="true" oninput="showSave('${s.id}')" data-f="realtyName">${s.realtyName}</div></td>
-                    <td><div class="editable-cell" contenteditable="true" oninput="showSave('${s.id}')" data-f="sellerName">${s.sellerName}</div></td>
-                    <td><div class="editable-cell" contenteditable="true" oninput="showSave('${s.id}')" data-f="coordinatorName">${s.coordinatorName}</div></td>
-                    <td><div class="editable-cell" contenteditable="true" oninput="showSave('${s.id}')" data-f="totalUnits">${s.totalUnits}</div></td>
-                    <td><div class="editable-cell" contenteditable="true" oninput="showSave('${s.id}')" data-f="totalParking">${s.totalParking}</div></td>
+                    <td><div class="editable-cell" contenteditable="false" data-f="dateEntry">${s.dateEntry}</div></td>
+                    <td><div class="editable-cell" contenteditable="false" data-f="realtyName">${s.realtyName}</div></td>
+                    <td><div class="editable-cell" contenteditable="false" data-f="sellerName">${s.sellerName}</div></td>
+                    <td><div class="editable-cell" contenteditable="false" data-f="coordinatorName">${s.coordinatorName}</div></td>
+                    <td><div class="editable-cell" contenteditable="false" data-f="totalUnits">${s.totalUnits}</div></td>
+                    <td><div class="editable-cell" contenteditable="false" data-f="totalParking">${s.totalParking}</div></td>
                     <td>
                         <span style="color:var(--primary-red)">₱</span>
-                        <span class="editable-cell" contenteditable="true" oninput="showSave('${s.id}')" data-f="totalAmount">${(s.totalAmount || 0).toLocaleString()}</span>
+                        <span class="editable-cell" contenteditable="false" data-f="totalAmount">${(s.totalAmount || 0).toLocaleString()}</span>
                     </td>
                     <td class="action-cell">
                         <i class="fas fa-save save-icon" id="saveIcon-${s.id}" onclick="saveEdit('${s.id}')"></i>
                         <button class="dots-btn" onclick="toggleActionMenu(event, '${s.id}')"><i class="fas fa-ellipsis-v"></i></button>
                         <div class="action-menu" id="menu-${s.id}">
-                            <button onclick="saveEdit('${s.id}')"><i class="fas fa-save"></i> Save</button>
+                            <button onclick="enableEditing('${s.id}')"><i class="fas fa-pen"></i> Edit Row</button>
                             <button onclick="deleteRecord('${s.id}')" style="color:red;"><i class="fas fa-trash"></i> Delete</button>
                         </div>
                     </td>
@@ -462,8 +465,12 @@
             });
         }
 
-        function showSave(id) {
+        function enableEditing(id) {
+            const row = document.getElementById(`row-${id}`);
+            row.classList.add('editing');
+            row.querySelectorAll('.editable-cell').forEach(cell => cell.contentEditable = "true");
             document.getElementById(`saveIcon-${id}`).style.display = 'inline-block';
+            document.querySelectorAll('.action-menu').forEach(m => m.style.display = 'none');
         }
 
         function toggleActionMenu(e, id) {
@@ -477,7 +484,7 @@
             const { value: pass } = await Swal.fire({ title: 'Enter Passcode to Update', input: 'password', showCancelButton: true });
             if(pass !== PASSCODE) return pass && Swal.fire('Error', 'Incorrect Passcode', 'error');
 
-            const row = document.getElementById(`saveIcon-${id}`).closest('tr');
+            const row = document.getElementById(`row-${id}`);
             const updates = {};
             row.querySelectorAll('.editable-cell').forEach(cell => {
                 let val = cell.innerText.replace(/,/g, '');
@@ -486,7 +493,11 @@
             });
 
             await db.ref(`sales/${id}`).update(updates);
-            Swal.fire('Updated', 'Record saved to database', 'success');
+            Swal.fire('Updated', 'Record saved', 'success');
+            
+            // Re-lock the row
+            row.classList.remove('editing');
+            row.querySelectorAll('.editable-cell').forEach(cell => cell.contentEditable = "false");
             document.getElementById(`saveIcon-${id}`).style.display = 'none';
         }
 
