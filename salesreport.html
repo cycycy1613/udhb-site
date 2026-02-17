@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sales Report Dashboard v2.0</title>
+    <title>Daily Sales Report</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
@@ -100,7 +100,7 @@
         <div class="container header-content">
             <div class="logo">
                 <div class="logo-icon"><i class="fas fa-chart-line"></i></div>
-                <h1>Sales Tracker</h1>
+                <h1>UDHB-DSR</h1>
             </div>
             <div class="header-actions">
                 <button class="icon-btn" onclick="openModal('encodeModal')"><i class="fas fa-plus"></i> Encode</button>
@@ -133,7 +133,7 @@
 
         <div class="dashboard">
             <div class="card">
-                <div class="card-header"><span>Net Sales</span><i class="fas fa-peso-sign"></i></div>
+                <div class="card-header"><span>Net-Too Sales</span><i class="fas fa-peso-sign"></i></div>
                 <div class="card-value" id="statSales">₱0.00</div>
             </div>
             <div class="card">
@@ -166,7 +166,7 @@
         </div>
 
         <div class="inactivity-section">
-            <h3 class="leaderboard-title"><i class="fas fa-clock"></i> Inactivity Tracker (Days since last Sale)</h3>
+            <h3 class="leaderboard-title"><i class="fas fa-clock"></i> Realty Tracker (Days since last Sales)</h3>
             <div class="scroll-list" id="inactivityList">
                 </div>
         </div>
@@ -174,7 +174,7 @@
 
     <div class="modal" id="encodeModal">
         <div class="modal-content">
-            <h2 style="margin-bottom:20px; color:var(--primary-red);">Encode New Sale</h2>
+            <h2 style="margin-bottom:20px; color:var(--primary-red);">Encode New Sales</h2>
             <div class="form-group">
                 <label class="form-label">Realty Name</label>
                 <input type="text" id="inpRealty" class="form-input" list="dlRealty">
