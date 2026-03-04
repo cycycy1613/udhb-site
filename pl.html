@@ -3,11 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Building U & T PL</title>
-    <!-- Professional design system · muted elegance, refined spacing, premium data presentation -->
+    <title>DS-Pricelist: Building U & T</title>
     <style>
-        /* ---------- design system: pro, calm, executive ---------- */
+        /* ---------- design system: dark red, executive, animated ---------- */
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@350;400;450;500;600&display=swap');
+
+        :root {
+            --bg-deep: #0f0a0a;
+            --card-bg: #1a1414;
+            --accent-red: #8b0000;
+            --bright-red: #ff3131;
+            --border-color: #3d2a2a;
+            --text-main: #e2d8ce;
+            --text-muted: #968c81;
+            --glass: rgba(255, 255, 255, 0.03);
+        }
 
         * {
             margin: 0;
@@ -15,24 +25,37 @@
             box-sizing: border-box;
         }
 
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes slideIn {
+            from { width: 0; opacity: 0; }
+            to { width: 100%; opacity: 1; }
+        }
+
         body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-            background: #f5f3f0;  /* soft greige */
-            color: #2c2824;
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-deep);
+            color: var(--text-main);
             line-height: 1.5;
             padding: 40px 24px;
             font-weight: 400;
             -webkit-font-smoothing: antialiased;
+            background-image: radial-gradient(circle at 50% -20%, #4a0000 0%, #0f0a0a 70%);
+            min-height: 100vh;
         }
 
         .container {
             max-width: 1040px;
             margin: 0 auto;
-            background: #ffffff;
+            background: var(--card-bg);
             border-radius: 32px;
-            box-shadow: 0 20px 35px -8px rgba(0,0,0,0.03), 0 8px 16px -6px rgba(0,0,0,0.01);
+            box-shadow: 0 40px 100px rgba(0,0,0,0.5);
             padding: 40px 44px;
-            border: 1px solid rgba(226, 216, 206, 0.6);
+            border: 1px solid var(--border-color);
+            animation: fadeIn 0.8s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
         /* header refined */
@@ -40,27 +63,28 @@
             font-size: 1.8rem;
             font-weight: 480;
             letter-spacing: -0.03em;
-            color: #1e1b18;
+            color: #fff;
             display: flex;
             align-items: center;
-            gap: 8px;
-            border-bottom: 1px solid #eae5df;
+            gap: 12px;
+            border-bottom: 1px solid var(--border-color);
             padding-bottom: 24px;
             margin-bottom: 24px;
         }
 
         h1::before {
-            content: "■";
-            font-size: 1.6rem;
-            color: #9d8d7c;
-            font-weight: 350;
-            opacity: 0.7;
+            content: "";
+            width: 12px;
+            height: 12px;
+            background: var(--accent-red);
+            border-radius: 2px;
+            box-shadow: 0 0 15px var(--bright-red);
         }
 
         h2 {
             font-size: 1.24rem;
             font-weight: 500;
-            color: #3d3732;
+            color: #fff;
             letter-spacing: -0.01em;
             margin-bottom: 20px;
             display: flex;
@@ -68,12 +92,12 @@
         }
 
         h2 span {
-            background: #e8e2db;
+            background: #3d1a1a;
             padding: 4px 12px;
             border-radius: 40px;
             font-size: 0.8rem;
             font-weight: 520;
-            color: #5a4f47;
+            color: #ff9e9e;
             margin-left: 16px;
             letter-spacing: 0.3px;
             text-transform: uppercase;
@@ -84,206 +108,152 @@
             position: relative;
         }
 
-        section:last-of-type {
-            margin-bottom: 8px;
+        /* form controls – dark mode elevated */
+        .field-group {
+            background: rgba(255,255,255,0.02);
+            border-radius: 20px;
+            padding: 20px;
+            margin-top: 4px;
+            border: 1px solid var(--border-color);
+            transition: 0.3s ease;
         }
 
-        /* form controls – elevated, minimalist */
-        .field-group {
-            background: #fcfbf9;
-            border-radius: 20px;
-            padding: 16px 20px 20px;
-            margin-top: 4px;
-            border: 1px solid #f0eae4;
-            transition: 0.2s ease;
+        .field-group:hover {
+            border-color: #5e3a3a;
+            background: rgba(255,255,255,0.04);
         }
 
         label {
             font-size: 0.75rem;
             font-weight: 600;
             text-transform: uppercase;
-            letter-spacing: 0.1em;
-            color: #786e64;
+            letter-spacing: 0.12em;
+            color: var(--text-muted);
             display: block;
-            margin-bottom: 6px;
+            margin-bottom: 8px;
         }
 
         select {
             font-family: 'Inter', sans-serif;
             font-size: 0.95rem;
             padding: 12px 18px;
-            border-radius: 16px;
-            border: 1.5px solid #e1d9d1;
-            background: white;
+            border-radius: 12px;
+            border: 1.5px solid #4a3a3a;
+            background: #110d0d;
             width: 100%;
             max-width: 360px;
-            color: #2c2722;
+            color: #fff;
             font-weight: 420;
             appearance: none;
-            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="%236e6258" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>');
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="%238b0000" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>');
             background-repeat: no-repeat;
             background-position: right 18px center;
-            background-size: 18px;
-            transition: border 0.15s, box-shadow 0.15s;
-        }
-
-        select:hover {
-            border-color: #b9aca0;
-            background-color: #fffefe;
+            transition: all 0.2s;
         }
 
         select:focus {
             outline: none;
-            border-color: #928677;
-            box-shadow: 0 0 0 3px rgba(146, 134, 119, 0.08);
+            border-color: var(--bright-red);
+            box-shadow: 0 0 0 4px rgba(255, 49, 49, 0.15);
         }
 
-        /* primary button — subtle, confident */
+        /* primary button — glow interaction */
         button {
-            background: #ffffff;
-            border: 1.5px solid #d6cdc2;
+            background: linear-gradient(145deg, #2a1a1a, #1a1414);
+            border: 1px solid #5e3a3a;
             padding: 12px 30px;
             border-radius: 40px;
             font-size: 0.95rem;
             font-weight: 520;
-            color: #3d3730;
-            letter-spacing: 0.02em;
-            margin-top: 24px;
-            margin-bottom: 12px;
+            color: #ff9e9e;
             cursor: pointer;
-            transition: all 0.2s cubic-bezier(0.23, 1, 0.32, 1);
+            transition: all 0.3s cubic-bezier(0.23, 1, 0.32, 1);
             display: inline-flex;
             align-items: center;
             gap: 10px;
-            background: #faf8f6;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.01);
+            margin-top: 24px;
         }
 
         button:hover {
-            background: #f3efea;
-            border-color: #b7aa9c;
-            color: #1f1c18;
-            box-shadow: 0 8px 14px -10px rgba(78, 66, 56, 0.15);
+            background: var(--accent-red);
+            color: #fff;
+            border-color: var(--bright-red);
+            box-shadow: 0 0 20px rgba(139, 0, 0, 0.4);
+            transform: translateY(-2px);
         }
 
         button:active {
-            background: #eae3db;
-            border-color: #a49486;
-            transform: scale(0.98);
+            transform: scale(0.96);
         }
 
-        /* table — like a pro financial schedule */
+        /* table — animated luxury */
         table {
             width: 100%;
             border-collapse: collapse;
             margin-top: 32px;
-            border-radius: 20px;
+            border-radius: 16px;
             overflow: hidden;
             display: none;
-            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.02);
-            border: 1px solid #ece6df;
-            background: white;
-            font-size: 0.92rem;
+            border: 1px solid var(--border-color);
+            background: #140e0e;
+            animation: fadeIn 0.5s ease-out;
         }
 
         th {
-            background-color: #f4f1ed;
-            color: #4c443e;
-            font-weight: 540;
-            font-size: 0.78rem;
+            background-color: #241a1a;
+            color: #ffbaba;
+            font-weight: 600;
+            font-size: 0.72rem;
             text-transform: uppercase;
-            letter-spacing: 0.1em;
-            padding: 18px 14px;
-            border-bottom: 1px solid #e3dbd2;
+            letter-spacing: 0.12em;
+            padding: 20px 14px;
+            border-bottom: 1px solid var(--border-color);
             text-align: left;
         }
 
         td {
-            padding: 16px 14px;
-            background-color: white;
-            border-bottom: 1px solid #f0eae4;
-            color: #3c3631;
-            font-weight: 410;
+            padding: 18px 14px;
+            border-bottom: 1px solid #241a1a;
+            color: #e2d8ce;
+            font-family: 'Inter', monospace;
+            font-size: 0.95rem;
         }
 
-        tr:last-child td {
-            border-bottom: none;
+        tr:hover td {
+            background: rgba(255, 255, 255, 0.02);
+            color: #fff;
         }
 
-        /* currency styling — clean, monospace */
-        td {
-            font-family: 'Inter', 'SF Mono', 'Roboto Mono', monospace;
-            font-weight: 430;
-            letter-spacing: 0.01em;
-        }
-
-        /* subtle area hint – sqm indicator */
         .area-badge {
             display: inline-block;
-            background: #eeebe7;
-            padding: 2px 14px;
+            background: #2d1a1a;
+            padding: 4px 14px;
             border-radius: 100px;
             font-size: 0.75rem;
-            font-weight: 540;
-            color: #625a52;
-            margin-left: 12px;
-            letter-spacing: 0.4px;
+            font-weight: 600;
+            color: #ff9e9e;
+            border: 1px solid #4a2a2a;
         }
 
         .pro-note {
-            color: #968c81;
+            color: var(--text-muted);
             font-size: 0.78rem;
-            margin-top: 12px;
-            font-weight: 390;
-            border-top: 1px solid #ece7e1;
+            margin-top: 32px;
+            border-top: 1px solid var(--border-color);
             padding-top: 24px;
             display: flex;
             justify-content: space-between;
         }
 
-        /* mini table spacing */
-        .table-wrapper {
-            transition: all 0.2s;
-        }
-
-        /* price prefix ₱ */
-        .price-prefix {
-            font-weight: 450;
-        }
-
-        /* parking & unit separation fine tuning */
-        .selector-sub {
-            color: #7e7268;
-            font-size: 0.8rem;
-            margin-left: 6px;
-        }
-
-        /* modern, airy */
-        .empty-state {
-            color: #9a9086;
-            font-style: italic;
-            font-weight: 380;
-        }
-
-        /* pro micro-interaction */
-        select option {
-            padding: 10px;
-        }
-
-        /* all texts use – sqm (exact) */
-        .sqm-marker {
-            font-feature-settings: "tnum";
-        }
     </style>
 </head>
 <body>
 <div class="container">
 
-    <h1>Building U & T · PL</h1>
+    <h1>DS-Pricelist: Building U & T</h1>
 
-    <!-- =========== RESIDENTIAL =========== -->
     <section>
-        <div style="display: flex; align-items: baseline; justify-content: space-between;">
+        <div style="display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 12px;">
             <h2>Residential offerings <span>floor‑specific</span></h2>
             <span class="area-badge">– sqm indicator</span>
         </div>
@@ -307,7 +277,6 @@
             </button>
         </div>
 
-        <!-- table: AREA COLUMN REMOVED. Pro presentation: discount, dp, rf, equity, loan -->
         <div class="table-wrapper">
             <table id="unitTable">
                 <thead>
@@ -319,16 +288,13 @@
                         <th>Loan amount (₱)</th>
                     </tr>
                 </thead>
-                <tbody id="unitBody">
-                    <!-- dynamic rows -->
-                </tbody>
+                <tbody id="unitBody"></tbody>
             </table>
         </div>
     </section>
 
-    <!-- =========== PARKING =========== -->
     <section style="margin-bottom: 16px;">
-        <div style="display: flex; align-items: baseline; justify-content: space-between;">
+        <div style="display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 12px;">
             <h2>Parking allocations <span>covered & tandem</span></h2>
             <span class="area-badge">– sqm</span>
         </div>
@@ -336,15 +302,13 @@
         <div class="field-group">
             <label for="parkingType">Parking category</label>
             <select id="parkingType">
-                <!-- dynamically filled with – sqm -->
-            </select>
+                </select>
 
             <button onclick="displayParkingData()">
                 <span style="font-size: 1.2rem;">→</span> View parking figures
             </button>
         </div>
 
-        <!-- table: NO AREA COLUMN (DP, RF, equity, loan) professional -->
         <div class="table-wrapper">
             <table id="parkingTable">
                 <thead>
@@ -362,16 +326,14 @@
 
     <div class="pro-note">
         <span>◈ all figures in PHP · net effective pricing</span>
-        <span style="font-weight: 450;">– sqm suffix · area integrated</span>
+        <span style="font-weight: 450; color: #ff9e9e;">– sqm suffix · area integrated</span>
     </div>
 </div>
 
-<!-- PROFESSIONAL SCRIPT – clean, typed, precise -->
 <script>
     (function() {
         "use strict";
 
-        // ---------- RESIDENTIAL DATA – verified source [2] ----------
         const unitData = {
             "2ND FLOOR": {
                 "2BR-A": { area: "36.34", discount: "115,000.00", dp: "129,199.22", rf: "10,000.00", equity: "119,199.22", loan: "2,454,785.20" },
@@ -396,46 +358,34 @@
             }
         };
 
-        // ---------- PARKING DATA – source [4] ----------
         const parkingData = {
             "CP-SINGLE":  { area: "12.5", dp: "30,289.47", rf: "10,000.00", equity: "20,289.47", loan: "575,500.00" },
             "MP-SINGLE":  { area: "3.00", dp: "10,000.00", rf: "10,000.00", equity: "0.00", loan: "88,500.00" },
             "MP-TANDEM":  { area: "6.00", dp: "10,000.00", rf: "10,000.00", equity: "0.00", loan: "154,875.00" }
         };
 
-        // --- update residential types: "2BR-A 36.34 – sqm" (professional, clean) ---
         window.updateUnitTypes = function() {
             const floor = document.getElementById('floor').value;
             const unitSelect = document.getElementById('unitType');
             unitSelect.innerHTML = '<option value="">— select unit type —</option>';
-
             if (floor && unitData[floor]) {
                 Object.keys(unitData[floor]).forEach(type => {
                     const opt = document.createElement('option');
                     opt.value = type;
                     const areaValue = unitData[floor][type].area;
-                    // EXACT: "2BR-A 36.34 – sqm"   (en dash + sqm)
                     opt.innerHTML = `${type} ${areaValue} – sqm`;
                     unitSelect.appendChild(opt);
                 });
             }
         };
 
-        // --- display unit data – AREA COLUMN REMOVED. ₱ prefix added ---
         window.displayUnitData = function() {
             const floor = document.getElementById('floor').value;
             const type = document.getElementById('unitType').value;
             const table = document.getElementById('unitTable');
             const body = document.getElementById('unitBody');
-
-            if (!floor || !type) {
-                alert("Please select floor and unit type");
-                return;
-            }
-
-            const data = unitData[floor]?.[type];
-            if (!data) return;
-
+            if (!floor || !type) return;
+            const data = unitData[floor][type];
             body.innerHTML = `<tr>
                 <td>₱${data.discount}</td>
                 <td>₱${data.dp}</td>
@@ -446,31 +396,22 @@
             table.style.display = 'table';
         };
 
-        // --- PARKING dropdown init: "CP-SINGLE 12.5 – sqm" ---
         window.initParkingDropdown = function() {
             const parkingSelect = document.getElementById('parkingType');
             parkingSelect.innerHTML = '<option value="">— select parking type —</option>';
-
             Object.keys(parkingData).forEach(key => {
                 const opt = document.createElement('option');
                 opt.value = key;
-                const areaVal = parkingData[key].area;
-                opt.innerHTML = `${key} ${areaVal} – sqm`;
+                opt.innerHTML = `${key} ${parkingData[key].area} – sqm`;
                 parkingSelect.appendChild(opt);
             });
         };
 
-        // --- display parking data – AREA COLUMN REMOVED (DP, RF, equity, loan) ---
         window.displayParkingData = function() {
             const type = document.getElementById('parkingType').value;
             const table = document.getElementById('parkingTable');
             const body = document.getElementById('parkingBody');
-
-            if (!type) {
-                alert("Please select a parking type");
-                return;
-            }
-
+            if (!type) return;
             const data = parkingData[type];
             body.innerHTML = `<tr>
                 <td>₱${data.dp}</td>
@@ -481,18 +422,10 @@
             table.style.display = 'table';
         };
 
-        // --- initialize everything when DOM ready ---
-        window.addEventListener('DOMContentLoaded', function() {
+        window.addEventListener('DOMContentLoaded', () => {
             initParkingDropdown();
-            const floorEl = document.getElementById('floor');
-            if (floorEl.value) updateUnitTypes();
-
-            // add small visual polish: all tables hidden by default, but we keep style.
         });
     })();
 </script>
-
-<!-- subtle design: all unit displays carry exact "– sqm" — both residential and parking -->
-<!-- AREA COLUMN TOTALLY REMOVED FROM TABLES — consistent premium layout -->
 </body>
 </html>
