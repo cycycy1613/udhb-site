@@ -880,7 +880,6 @@
         </div>
     </header>
 
-    <!-- filter bar -->
     <div class="filter-bar">
         <div class="search-wrap">
             <i class="fas fa-search"></i>
@@ -898,7 +897,6 @@
         </div>
     </div>
 
-    <!-- sections -->
     <div class="section-title">
         <i class="fas fa-building" style="color:#1e5ef7;"></i> UDHB
         <span class="pill" id="udhbCount">0</span>
@@ -920,7 +918,6 @@
     <div class="section-divider" style="background:linear-gradient(90deg,#e2e1f0,transparent);"></div>
     <div class="card-grid" id="prospectGrid"></div>
 
-    <!-- detail modal -->
     <div class="modal-overlay" id="detailModal">
         <div class="modal-box">
             <button class="modal-close" onclick="closeDetailModal()"><i class="fas fa-times"></i></button>
@@ -963,7 +960,6 @@
         </div>
     </div>
 
-    <!-- encode modal -->
     <div class="modal-overlay" id="encodeModal">
         <div class="modal-box">
             <button class="modal-close" onclick="closeEncodeModal()"><i class="fas fa-times"></i></button>
@@ -1011,15 +1007,14 @@
         </div>
     </div>
 
-    <!-- confirm dialog (yes/no) -->
     <div class="modal-overlay" id="confirmModal">
         <div class="modal-box" style="max-width:420px; text-align:center;">
             <div style="font-size:40px; color:#1e5ef7; margin-bottom:8px;"><i class="fas fa-question-circle"></i></div>
             <h3 id="confirmTitle">Confirm</h3>
             <p id="confirmMessage" style="color:#5b6f88; margin:6px 0 18px;">Are you sure?</p>
             <div style="display:flex; gap:14px; justify-content:center;">
-                <button class="btn btn-outline" onclick="closeConfirm()">Cancel</button>
-                <button class="btn btn-primary" id="confirmYesBtn" onclick="executeConfirm()">Yes</button>
+                <button class="btn btn-outline" onclick="closeConfirm(false)">Cancel</button>
+                <button class="btn btn-primary" id="confirmYesBtn" onclick="closeConfirm(true)">Yes</button>
             </div>
         </div>
     </div>
@@ -1156,13 +1151,6 @@
             return d.toLocaleString('en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit' });
         }
 
-        function escapeHtml(str) {
-            if (!str) return '';
-            const div = document.createElement('div');
-            div.textContent = str;
-            return div.innerHTML;
-        }
-
         // ─── CONFIRM DIALOG ───
         function openConfirm(title, message) {
             return new Promise((resolve) => {
@@ -1170,17 +1158,15 @@
                 document.getElementById('confirmMessage').textContent = message;
                 document.getElementById('confirmModal').classList.add('active');
                 confirmResolve = resolve;
-                document.getElementById('confirmYesBtn').onclick = () => { closeConfirm();
-                    resolve(true); };
-                document.getElementById('confirmModal').querySelector('.btn-outline').onclick = () => { closeConfirm();
-                    resolve(false); };
             });
         }
 
-        function closeConfirm() {
+        function closeConfirm(value) {
             document.getElementById('confirmModal').classList.remove('active');
-            if (confirmResolve) { confirmResolve(false);
-                confirmResolve = null; }
+            if (confirmResolve) { 
+                confirmResolve(value);
+                confirmResolve = null; 
+            }
         }
 
         async function confirmAction(title, message) {
@@ -1256,12 +1242,12 @@
                     const projectLabel = item.project || '—';
                     return `<div class="buyer-card ${cls}" onclick="openDetail('${item.key}')">
                                 <span class="card-status-badge">${label}</span>
-                                <div class="card-name">${escapeHtml(item.name || 'Unnamed')}</div>
-                                <div class="card-project">${escapeHtml(projectLabel)}</div>
+                                <div class="card-name">${(item.name || 'Unnamed')}</div>
+                                <div class="card-project">${(projectLabel)}</div>
                                 <div class="card-meta">
                                     <span><i class="far fa-calendar-alt"></i> ${dateDisplay}</span>
                                     <span class="months-ago"><i class="far fa-clock"></i> ${ago}</span>
-                                    <span class="unit-slot"><i class="fas fa-hashtag"></i> ${escapeHtml(item.unitSlot || '—')}</span>
+                                    <span class="unit-slot"><i class="fas fa-hashtag"></i> ${(item.unitSlot || '—')}</span>
                                 </div>
                                 <div class="card-meta" style="margin-top:6px; font-size:13px; color:#8a9fb8;">
                                     <span><i class="fas fa-list-check"></i> ${reqCount} reqs</span>
@@ -1346,10 +1332,10 @@
                 const label = checked ? '✓ Submitted' : '✗ Lacking';
                 html += `<div class="checklist-item">
                             <input type="checkbox" ${checked ? 'checked' : ''} 
-                                   onchange="toggleRequirement('${escapeHtml(name)}', this.checked)" />
-                            <span class="req-label">${escapeHtml(name)}</span>
+                                   onchange="toggleRequirement('${name}', this.checked)" />
+                            <span class="req-label">${name}</span>
                             <span class="req-status ${cls}">${label}</span>
-                            <button class="req-del" onclick="removeRequirement('${escapeHtml(name)}')"><i class="fas fa-times"></i></button>
+                            <button class="req-del" onclick="removeRequirement('${name}')"><i class="fas fa-times"></i></button>
                         </div>`;
             }
             container.innerHTML = html;
@@ -1505,7 +1491,7 @@
             }
             container.innerHTML = encodeRequirements.map((name, i) =>
                 `<span style="background:#eef3fa; padding:3px 12px; border-radius:30px; font-size:13px; display:inline-flex; align-items:center; gap:6px;">
-                            ${escapeHtml(name)}
+                            ${name}
                             <button onclick="removeEncodeRequirement(${i})" style="background:none; border:none; color:#8a9fb8; cursor:pointer; font-size:14px;">&times;</button>
                         </span>`
             ).join('');
@@ -1519,9 +1505,11 @@
             const project = document.getElementById('encodeProject').value;
             const date = document.getElementById('encodeDate').value;
             const slot = document.getElementById('encodeSlot').value.trim();
+            
             if (!name) { toast('Enter buyer name.', 'error'); return; }
             if (!date) { toast('Select date.', 'error'); return; }
             if (!slot) { toast('Enter slot.', 'error'); return; }
+            
             const ok = await confirmAction('Save New Buyer', `Create "${name}" under ${project}?`);
             if (ok) {
                 const reqs = {};
@@ -1537,10 +1525,15 @@
                     createdAt: Date.now(),
                     updatedAt: Date.now()
                 };
-                if (!buyersRef) return;
+                if (!buyersRef) {
+                    toast('Database error. Are you logged in?', 'error');
+                    return;
+                }
                 buyersRef.push().set(data)
-                    .then(() => { toast(`"${name}" added!`, 'success');
-                        closeEncodeModal(); })
+                    .then(() => { 
+                        toast(`"${name}" added!`, 'success');
+                        closeEncodeModal(); 
+                    })
                     .catch(err => toast('Save failed: ' + err.message, 'error'));
             }
         }
@@ -1598,7 +1591,7 @@
         // ─── ESC / CLOSE ───
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape') {
-                if (document.getElementById('confirmModal').classList.contains('active')) closeConfirm();
+                if (document.getElementById('confirmModal').classList.contains('active')) closeConfirm(false);
                 else if (document.getElementById('detailModal').classList.contains('active')) closeDetailModal();
                 else if (document.getElementById('encodeModal').classList.contains('active')) closeEncodeModal();
             }
@@ -1608,7 +1601,7 @@
                 if (e.target === overlay) {
                     if (overlay.id === 'detailModal') closeDetailModal();
                     else if (overlay.id === 'encodeModal') closeEncodeModal();
-                    else if (overlay.id === 'confirmModal') closeConfirm();
+                    else if (overlay.id === 'confirmModal') closeConfirm(false);
                 }
             });
         });
