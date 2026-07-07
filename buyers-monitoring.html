@@ -4,15 +4,11 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Buyer Monitoring System</title>
-    <!-- Google Font -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet" />
-    <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
-    <!-- Firebase v9 compat -->
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js">
-    </script>
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js">
-    </script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
 
     <style>
         /* ── RESET & BASE ── */
@@ -40,6 +36,56 @@
         ::-webkit-scrollbar-thumb {
             background: #b9c4d4;
             border-radius: 8px;
+        }
+
+        /* ── AUTH CONTAINER ── */
+        .auth-overlay {
+            position: fixed;
+            inset: 0;
+            background: #f4f6fb;
+            z-index: 2000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .auth-card {
+            background: #ffffff;
+            border-radius: 24px;
+            max-width: 420px;
+            width: 100%;
+            padding: 36px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+        }
+        .auth-card h2 {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .auth-card h2 i {
+            color: #3b82f6;
+        }
+        .auth-card p {
+            color: #64748b;
+            font-size: 14px;
+            margin-bottom: 24px;
+        }
+        .auth-footer-link {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 14px;
+            color: #64748b;
+        }
+        .auth-footer-link a {
+            color: #3b82f6;
+            text-decoration: none;
+            font-weight: 600;
+        }
+        .auth-footer-link a:hover {
+            text-decoration: underline;
         }
 
         /* ── HEADER ── */
@@ -720,7 +766,46 @@
 </head>
 <body>
 
-    <!-- ═══ HEADER ═══ -->
+    <div class="auth-overlay" id="authOverlay">
+        <div class="auth-card" id="loginFormCard">
+            <h2><i class="fas fa-chart-line"></i> Buyer Monitor</h2>
+            <p>Please log in to manage your monitoring network.</p>
+            <div class="field-group">
+                <label>11-Digit Mobile Number</label>
+                <input type="text" id="loginPhone" placeholder="e.g. 09171234567" maxlength="11" inputmode="numeric" />
+            </div>
+            <div class="field-group">
+                <label>Password</label>
+                <input type="password" id="loginPassword" placeholder="••••••••" />
+            </div>
+            <button class="btn btn-primary w-full flex-center" style="margin-top: 10px;" onclick="handleLogin()">
+                <i class="fas fa-sign-in-alt"></i> Sign In
+            </button>
+            <div class="auth-footer-link">
+                Don't have an account? <a href="javascript:void(0)" onclick="toggleAuthForms(true)">Create Account</a>
+            </div>
+        </div>
+
+        <div class="auth-card hidden" id="registerFormCard">
+            <h2><i class="fas fa-user-plus"></i> Create Account</h2>
+            <p>Set up your unique dashboard database profile.</p>
+            <div class="field-group">
+                <label>11-Digit Mobile Number</label>
+                <input type="text" id="regPhone" placeholder="e.g. 09171234567" maxlength="11" inputmode="numeric" />
+            </div>
+            <div class="field-group">
+                <label>Password</label>
+                <input type="password" id="regPassword" placeholder="Minimum 6 characters" />
+            </div>
+            <button class="btn btn-primary w-full flex-center" style="margin-top: 10px;" onclick="handleRegistration()">
+                <i class="fas fa-user-check"></i> Register Account
+            </button>
+            <div class="auth-footer-link">
+                Already registered? <a href="javascript:void(0)" onclick="toggleAuthForms(false)">Sign In</a>
+            </div>
+        </div>
+    </div>
+
     <header class="app-header">
         <h1>
             <i class="fas fa-chart-line"></i>
@@ -728,13 +813,15 @@
             <span class="badge-count" id="totalBadge">0</span>
         </h1>
         <div class="header-actions">
+            <button class="btn btn-outline" onclick="handleLogout()">
+                <i class="fas fa-sign-out-alt"></i> Logout
+            </button>
             <button class="btn btn-primary" onclick="openEncodeModal()">
                 <i class="fas fa-plus-circle"></i> Add Buyer
             </button>
         </div>
     </header>
 
-    <!-- ═══ UDHB SECTION ═══ -->
     <div class="section-title">
         <i class="fas fa-building" style="color:#3b82f6;"></i> UDHB
         <span class="pill" id="udhbCount">0</span>
@@ -742,7 +829,6 @@
     <div class="section-divider"></div>
     <div class="card-grid" id="udhbGrid"></div>
 
-    <!-- ═══ BTB SECTION ═══ -->
     <div class="section-title" style="margin-top:40px;">
         <i class="fas fa-briefcase" style="color:#c62828;"></i> BTB
         <span class="pill btb-pill" id="btbCount">0</span>
@@ -750,14 +836,12 @@
     <div class="section-divider" style="background:linear-gradient(90deg,#fce4ec,transparent);"></div>
     <div class="card-grid" id="btbGrid"></div>
 
-    <!-- ═══ DETAIL MODAL ═══ -->
     <div class="modal-overlay" id="detailModal">
         <div class="modal-box">
             <button class="modal-close" onclick="closeDetailModal()"><i class="fas fa-times"></i></button>
             <h2 id="detailName">—</h2>
             <div class="subhead" id="detailSubhead">—</div>
 
-            <!-- Detail fields -->
             <div class="field-group">
                 <label>Project</label>
                 <div id="detailProject" style="font-weight:500; background:#f1f4f9; padding:6px 14px; border-radius:30px; display:inline-block;">—</div>
@@ -775,7 +859,6 @@
                 </div>
             </div>
 
-            <!-- Status -->
             <div class="field-group">
                 <label>Account Status</label>
                 <div class="status-selector" id="detailStatusSelector">
@@ -785,7 +868,6 @@
                 </div>
             </div>
 
-            <!-- Requirements Checklist -->
             <div class="field-group">
                 <label>Requirements Checklist <span class="text-muted">(checked = submitted)</span></label>
                 <div class="checklist-wrap" id="detailChecklist">
@@ -797,13 +879,11 @@
                 </div>
             </div>
 
-            <!-- Notes -->
             <div class="field-group">
                 <label>Notes</label>
                 <textarea id="detailNotes" placeholder="Add notes about this buyer…" oninput="saveNotes(this.value)"></textarea>
             </div>
 
-            <!-- Actions -->
             <div class="modal-actions">
                 <div class="left-actions">
                     <button class="btn btn-danger btn-sm" onclick="deleteCard()">
@@ -817,7 +897,6 @@
         </div>
     </div>
 
-    <!-- ═══ ENCODE MODAL ═══ -->
     <div class="modal-overlay" id="encodeModal">
         <div class="modal-box">
             <button class="modal-close" onclick="closeEncodeModal()"><i class="fas fa-times"></i></button>
@@ -869,7 +948,6 @@
         </div>
     </div>
 
-    <!-- ═══ PASSCODE MODAL ═══ -->
     <div class="modal-overlay" id="passcodeModal">
         <div class="modal-box passcode-box">
             <div class="pc-icon"><i class="fas fa-lock"></i></div>
@@ -884,12 +962,8 @@
         </div>
     </div>
 
-    <!-- ═══ TOAST ═══ -->
     <div class="toast" id="toast"></div>
 
-    <!-- ════════════════════════════════════════════════════════════════════ -->
-    <!-- ═══ FIREBASE + APP SCRIPT ═══ -->
-    <!-- ════════════════════════════════════════════════════════════════════ -->
     <script>
         // ─── FIREBASE INIT ───
         const firebaseConfig = {
@@ -903,7 +977,11 @@
         };
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
-        const buyersRef = db.ref('buyers');
+        const auth = firebase.auth();
+        
+        // Dynamic reference assigned post-authentication
+        let buyersRef = null;
+        let syncListener = null;
 
         // ─── STATE ───
         let allBuyers = {}; // key -> data
@@ -912,6 +990,95 @@
         let pendingPasscodeData = null; // data for save
         let encodeRequirements = []; // list of req names for new buyer
         let isSyncing = false;
+
+        // ─── AUTHENTICATION FLOW CODES ───
+        function toggleAuthForms(showRegister) {
+            document.getElementById('loginFormCard').classList.toggle('hidden', showRegister);
+            document.getElementById('registerFormCard').classList.toggle('hidden', !showRegister);
+        }
+
+        function validatePhone(phone) {
+            return /^\d{11}$/.test(phone);
+        }
+
+        function handleRegistration() {
+            const phone = document.getElementById('regPhone').value.trim();
+            const password = document.getElementById('regPassword').value;
+
+            if (!validatePhone(phone)) {
+                toast('Phone number must be exactly 11 digits.', 'error');
+                return;
+            }
+            if (password.length < 6) {
+                toast('Password must be at least 6 characters long.', 'error');
+                return;
+            }
+
+            // Create a pseudo-email out of the 11 digit input for authentication mapping
+            const virtualEmail = `${phone}@buyer-monitor.local`;
+
+            auth.createUserWithEmailAndPassword(virtualEmail, password)
+                .then((userCredential) => {
+                    toast('Account profile created successfully!', 'success');
+                    toggleAuthForms(false);
+                    document.getElementById('loginPhone').value = phone;
+                    document.getElementById('loginPassword').value = '';
+                })
+                .catch((error) => {
+                    toast(error.message, 'error');
+                });
+        }
+
+        function handleLogin() {
+            const phone = document.getElementById('loginPhone').value.trim();
+            const password = document.getElementById('loginPassword').value;
+
+            if (!validatePhone(phone)) {
+                toast('Please enter a valid 11-digit mobile number.', 'error');
+                return;
+            }
+            if (!password) {
+                toast('Please enter your password.', 'error');
+                return;
+            }
+
+            const virtualEmail = `${phone}@buyer-monitor.local`;
+
+            auth.signInWithEmailAndPassword(virtualEmail, password)
+                .catch((error) => {
+                    toast('Invalid credentials. Please try again.', 'error');
+                });
+        }
+
+        function handleLogout() {
+            auth.signOut().then(() => {
+                if (buyersRef && syncListener) {
+                    buyersRef.off('value', syncListener);
+                }
+                allBuyers = {};
+                renderAll();
+                document.getElementById('authOverlay').style.display = 'flex';
+                toast('Logged out safely.', 'info');
+            });
+        }
+
+        // Firebase Auth Monitor
+        auth.onAuthStateChanged((user) => {
+            if (user) {
+                document.getElementById('authOverlay').style.display = 'none';
+                
+                // Extract 11 digit identification key to isolate databases
+                const parsedUserId = user.email.split('@')[0];
+                
+                // Initialize dedicated, sandboxed route inside realtime engine
+                buyersRef = db.ref(`users/${parsedUserId}/buyers`);
+                
+                // Initialize tracking listeners
+                setupRealtimeSync();
+            } else {
+                document.getElementById('authOverlay').style.display = 'flex';
+            }
+        });
 
         // ─── HELPERS ───
         function formatDate(dateStr) {
@@ -972,8 +1139,7 @@
         function formatTimestamp(ts) {
             if (!ts) return '—';
             const d = new Date(ts);
-            return d.toLocaleString('en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: '2-digit',
-                minute: '2-digit' });
+            return d.toLocaleString('en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit' });
         }
 
         // ─── PASSCODE ───
@@ -1064,8 +1230,7 @@
                 const dateDisplay = formatDate(item.reservationDate);
                 const ago = monthsAgo(item.reservationDate);
                 const reqCount = item.requirements ? Object.keys(item.requirements).length : 0;
-                const lackCount = item.requirements ? Object.values(item.requirements).filter(v => v === false).length :
-                0;
+                const lackCount = item.requirements ? Object.values(item.requirements).filter(v => v === false).length : 0;
 
                 return `<div class="buyer-card ${cls}" onclick="openDetail('${item.key}')">
                             <span class="card-status-badge">${label}</span>
@@ -1099,8 +1264,7 @@
             const modal = document.getElementById('detailModal');
 
             document.getElementById('detailName').textContent = data.name || 'Unnamed';
-            document.getElementById('detailSubhead').textContent =
-                `Added ${formatTimestamp(data.createdAt)} · ${data.project || '—'}`;
+            document.getElementById('detailSubhead').textContent = `Added ${formatTimestamp(data.createdAt)} · ${data.project || '—'}`;
             document.getElementById('detailProject').textContent = data.project || '—';
             document.getElementById('detailDate').textContent = formatDate(data.reservationDate);
             document.getElementById('detailSlot').textContent = data.unitSlot || '—';
@@ -1118,8 +1282,7 @@
             document.getElementById('detailNotes').value = data.notes || '';
 
             // Updated at
-            document.getElementById('detailUpdatedAt').textContent =
-                data.updatedAt ? `Updated ${formatTimestamp(data.updatedAt)}` : '';
+            document.getElementById('detailUpdatedAt').textContent = data.updatedAt ? `Updated ${formatTimestamp(data.updatedAt)}` : '';
 
             modal.classList.add('active');
         }
@@ -1159,7 +1322,7 @@
 
         // ─── REQUIREMENT OPERATIONS ───
         function toggleRequirement(name, checked) {
-            if (!currentDetailId) return;
+            if (!currentDetailId || !buyersRef) return;
             const data = allBuyers[currentDetailId];
             if (!data) return;
             if (!data.requirements) data.requirements = {};
@@ -1175,7 +1338,7 @@
         }
 
         function removeRequirement(name) {
-            if (!currentDetailId) return;
+            if (!currentDetailId || !buyersRef) return;
             const data = allBuyers[currentDetailId];
             if (!data) return;
             if (!data.requirements) data.requirements = {};
@@ -1193,7 +1356,7 @@
             const input = document.getElementById('newReqInput');
             const name = input.value.trim();
             if (!name) { toast('Please enter a requirement name.', 'error'); return; }
-            if (!currentDetailId) return;
+            if (!currentDetailId || !buyersRef) return;
             const data = allBuyers[currentDetailId];
             if (!data) return;
             if (!data.requirements) data.requirements = {};
@@ -1215,8 +1378,7 @@
 
         // Enter key for add requirement
         document.getElementById('newReqInput').addEventListener('keydown', (e) => {
-            if (e.key === 'Enter') { e.preventDefault();
-                addRequirement(); }
+            if (e.key === 'Enter') { e.preventDefault(); addRequirement(); }
         });
 
         function updateLackingsDisplay() {
@@ -1226,7 +1388,7 @@
 
         // ─── STATUS ───
         function setStatus(status) {
-            if (!currentDetailId) return;
+            if (!currentDetailId || !buyersRef) return;
             const data = allBuyers[currentDetailId];
             if (!data) return;
             data.status = status;
@@ -1246,7 +1408,7 @@
         let notesTimeout = null;
 
         function saveNotes(val) {
-            if (!currentDetailId) return;
+            if (!currentDetailId || !buyersRef) return;
             clearTimeout(notesTimeout);
             notesTimeout = setTimeout(() => {
                 const data = allBuyers[currentDetailId];
@@ -1257,8 +1419,7 @@
                     notes: val,
                     updatedAt: data.updatedAt
                 }).catch(err => toast('Sync error: ' + err.message, 'error'));
-                document.getElementById('detailUpdatedAt').textContent =
-                    `Updated ${formatTimestamp(data.updatedAt)}`;
+                document.getElementById('detailUpdatedAt').textContent = `Updated ${formatTimestamp(data.updatedAt)}`;
             }, 600);
         }
 
@@ -1271,7 +1432,7 @@
         }
 
         function doDeleteCard() {
-            if (!currentDetailId) return;
+            if (!currentDetailId || !buyersRef) return;
             const key = currentDetailId;
             const name = allBuyers[key]?.name || 'Unnamed';
             buyersRef.child(key).remove()
@@ -1335,8 +1496,7 @@
 
         // Enter key for encode req input
         document.getElementById('encodeReqInput').addEventListener('keydown', (e) => {
-            if (e.key === 'Enter') { e.preventDefault();
-                addEncodeRequirement(); }
+            if (e.key === 'Enter') { e.preventDefault(); addEncodeRequirement(); }
         });
 
         // ─── SAVE NEW BUYER ───
@@ -1372,6 +1532,7 @@
         }
 
         function doSaveNewBuyer(data) {
+            if (!buyersRef) return;
             const ref = buyersRef.push();
             ref.set(data)
                 .then(() => {
@@ -1383,48 +1544,49 @@
         }
 
         // ─── REAL-TIME SYNC ───
-        buyersRef.on('value', (snapshot) => {
-            if (isSyncing) return;
-            isSyncing = true;
-            const val = snapshot.val();
-            allBuyers = val || {};
-            renderAll();
-            // If detail modal is open, refresh its content
-            if (currentDetailId && allBuyers[currentDetailId]) {
-                // Only refresh if the data changed for the current detail
-                // We'll just re-render the checklist and notes if open
-                const data = allBuyers[currentDetailId];
-                if (data) {
-                    // Update status selector
-                    const currentStatus = data.status || 'Reserved';
-                    document.querySelectorAll('#detailStatusSelector .stat-opt').forEach(el => {
-                        el.classList.toggle('active', el.dataset.status === currentStatus);
-                    });
-                    // Update checklist
-                    renderChecklist(data.requirements || {});
-                    // Update notes (but don't overwrite user input)
-                    const notesField = document.getElementById('detailNotes');
-                    if (notesField.value !== data.notes) {
-                        notesField.value = data.notes || '';
+        function setupRealtimeSync() {
+            if (!buyersRef) return;
+            
+            syncListener = buyersRef.on('value', (snapshot) => {
+                if (isSyncing) return;
+                isSyncing = true;
+                const val = snapshot.val();
+                allBuyers = val || {};
+                renderAll();
+                // If detail modal is open, refresh its content
+                if (currentDetailId && allBuyers[currentDetailId]) {
+                    // Only refresh if the data changed for the current detail
+                    const data = allBuyers[currentDetailId];
+                    if (data) {
+                        // Update status selector
+                        const currentStatus = data.status || 'Reserved';
+                        document.querySelectorAll('#detailStatusSelector .stat-opt').forEach(el => {
+                            el.classList.toggle('active', el.dataset.status === currentStatus);
+                        });
+                        // Update checklist
+                        renderChecklist(data.requirements || {});
+                        // Update notes (but don't overwrite user input)
+                        const notesField = document.getElementById('detailNotes');
+                        if (notesField.value !== data.notes) {
+                            notesField.value = data.notes || '';
+                        }
+                        // Update updatedAt
+                        document.getElementById('detailUpdatedAt').textContent = data.updatedAt ? `Updated ${formatTimestamp(data.updatedAt)}` : '';
+                        // Update name and subhead
+                        document.getElementById('detailName').textContent = data.name || 'Unnamed';
+                        document.getElementById('detailSubhead').textContent = `Added ${formatTimestamp(data.createdAt)} · ${data.project || '—'}`;
+                        document.getElementById('detailProject').textContent = data.project || '—';
+                        document.getElementById('detailDate').textContent = formatDate(data.reservationDate);
+                        document.getElementById('detailSlot').textContent = data.unitSlot || '—';
                     }
-                    // Update updatedAt
-                    document.getElementById('detailUpdatedAt').textContent =
-                        data.updatedAt ? `Updated ${formatTimestamp(data.updatedAt)}` : '';
-                    // Update name and subhead
-                    document.getElementById('detailName').textContent = data.name || 'Unnamed';
-                    document.getElementById('detailSubhead').textContent =
-                        `Added ${formatTimestamp(data.createdAt)} · ${data.project || '—'}`;
-                    document.getElementById('detailProject').textContent = data.project || '—';
-                    document.getElementById('detailDate').textContent = formatDate(data.reservationDate);
-                    document.getElementById('detailSlot').textContent = data.unitSlot || '—';
                 }
-            }
-            isSyncing = false;
-        }, (error) => {
-            console.error('Firebase sync error:', error);
-            toast('Realtime sync error. Check console.', 'error');
-            isSyncing = false;
-        });
+                isSyncing = false;
+            }, (error) => {
+                console.error('Firebase sync error:', error);
+                toast('Realtime sync error. Check console.', 'error');
+                isSyncing = false;
+            });
+        }
 
         // ─── KEYBOARD SHORTCUTS ───
         document.addEventListener('keydown', (e) => {
