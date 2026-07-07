@@ -1124,8 +1124,8 @@
 
         function getStatusClass(status, project) {
             if (project === 'Prospect') {
-                if (status === 'Approval') return 'status-prospect-in evaluation';
-                if (status === 'Reservation') return 'status-prospect-Ready for Booking';
+                if (status === 'Approval') return 'status-prospect-approval';
+                if (status === 'Reservation') return 'status-prospect-reservation';
                 if (status === 'Backed out') return 'status-prospect-backed';
                 return 'status-prospect-approval';
             }
