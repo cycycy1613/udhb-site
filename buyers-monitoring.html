@@ -891,8 +891,8 @@
             <span class="stat-filter" data-filter="Reserved" onclick="setStatusFilter('Reserved')">Reserved</span>
             <span class="stat-filter" data-filter="Approved" onclick="setStatusFilter('Approved')">Approved</span>
             <span class="stat-filter" data-filter="Declined" onclick="setStatusFilter('Declined')">Declined</span>
-            <span class="stat-filter" data-filter="Prospect Approval" onclick="setStatusFilter('Prospect Approval')">Approval</span>
-            <span class="stat-filter" data-filter="Prospect Reservation" onclick="setStatusFilter('Prospect Reservation')">Reservation</span>
+            <span class="stat-filter" data-filter="Prospect Approval" onclick="setStatusFilter('Prospect Approval')">In Evaluation</span>
+            <span class="stat-filter" data-filter="Prospect Reservation" onclick="setStatusFilter('Prospect Reservation')">Ready for Booking</span>
             <span class="stat-filter" data-filter="Backed out" onclick="setStatusFilter('Backed out')">Backed out</span>
         </div>
     </div>
@@ -1289,8 +1289,8 @@
             let statusOptions = [];
             if (isProspect) {
                 statusOptions = [
-                    { value: 'Approval', label: 'Approval', cls: 's-prospect-approval' },
-                    { value: 'Reservation', label: 'Reservation', cls: 's-prospect-reservation' },
+                    { value: 'Approval', label: 'In Evaluation', cls: 's-prospect-approval' },
+                    { value: 'Reservation', label: 'Ready for Booking', cls: 's-prospect-reservation' },
                     { value: 'Backed out', label: 'Backed out', cls: 's-prospect-backed' }
                 ];
             } else {
@@ -1559,8 +1559,8 @@
                         let opts = [];
                         if (isProspect) {
                             opts = [
-                                { value: 'Approval', label: 'Approval', cls: 's-prospect-approval' },
-                                { value: 'Reservation', label: 'Reservation', cls: 's-prospect-reservation' },
+                                { value: 'Approval', label: 'In Evaluation', cls: 's-prospect-approval' },
+                                { value: 'Reservation', label: 'Ready for Booking', cls: 's-prospect-reservation' },
                                 { value: 'Backed out', label: 'Backed out', cls: 's-prospect-backed' }
                             ];
                         } else {
