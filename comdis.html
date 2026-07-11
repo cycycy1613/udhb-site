@@ -660,6 +660,11 @@
                     <label>Parking Reservation Fee (RF)</label>
                     <input type="number" step="0.01" id="inputParkingRF" value="0.00" oninput="calculateFinancials()">
                 </div>
+                <!-- NEW: Parking Block / Bldg input -->
+                <div class="form-group">
+                    <label>Parking Block / Bldg</label>
+                    <input type="text" id="inputParkingBlock" value="B0U0" oninput="this.value = this.value.toUpperCase(); updatePreview()">
+                </div>
             </div>
 
             <div class="form-grid" style="background: #0f172a; padding: 15px; border-radius: 8px;">
@@ -818,7 +823,7 @@
                 <div class="doc-meta-grid">
                     <table class="doc-meta-table">
                         <tr><td>Project Name</td><td>:</td><td class="lblParkingProjName" style="font-weight:bold;"></td></tr>
-                        <tr><td>Block/Bldg</td><td>:</td><td class="lblParkingBlock"></td></tr>
+                        <tr><td>Block/Bldg</td><td>:</td><td id="lblParkingBlockView"></td></tr>
                         <tr style="height: 12px;"><td></td><td></td><td></td></tr>
                         <tr><td>Buyer's Name</td><td>:</td><td class="lblParkingBuyer" style="font-weight:bold;"></td></tr>
                         <tbody class="lblDynamicSlotsContainer"></tbody>
@@ -1124,6 +1129,7 @@
         function updatePreview() {
             const projName = toUpper(document.getElementById('inputProjName').value);
             const block = toUpper(document.getElementById('inputBlock').value);
+            const parkingBlock = toUpper(document.getElementById('inputParkingBlock').value);
             const buyer = toUpper(document.getElementById('inputBuyer').value);
             const financing = toUpper(document.getElementById('inputFinancing').value);
             
@@ -1137,7 +1143,7 @@
             document.getElementById('lblProjName').innerText = projName;
             document.querySelectorAll('.lblParkingProjName').forEach(el => el.innerText = projName);
             document.getElementById('lblBlock').innerText = block;
-            document.querySelectorAll('.lblParkingBlock').forEach(el => el.innerText = block);
+            document.getElementById('lblParkingBlockView').innerText = parkingBlock;
             document.getElementById('lblBuyer').innerText = buyer;
             document.querySelectorAll('.lblParkingBuyer').forEach(el => el.innerText = buyer);
             document.getElementById('lblFinancing').innerText = financing;
@@ -1229,6 +1235,7 @@
                 parkingProcCost: document.getElementById('inputParkingProcCost').value,
                 parkingCommRate: document.getElementById('inputParkingCommRate').value,
                 parkingRF: document.getElementById('inputParkingRF').value,
+                parkingBlock: document.getElementById('inputParkingBlock').value,  // added
                 shareRows: shareRows.map(r => ({ ...r })),
                 signPrep: document.getElementById('signPrep').value,
                 signNote: document.getElementById('signNote').value,
@@ -1257,6 +1264,7 @@
             document.getElementById('inputParkingProcCost').value = data.parkingProcCost || '0';
             document.getElementById('inputParkingCommRate').value = data.parkingCommRate || '0';
             document.getElementById('inputParkingRF').value = data.parkingRF || '0';
+            document.getElementById('inputParkingBlock').value = data.parkingBlock || '';
 
             shareRows = data.shareRows ? data.shareRows.map(r => ({ ...r })) : [];
             document.getElementById('signPrep').value = data.signPrep || '';
@@ -1291,6 +1299,7 @@
                 parkingProcCost: '0',
                 parkingCommRate: '0',
                 parkingRF: '0',
+                parkingBlock: '',
                 shareRows: [{ hierarchy: "Agent", name: "", percentage: 0 }],
                 signPrep: '',
                 signNote: '',
@@ -1404,6 +1413,7 @@
                     parkingProcCost: "0.00",
                     parkingCommRate: "6.50",
                     parkingRF: "0.00",
+                    parkingBlock: "PS0T",
                     shareRows: [
                         { hierarchy: "Unit Manager", name: "Type Here", percentage: 1.10 },
                         { hierarchy: "Sales Director", name: "Type Here", percentage: 0.25 },
