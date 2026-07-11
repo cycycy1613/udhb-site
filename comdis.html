@@ -180,7 +180,7 @@
             flex-wrap: wrap;
         }
 
-        .print-btn {
+        .print-btn, .pdf-btn {
             display: flex;
             align-items: center;
             gap: 8px;
@@ -193,8 +193,11 @@
             font-weight: 600;
             transition: transform 0.2s;
         }
-        .print-btn:hover {
+        .print-btn:hover, .pdf-btn:hover {
             transform: scale(1.03);
+        }
+        .pdf-btn {
+            background: #2563eb;
         }
 
         /* --- PRINT AREA --- */
@@ -203,10 +206,10 @@
             color: #000;
             padding: 20px 30px;
             font-family: Arial, Helvetica, sans-serif;
-            line-height: 1.2;          /* reduced line spacing globally */
+            line-height: 1.2;
             max-width: 100%;
             margin: 0 auto;
-            font-size: 16px;           /* increased base font size */
+            font-size: 16px;
         }
         #print-area * {
             font-size: inherit;
@@ -221,26 +224,30 @@
 
         .doc-header {
             text-align: center;
-            margin-bottom: 12px;        /* reduced bottom margin */
+            margin-bottom: 20px; /* increased space below subline */
         }
         .doc-header h1 {
             text-transform: uppercase;
             letter-spacing: 0.5px;
-            margin-bottom: 0px;          /* reduced */
+            margin-bottom: 2px;
             color: #000;
-            font-size: 20px;            /* larger */
+            font-size: 20px;
         }
         .doc-header p {
             color: #000;
             font-size: 15px;
-            margin-top: 2px;
+            margin-top: 0px;
+            margin-bottom: 0px;
+        }
+        .doc-header .subline-spacer {
+            height: 4px; /* 1 line space */
         }
 
         .doc-meta-grid {
             display: grid;
             grid-template-columns: 1.2fr 1fr;
             gap: 30px;
-            margin-bottom: 10px;         /* reduced */
+            margin-bottom: 10px;
         }
 
         .doc-meta-table {
@@ -249,7 +256,7 @@
             color: #000;
         }
         .doc-meta-table td {
-            padding: 2px 0;              /* reduced cell padding */
+            padding: 2px 0;
             vertical-align: top;
             font-size: 15px;
         }
@@ -271,7 +278,7 @@
         .doc-main-table th,
         .doc-main-table td {
             border: 1px solid #000;
-            padding: 3px 6px;            /* reduced inside margin */
+            padding: 3px 6px;
             color: #000;
             font-size: 15px;
         }
@@ -293,7 +300,7 @@
 
         .doc-footnote {
             font-style: italic;
-            margin-bottom: 15px;          /* reduced */
+            margin-bottom: 15px;
             color: #000;
             font-size: 14px;
         }
@@ -301,16 +308,16 @@
         .doc-sign-grid {
             display: grid;
             grid-template-columns: 1fr 1fr 1fr;
-            gap: 20px;                   /* reduced gap */
+            gap: 20px;
             row-gap: 25px;
-            margin-top: 15px;            /* reduced */
+            margin-top: 15px;
         }
         .sign-block {
             display: flex;
             flex-direction: column;
         }
         .sign-label {
-            margin-bottom: 10px;          /* reduced */
+            margin-bottom: 10px;
             color: #000;
             font-size: 15px;
         }
@@ -478,13 +485,17 @@
             color: #fff;
         }
 
-        /* print: half page, hide UI extras */
+        /* print: high quality, scale 70%, no blank pages, clean ink */
         @media print {
             body {
                 background: #fff;
                 color: #000;
                 padding: 0;
                 margin: 0;
+                transform: scale(0.70);
+                transform-origin: top left;
+                width: 142.857%;
+                height: 142.857%;
             }
             .form-container,
             .preview-header-bar {
@@ -496,6 +507,7 @@
                 margin: 0 auto !important;
                 width: 100% !important;
                 max-width: 100% !important;
+                border-radius: 0 !important;
             }
             #print-area {
                 display: block !important;
@@ -503,6 +515,8 @@
                 margin: 0 auto !important;
                 max-width: 100% !important;
                 font-size: 15px !important;
+                background: #fff !important;
+                color: #000 !important;
             }
             .doc-meta-grid {
                 display: flex !important;
@@ -523,6 +537,45 @@
             .doc-main-table th,
             .doc-main-table td {
                 padding: 2px 4px !important;
+            }
+            .doc-main-table thead th {
+                background-color: #fef08a !important;
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
+            .doc-main-table th,
+            .doc-main-table td {
+                border: 1px solid #000 !important;
+            }
+            .doc-main-table {
+                border-collapse: collapse !important;
+            }
+            .sign-line {
+                border-top: 1px solid #000 !important;
+            }
+            /* avoid clipping & blank pages */
+            .print-page-block {
+                page-break-after: avoid !important;
+                break-after: avoid !important;
+                page-break-inside: avoid !important;
+                break-inside: avoid !important;
+            }
+            .print-page-block:last-child {
+                page-break-after: avoid !important;
+                break-after: avoid !important;
+            }
+            /* ensure single page for UNIT or PARKING only */
+            #unitPrintBlock, #parkingPrintBlock {
+                page-break-after: avoid !important;
+                break-after: avoid !important;
+                margin: 0 !important;
+                padding: 0 !important;
+                border: none !important;
+            }
+            #parkingPrintBlock {
+                margin-top: 0 !important;
+                padding-top: 0 !important;
+                border-top: none !important;
             }
         }
     </style>
@@ -720,6 +773,10 @@
         <div class="preview-header-bar">
             <span style="font-weight: 600; color: #64748b;">Blueprint Preview</span>
             <div class="preview-controls">
+                <button class="pdf-btn" onclick="saveAsPDF()">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6z"/><path d="M14 2v6h6M12 18v-4M12 9v.01"/><path d="M9 15l3 3 3-3"/></svg>
+                    Save as PDF
+                </button>
                 <button class="print-btn" onclick="window.print()">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9V2h12v7M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
                     Print
@@ -732,6 +789,7 @@
                 <div class="doc-header">
                     <h1 id="viewHeadTitle">COMMISSION DISTRIBUTION</h1>
                     <p>Batangas Branch</p>
+                    <div class="subline-spacer"></div>
                 </div>
 
                 <div class="doc-meta-grid">
@@ -809,6 +867,7 @@
                 <div class="doc-header">
                     <h1>COMMISSION DISTRIBUTION</h1>
                     <p>Batangas Branch</p>
+                    <div class="subline-spacer"></div>
                 </div>
 
                 <div class="doc-meta-grid">
@@ -1380,6 +1439,126 @@
             const setups = JSON.parse(localStorage.getItem('commSetups') || '{}');
             if (setups[name]) {
                 loadSetup(setups[name]);
+            }
+        }
+
+        // ----- SAVE AS PDF (html2canvas + jsPDF) -----
+        function saveAsPDF() {
+            // show a small loading indicator
+            const btn = document.querySelector('.pdf-btn');
+            const origText = btn.innerHTML;
+            btn.innerHTML = '⏳ Generating...';
+            btn.disabled = true;
+
+            // dynamically load html2canvas and jsPDF
+            if (typeof html2canvas === 'undefined') {
+                const script = document.createElement('script');
+                script.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js';
+                script.onload = function() {
+                    if (typeof jspdf === 'undefined') {
+                        const script2 = document.createElement('script');
+                        script2.src = 'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js';
+                        script2.onload = function() { captureAndDownload(); };
+                        document.head.appendChild(script2);
+                    } else {
+                        captureAndDownload();
+                    }
+                };
+                document.head.appendChild(script);
+            } else if (typeof jspdf === 'undefined') {
+                const script2 = document.createElement('script');
+                script2.src = 'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js';
+                script2.onload = function() { captureAndDownload(); };
+                document.head.appendChild(script2);
+            } else {
+                captureAndDownload();
+            }
+
+            function captureAndDownload() {
+                const printArea = document.getElementById('print-area');
+                // Determine which blocks are visible
+                const unitBlock = document.getElementById('unitPrintBlock');
+                const parkingBlock = document.getElementById('parkingPrintBlock');
+                const focusType = document.getElementById('inputFocusType').value;
+
+                // Temporarily show both if BOTH, else only the visible one
+                const unitDisplay = unitBlock.style.display;
+                const parkingDisplay = parkingBlock.style.display;
+                if (focusType === 'BOTH') {
+                    unitBlock.style.display = 'block';
+                    parkingBlock.style.display = 'block';
+                    parkingBlock.style.marginTop = '30px';
+                    parkingBlock.style.borderTop = '2px dashed #ccc';
+                    parkingBlock.style.paddingTop = '30px';
+                } else if (focusType === 'UNIT') {
+                    unitBlock.style.display = 'block';
+                    parkingBlock.style.display = 'none';
+                } else {
+                    unitBlock.style.display = 'none';
+                    parkingBlock.style.display = 'block';
+                    parkingBlock.style.marginTop = '0px';
+                    parkingBlock.style.borderTop = 'none';
+                    parkingBlock.style.paddingTop = '0px';
+                }
+
+                // Temporarily remove scale for capture (we want full resolution)
+                const originalTransform = printArea.style.transform;
+                const originalWidth = printArea.style.width;
+                printArea.style.transform = 'scale(1)';
+                printArea.style.width = '100%';
+
+                html2canvas(printArea, {
+                    scale: 2, // high quality
+                    useCORS: true,
+                    backgroundColor: '#ffffff',
+                    logging: false,
+                    width: printArea.scrollWidth,
+                    height: printArea.scrollHeight,
+                    windowWidth: printArea.scrollWidth,
+                    windowHeight: printArea.scrollHeight
+                }).then(canvas => {
+                    // Restore original styles
+                    printArea.style.transform = originalTransform;
+                    printArea.style.width = originalWidth;
+                    unitBlock.style.display = unitDisplay;
+                    parkingBlock.style.display = parkingDisplay;
+
+                    const imgData = canvas.toDataURL('image/png');
+                    const { jsPDF } = window.jspdf;
+                    // Calculate dimensions: use A4 ratio, fit to page
+                    const pdfWidth = 210; // mm
+                    const pdfHeight = (canvas.height / canvas.width) * pdfWidth;
+                    const pdf = new jsPDF('p', 'mm', 'a4');
+                    // If height exceeds one page, split into multiple pages
+                    const maxHeight = 297; // A4 height in mm
+                    if (pdfHeight <= maxHeight) {
+                        pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+                    } else {
+                        // split into pages
+                        const totalPages = Math.ceil(pdfHeight / maxHeight);
+                        for (let i = 0; i < totalPages; i++) {
+                            const yOffset = i * maxHeight;
+                            const pageCanvas = document.createElement('canvas');
+                            pageCanvas.width = canvas.width;
+                            pageCanvas.height = canvas.height / totalPages;
+                            const ctx = pageCanvas.getContext('2d');
+                            ctx.drawImage(canvas, 0, -yOffset * (canvas.height / totalPages), canvas.width, canvas.height);
+                            const pageImg = pageCanvas.toDataURL('image/png');
+                            if (i > 0) pdf.addPage();
+                            pdf.addImage(pageImg, 'PNG', 0, 0, pdfWidth, maxHeight);
+                        }
+                    }
+                    pdf.save('commission_distribution.pdf');
+
+                    // Reset button
+                    btn.innerHTML = origText;
+                    btn.disabled = false;
+                }).catch(err => {
+                    console.error(err);
+                    alert('Error generating PDF. Please try again.');
+                    btn.innerHTML = origText;
+                    btn.disabled = false;
+                });
             }
         }
     </script>
