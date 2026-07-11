@@ -217,14 +217,16 @@
 
         .print-page-block {
             page-break-after: always;
+            break-after: page;
         }
         .print-page-block:last-child {
             page-break-after: avoid;
+            break-after: avoid;
         }
 
         .doc-header {
             text-align: center;
-            margin-bottom: 20px; /* increased space below subline */
+            margin-bottom: 20px;
         }
         .doc-header h1 {
             text-transform: uppercase;
@@ -240,7 +242,7 @@
             margin-bottom: 0px;
         }
         .doc-header .subline-spacer {
-            height: 4px; /* 1 line space */
+            height: 4px;
         }
 
         .doc-meta-grid {
@@ -553,10 +555,9 @@
             .sign-line {
                 border-top: 1px solid #000 !important;
             }
-            /* avoid clipping & blank pages */
             .print-page-block {
-                page-break-after: avoid !important;
-                break-after: avoid !important;
+                page-break-after: always !important;
+                break-after: page !important;
                 page-break-inside: avoid !important;
                 break-inside: avoid !important;
             }
@@ -564,10 +565,9 @@
                 page-break-after: avoid !important;
                 break-after: avoid !important;
             }
-            /* ensure single page for UNIT or PARKING only */
             #unitPrintBlock, #parkingPrintBlock {
-                page-break-after: avoid !important;
-                break-after: avoid !important;
+                page-break-after: always !important;
+                break-after: page !important;
                 margin: 0 !important;
                 padding: 0 !important;
                 border: none !important;
@@ -1442,15 +1442,13 @@
             }
         }
 
-        // ----- SAVE AS PDF (html2canvas + jsPDF) -----
+        // ----- SAVE AS PDF (html2canvas + jsPDF) - Improved: no blank pages, content at top -----
         function saveAsPDF() {
-            // show a small loading indicator
             const btn = document.querySelector('.pdf-btn');
             const origText = btn.innerHTML;
             btn.innerHTML = '⏳ Generating...';
             btn.disabled = true;
 
-            // dynamically load html2canvas and jsPDF
             if (typeof html2canvas === 'undefined') {
                 const script = document.createElement('script');
                 script.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js';
@@ -1475,21 +1473,24 @@
             }
 
             function captureAndDownload() {
-                const printArea = document.getElementById('print-area');
-                // Determine which blocks are visible
+                const focusType = document.getElementById('inputFocusType').value;
                 const unitBlock = document.getElementById('unitPrintBlock');
                 const parkingBlock = document.getElementById('parkingPrintBlock');
-                const focusType = document.getElementById('inputFocusType').value;
 
-                // Temporarily show both if BOTH, else only the visible one
+                // Store original display values
                 const unitDisplay = unitBlock.style.display;
                 const parkingDisplay = parkingBlock.style.display;
+                const parkingMargin = parkingBlock.style.marginTop;
+                const parkingBorder = parkingBlock.style.borderTop;
+                const parkingPadding = parkingBlock.style.paddingTop;
+
+                // Prepare for capture: show only relevant blocks
                 if (focusType === 'BOTH') {
                     unitBlock.style.display = 'block';
                     parkingBlock.style.display = 'block';
-                    parkingBlock.style.marginTop = '30px';
-                    parkingBlock.style.borderTop = '2px dashed #ccc';
-                    parkingBlock.style.paddingTop = '30px';
+                    parkingBlock.style.marginTop = '0px';
+                    parkingBlock.style.borderTop = 'none';
+                    parkingBlock.style.paddingTop = '0px';
                 } else if (focusType === 'UNIT') {
                     unitBlock.style.display = 'block';
                     parkingBlock.style.display = 'none';
@@ -1501,14 +1502,15 @@
                     parkingBlock.style.paddingTop = '0px';
                 }
 
-                // Temporarily remove scale for capture (we want full resolution)
+                const printArea = document.getElementById('print-area');
                 const originalTransform = printArea.style.transform;
                 const originalWidth = printArea.style.width;
                 printArea.style.transform = 'scale(1)';
                 printArea.style.width = '100%';
 
+                // Use a higher scale for quality, but keep content at top
                 html2canvas(printArea, {
-                    scale: 2, // high quality
+                    scale: 3,
                     useCORS: true,
                     backgroundColor: '#ffffff',
                     logging: false,
@@ -1522,37 +1524,51 @@
                     printArea.style.width = originalWidth;
                     unitBlock.style.display = unitDisplay;
                     parkingBlock.style.display = parkingDisplay;
+                    parkingBlock.style.marginTop = parkingMargin;
+                    parkingBlock.style.borderTop = parkingBorder;
+                    parkingBlock.style.paddingTop = parkingPadding;
 
                     const imgData = canvas.toDataURL('image/png');
                     const { jsPDF } = window.jspdf;
-                    // Calculate dimensions: use A4 ratio, fit to page
-                    const pdfWidth = 210; // mm
-                    const pdfHeight = (canvas.height / canvas.width) * pdfWidth;
-                    const pdf = new jsPDF('p', 'mm', 'a4');
-                    // If height exceeds one page, split into multiple pages
+                    const pdfWidth = 210; // A4 width in mm
                     const maxHeight = 297; // A4 height in mm
-                    if (pdfHeight <= maxHeight) {
-                        pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
-                    } else {
-                        // split into pages
-                        const totalPages = Math.ceil(pdfHeight / maxHeight);
-                        for (let i = 0; i < totalPages; i++) {
-                            const yOffset = i * maxHeight;
-                            const pageCanvas = document.createElement('canvas');
-                            pageCanvas.width = canvas.width;
-                            pageCanvas.height = canvas.height / totalPages;
-                            const ctx = pageCanvas.getContext('2d');
-                            ctx.drawImage(canvas, 0, -yOffset * (canvas.height / totalPages), canvas.width, canvas.height);
-                            const pageImg = pageCanvas.toDataURL('image/png');
-                            if (i > 0) pdf.addPage();
-                            pdf.addImage(pageImg, 'PNG', 0, 0, pdfWidth, maxHeight);
-                        }
-                    }
-                    pdf.save('commission_distribution.pdf');
 
-                    // Reset button
-                    btn.innerHTML = origText;
-                    btn.disabled = false;
+                    const pdf = new jsPDF('p', 'mm', 'a4');
+
+                    if (focusType === 'BOTH') {
+                        // Capture each block separately for clean page breaks
+                        const captureBlock = (block, pageIndex, totalPages, callback) => {
+                            html2canvas(block, {
+                                scale: 3,
+                                useCORS: true,
+                                backgroundColor: '#ffffff',
+                                logging: false,
+                            }).then(bCanvas => {
+                                const bImg = bCanvas.toDataURL('image/png');
+                                const bHeight = (bCanvas.height / bCanvas.width) * pdfWidth;
+                                // Add page for second block
+                                if (pageIndex > 0) pdf.addPage();
+                                // Place at top (y=0)
+                                pdf.addImage(bImg, 'PNG', 0, 0, pdfWidth, bHeight);
+                                callback();
+                            });
+                        };
+
+                        captureBlock(unitBlock, 0, 2, () => {
+                            captureBlock(parkingBlock, 1, 2, () => {
+                                pdf.save('commission_distribution.pdf');
+                                btn.innerHTML = origText;
+                                btn.disabled = false;
+                            });
+                        });
+                    } else {
+                        // Single block: place at top (y=0)
+                        const imgHeight = (canvas.height / canvas.width) * pdfWidth;
+                        pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, imgHeight);
+                        pdf.save('commission_distribution.pdf');
+                        btn.innerHTML = origText;
+                        btn.disabled = false;
+                    }
                 }).catch(err => {
                     console.error(err);
                     alert('Error generating PDF. Please try again.');
