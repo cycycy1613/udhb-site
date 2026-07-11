@@ -6,14 +6,18 @@
     <title>Commission Distribution System</title>
     <style>
         :root {
-            --primary: #2563eb;
-            --primary-hover: #1d4ed8;
-            --bg-main: #f8fafc;
-            --bg-card: #ffffff;
-            --text-main: #1e293b;
-            --text-muted: #64748b;
-            --border: #e2e8f0;
+            --primary: #3b82f6;
+            --primary-hover: #2563eb;
+            --bg-main: #0f172a;
+            --bg-card: #1e293b;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --border: #334155;
             --accent: #10b981;
+            --danger: #ef4444;
+            --danger-hover: #dc2626;
+            --input-bg: #1e293b;
+            --input-border: #475569;
         }
 
         * {
@@ -35,12 +39,11 @@
         .form-container {
             background: var(--bg-card);
             border-radius: 12px;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -1px rgba(0, 0, 0, 0.2);
             padding: 30px;
             max-width: 1100px;
             margin: 0 auto;
             width: 100%;
-            animation: slideUp 0.5s ease-out;
         }
 
         h2.section-title {
@@ -73,9 +76,11 @@
         input,
         select {
             padding: 10px;
-            border: 1px solid var(--border);
+            background-color: #0f172a;
+            border: 1px solid var(--input-border);
             border-radius: 6px;
             font-size: 0.95rem;
+            color: var(--text-main);
             transition: all 0.3s ease;
         }
 
@@ -83,12 +88,13 @@
         select:focus {
             outline: none;
             border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.25);
         }
 
         input:disabled {
-            background-color: #f1f5f9;
+            background-color: #334155;
             color: var(--text-muted);
+            border-color: var(--border);
         }
 
         .dynamic-list {
@@ -100,7 +106,6 @@
         .dynamic-item {
             display: flex;
             gap: 8px;
-            animation: fadeIn 0.3s ease-in;
         }
 
         button.btn-small {
@@ -119,10 +124,10 @@
             background: var(--primary-hover);
         }
         button.btn-danger {
-            background: #ef4444;
+            background: var(--danger);
         }
         button.btn-danger:hover {
-            background: #dc2626;
+            background: var(--danger-hover);
         }
 
         .table-editor-wrap {
@@ -140,7 +145,8 @@
             text-align: left;
         }
         .editor-table th {
-            background: #f8fafc;
+            background: #0f172a;
+            color: var(--text-muted);
             font-size: 0.85rem;
         }
 
@@ -149,8 +155,9 @@
             margin: 0 auto;
             width: 100%;
             background: #fff;
+            color: #000;
             border-radius: 12px;
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
             padding: 20px;
             position: relative;
         }
@@ -161,7 +168,34 @@
             align-items: center;
             margin-bottom: 15px;
             padding-bottom: 10px;
-            border-bottom: 1px dashed var(--border);
+            border-bottom: 1px dashed #e2e8f0;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .preview-controls {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+        .font-size-control {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .font-size-control label {
+            color: #334155;
+            font-weight: 600;
+            font-size: 0.85rem;
+        }
+        .font-size-control input {
+            width: 70px;
+            padding: 4px 8px;
+            border: 1px solid #cbd5e1;
+            border-radius: 4px;
+            background: #fff;
+            color: #000;
         }
 
         .print-btn {
@@ -187,11 +221,19 @@
             color: #000;
             padding: 20px 30px;
             font-family: Arial, Helvetica, sans-serif;
-            font-size: 13px;
             line-height: 1.4;
-            /* half‑page simulation for print preview */
             max-width: 100%;
             margin: 0 auto;
+        }
+        #print-area * {
+            font-size: inherit;
+        }
+
+        .print-page-block {
+            page-break-after: always;
+        }
+        .print-page-block:last-child {
+            page-break-after: avoid;
         }
 
         .doc-header {
@@ -199,13 +241,13 @@
             margin-bottom: 20px;
         }
         .doc-header h1 {
-            font-size: 16px;
             text-transform: uppercase;
             letter-spacing: 0.5px;
             margin-bottom: 2px;
+            color: #000;
         }
         .doc-header p {
-            font-size: 14px;
+            color: #000;
         }
 
         .doc-meta-grid {
@@ -218,6 +260,7 @@
         .doc-meta-table {
             width: 100%;
             border-collapse: collapse;
+            color: #000;
         }
         .doc-meta-table td {
             padding: 3px 0;
@@ -236,23 +279,24 @@
             border-collapse: collapse;
             margin-top: 15px;
             margin-bottom: 8px;
+            color: #000;
         }
         .doc-main-table th,
         .doc-main-table td {
             border: 1px solid #000;
             padding: 5px 8px;
-            font-size: 12px;
+            color: #000;
         }
         .doc-main-table th {
             font-weight: normal;
             text-align: center;
         }
 
-        /* YELLOW highlight on header cells (not rows) */
         .doc-main-table thead th {
             background-color: #fef08a !important;
             -webkit-print-color-adjust: exact;
             print-color-adjust: exact;
+            color: #000;
         }
 
         .doc-main-table tr.total-row td {
@@ -261,8 +305,8 @@
 
         .doc-footnote {
             font-style: italic;
-            font-size: 11px;
             margin-bottom: 30px;
+            color: #000;
         }
 
         .doc-sign-grid {
@@ -277,79 +321,169 @@
             flex-direction: column;
         }
         .sign-label {
-            font-size: 12px;
             margin-bottom: 20px;
+            color: #000;
         }
         .sign-line {
             border-top: 1px solid #000;
             text-align: center;
             padding-top: 3px;
             font-weight: bold;
-            font-size: 12px;
             text-transform: uppercase;
+            min-height: 15px;
+            color: #000;
         }
         .sign-title {
             text-align: center;
-            font-size: 11px;
             color: #333;
             text-transform: none;
             font-weight: normal;
             margin-top: 2px;
         }
 
-        /* --- SAVE / TAB FEATURE --- */
-        .tab-save-bar {
+        /* --- TEMPLATE FEATURE DESIGN --- */
+        .template-bar {
             display: flex;
             flex-wrap: wrap;
             align-items: center;
-            gap: 12px;
-            margin-bottom: 20px;
-            background: #f1f5f9;
-            padding: 10px 16px;
-            border-radius: 40px;
+            gap: 16px;
+            background: var(--bg-card);
+            padding: 16px 20px;
+            border-radius: 10px;
+            border: 1px solid var(--border);
         }
-        .tab-save-bar .tab-group {
+        .template-title-wrap {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-weight: 600;
+            color: var(--text-main);
+        }
+        .template-group {
             display: flex;
             flex-wrap: wrap;
-            gap: 6px;
+            gap: 8px;
         }
-        .tab-btn {
-            background: transparent;
-            border: 1px solid var(--border);
-            border-radius: 30px;
-            padding: 4px 16px;
-            font-size: 0.85rem;
-            cursor: pointer;
-            transition: 0.2s;
+        .template-tab-wrapper {
+            display: inline-flex;
+            align-items: center;
+            background: #0f172a;
+            border-radius: 20px;
+            padding: 2px 4px 2px 12px;
+            border: 1px solid transparent;
+            transition: all 0.2s;
         }
-        .tab-btn.active {
-            background: var(--primary);
-            color: white;
+        .template-tab-wrapper.active {
+            background: #1e3a8a;
             border-color: var(--primary);
         }
-        .tab-btn:hover {
-            background: var(--primary-hover);
-            color: white;
-        }
-        .save-icon-btn {
-            background: var(--accent);
-            border: none;
-            border-radius: 30px;
-            padding: 6px 18px;
-            color: white;
+        .template-tab-wrapper.active .template-btn {
+            color: #93c5fd;
             font-weight: 600;
+        }
+        .template-btn {
+            background: transparent;
+            border: none;
+            font-size: 0.85rem;
+            cursor: pointer;
+            color: var(--text-main);
+            padding: 4px 4px 4px 0;
+        }
+        .template-del-btn {
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            color: var(--text-muted);
+            padding: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+        }
+        .template-del-btn:hover {
+            color: var(--danger);
+            background: rgba(239, 68, 68, 0.2);
+        }
+        .add-template-btn {
+            background: var(--primary);
+            border: none;
+            border-radius: 50%;
+            width: 36px;
+            height: 36px;
+            color: white;
+            font-size: 1.4rem;
+            font-weight: 300;
             cursor: pointer;
             display: inline-flex;
             align-items: center;
-            gap: 6px;
+            justify-content: center;
+            box-shadow: 0 2px 4px rgba(59, 130, 246, 0.3);
+            transition: transform 0.2s;
         }
-        .save-icon-btn:hover {
-            opacity: 0.85;
+        .add-template-btn:hover {
+            transform: scale(1.05);
+            opacity: 0.9;
         }
         .disclaimer {
-            font-size: 0.7rem;
+            font-size: 0.75rem;
             color: var(--text-muted);
             margin-left: auto;
+        }
+
+        .hidden-config {
+            display: none;
+        }
+
+        /* modal */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 999;
+        }
+        .modal-box {
+            background: var(--bg-card);
+            padding: 30px 35px;
+            border-radius: 16px;
+            max-width: 450px;
+            width: 100%;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+        }
+        .modal-box h3 {
+            color: var(--text-main);
+            margin-bottom: 12px;
+        }
+        .modal-box input {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0 20px;
+            background: #0f172a;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            color: #fff;
+        }
+        .modal-actions {
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+        }
+        .modal-actions button {
+            padding: 8px 24px;
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        .modal-actions .btn-confirm {
+            background: var(--accent);
+            color: #fff;
+        }
+        .modal-actions .btn-cancel {
+            background: #475569;
+            color: #fff;
         }
 
         /* print: half page, hide UI extras */
@@ -361,8 +495,7 @@
                 margin: 0;
             }
             .form-container,
-            .preview-header-bar,
-            .tab-save-bar {
+            .preview-header-bar {
                 display: none !important;
             }
             .preview-wrapper {
@@ -377,9 +510,6 @@
                 padding: 16px 20px !important;
                 margin: 0 auto !important;
                 max-width: 100% !important;
-                /* half page simulation: reduce height and content spacing */
-                page-break-after: avoid;
-                page-break-inside: avoid;
             }
             .doc-meta-grid {
                 display: flex !important;
@@ -397,49 +527,43 @@
             .sign-block {
                 width: 30% !important;
             }
-            /* enforce half page roughly */
-            .preview-wrapper {
-                height: 50vh !important;
-                overflow: hidden !important;
-            }
-            #print-area {
-                height: auto !important;
-                max-height: 50vh !important;
-                overflow: visible !important;
-            }
         }
     </style>
 </head>
 <body>
 
-    <!-- ========== TAB SAVE BAR ========== -->
-    <div class="form-container" style="padding-bottom: 10px;">
-        <div class="tab-save-bar">
-            <span style="font-weight:600; font-size:0.9rem;">📁 Setups</span>
-            <div class="tab-group" id="tabContainer">
-                <button class="tab-btn active" data-tab="default">Default</button>
+    <div class="form-container" style="padding: 10px; background: transparent; box-shadow: none;">
+        <div class="template-bar">
+            <div class="template-title-wrap">📑 Templates</div>
+            <div class="template-group" id="tabContainer">
+                <div class="template-tab-wrapper active" data-tab="default">
+                    <button class="template-btn" onclick="switchTab('default')">Default</button>
+                </div>
             </div>
-            <button class="save-icon-btn" onclick="saveCurrentSetup()">💾 Save as new</button>
-            <span class="disclaimer">⚠️ Data stored in your browser (localStorage). Do not clear site data.</span>
+            <button class="add-template-btn" onclick="createBlankTemplate()" title="Create new blank template">+</button>
+            <span class="disclaimer">⚠️ Templates stored in your local browser storage.</span>
         </div>
     </div>
 
-    <!-- ========== MAIN FORM ========== -->
     <div class="form-container" id="mainFormContainer">
         <h2 class="section-title">Commission Distribution Setup</h2>
 
         <div class="form-grid">
             <div class="form-group">
+                <label>Setup Focus Type</label>
+                <select id="inputFocusType" onchange="toggleFocusType(); calculateFinancials();">
+                    <option value="UNIT" selected>Unit Only</option>
+                    <option value="PARKING">Parking Only</option>
+                    <option value="BOTH">Both (Unit & Parking)</option>
+                </select>
+            </div>
+            <div class="form-group">
                 <label>Project Name</label>
-                <input type="text" id="inputProjName" value="UDH BATANGAS" oninput="updatePreview()">
+                <input type="text" id="inputProjName" value="UDH BATANGAS" oninput="this.value = this.value.toUpperCase(); updatePreview()">
             </div>
             <div class="form-group">
                 <label>Block / Bldg</label>
-                <input type="text" id="inputBlock" value="B0U0" oninput="updatePreview()">
-            </div>
-            <div class="form-group">
-                <label>Unit / Parking Description</label>
-                <input type="text" id="inputUnit" value="2044" oninput="updatePreview()">
+                <input type="text" id="inputBlock" value="B0U0" oninput="this.value = this.value.toUpperCase(); updatePreview()">
             </div>
             <div class="form-group">
                 <label>Financing Selection</label>
@@ -458,7 +582,7 @@
         <div class="form-grid">
             <div class="form-group">
                 <label>Buyer's Name</label>
-                <input type="text" id="inputBuyer" value="MONTILLA, APRIL JOHN PITPITAN" oninput="updatePreview()">
+                <input type="text" id="inputBuyer" value="MONTILLA, APRIL JOHN PITPITAN" oninput="this.value = this.value.toUpperCase(); updatePreview()">
             </div>
             <div class="form-group">
                 <label>Co-Borrower Slots</label>
@@ -472,37 +596,85 @@
             </div>
         </div>
 
-        <div class="form-grid">
-            <div class="form-group">
-                <label>Contract Price</label>
-                <input type="number" step="0.01" id="inputContractPrice" value="2339420.00" oninput="calculateFinancials()">
+        <div id="unitFinancialsSection">
+            <h3 style="font-size: 1rem; color: var(--text-muted); margin-bottom: 12px; font-weight: 600;">[Unit Financial Parameters]</h3>
+            <div class="form-grid">
+                <div class="form-group">
+                    <label>Unit Description</label>
+                    <input type="text" id="inputUnit" value="2044" oninput="this.value = this.value.toUpperCase(); updatePreview()">
+                </div>
+                <div class="form-group">
+                    <label>Contract Price</label>
+                    <input type="number" step="0.01" id="inputContractPrice" value="2339420.00" oninput="calculateFinancials()">
+                </div>
+                <div class="form-group">
+                    <label>Processing Cost 1</label>
+                    <input type="number" step="0.01" id="inputProcCost" value="0.00" oninput="calculateFinancials()">
+                </div>
+                <div class="form-group">
+                    <label>Commission Rate (%)</label>
+                    <input type="number" step="0.01" id="inputCommRate" value="6.50" oninput="calculateFinancials()">
+                </div>
+                <div class="form-group">
+                    <label>Reservation Fee (RF)</label>
+                    <input type="number" step="0.01" id="inputRF" value="10000.00" oninput="calculateFinancials()">
+                </div>
             </div>
-            <div class="form-group">
-                <label>Processing Cost 1</label>
-                <input type="number" step="0.01" id="inputProcCost" value="0.00" oninput="calculateFinancials()">
-            </div>
-            <div class="form-group">
-                <label>Commission Rate (%)</label>
-                <input type="number" step="0.01" id="inputCommRate" value="6.50" oninput="calculateFinancials()">
-            </div>
-            <div class="form-group">
-                <label>Reservation Fee (RF)</label>
-                <input type="number" step="0.01" id="inputRF" value="10000.00" oninput="calculateFinancials()">
+
+            <div class="form-grid" style="background: #0f172a; padding: 15px; border-radius: 8px;">
+                <div class="form-group">
+                    <label>Total Unit Comm. Amnt (Auto)</label>
+                    <input type="text" id="inputTotalCommAmnt" disabled>
+                </div>
+                <div class="form-group">
+                    <label>Total Unit Comm. Payable (Auto)</label>
+                    <input type="text" id="inputTotalCommPayable" disabled>
+                </div>
+                <div class="form-group">
+                    <label>80% of Unit RF (Auto Base)</label>
+                    <input type="text" id="input80RF" disabled>
+                </div>
             </div>
         </div>
 
-        <div class="form-grid" style="background: #f8fafc; padding: 15px; border-radius: 8px;">
-            <div class="form-group">
-                <label>Total Commissionable Amnt (Auto)</label>
-                <input type="text" id="inputTotalCommAmnt" disabled>
+        <div id="parkingFinancialsSection" class="hidden-config">
+            <h3 style="font-size: 1rem; color: var(--text-muted); margin-bottom: 12px; font-weight: 600;">[Parking Financial Parameters]</h3>
+            <div class="form-grid">
+                <div class="form-group">
+                    <label>Parking Description</label>
+                    <input type="text" id="inputParkingDesc" value="P-SLOT 01" oninput="this.value = this.value.toUpperCase(); updatePreview()">
+                </div>
+                <div class="form-group">
+                    <label>Parking Contract Price</label>
+                    <input type="number" step="0.01" id="inputParkingContractPrice" value="0.00" oninput="calculateFinancials()">
+                </div>
+                <div class="form-group">
+                    <label>Parking Processing Cost</label>
+                    <input type="number" step="0.01" id="inputParkingProcCost" value="0.00" oninput="calculateFinancials()">
+                </div>
+                <div class="form-group">
+                    <label>Parking Commission Rate (%)</label>
+                    <input type="number" step="0.01" id="inputParkingCommRate" value="6.50" oninput="calculateFinancials()">
+                </div>
+                <div class="form-group">
+                    <label>Parking Reservation Fee (RF)</label>
+                    <input type="number" step="0.01" id="inputParkingRF" value="0.00" oninput="calculateFinancials()">
+                </div>
             </div>
-            <div class="form-group">
-                <label>Total Commission Payable (Auto)</label>
-                <input type="text" id="inputTotalCommPayable" disabled>
-            </div>
-            <div class="form-group">
-                <label>80% of RF (Auto Base For Add. Comm)</label>
-                <input type="text" id="input80RF" disabled>
+
+            <div class="form-grid" style="background: #0f172a; padding: 15px; border-radius: 8px;">
+                <div class="form-group">
+                    <label>Total Parking Comm. Amnt (Auto)</label>
+                    <input type="text" id="inputParkingTotalCommAmnt" disabled>
+                </div>
+                <div class="form-group">
+                    <label>Total Parking Comm. Payable (Auto)</label>
+                    <input type="text" id="inputParkingTotalCommPayable" disabled>
+                </div>
+                <div class="form-group">
+                    <label>80% of Parking RF (Auto Base)</label>
+                    <input type="text" id="inputParking80RF" disabled>
+                </div>
             </div>
         </div>
 
@@ -527,106 +699,197 @@
         <div class="form-grid">
             <div class="form-group">
                 <label>Prepared By (Marketing Secretary)</label>
-                <input type="text" id="signPrep" value="CYRON MATHEW PANGANIBAN" oninput="updatePreview()">
+                <input type="text" id="signPrep" value="CYRON MATHEW PANGANIBAN" oninput="this.value = this.value.toUpperCase(); updatePreview()">
             </div>
             <div class="form-group">
                 <label>Noted By (Unit Manager)</label>
-                <input type="text" id="signNote" value="DECA GOLD REALTY & DEVELOPMENT INC." oninput="updatePreview()">
+                <input type="text" id="signNote" value="DECA GOLD REALTY & DEVELOPMENT INC." oninput="this.value = this.value.toUpperCase(); updatePreview()">
             </div>
             <div class="form-group">
                 <label>Approved By (Decagold)</label>
-                <input type="text" id="signAppr" value="JHOVIE B. LAHER" oninput="updatePreview()">
+                <input type="text" id="signAppr" value="JHOVIE B. LAHER" oninput="this.value = this.value.toUpperCase(); updatePreview()">
             </div>
+        </div>
+        <!-- save button placed here -->
+        <div style="display: flex; justify-content: flex-end; margin-top: 12px;">
+            <button class="print-btn" style="background: var(--primary);" onclick="saveCurrentSetup()">💾 Save as Template</button>
         </div>
     </div>
 
-    <!-- ========== PREVIEW ========== -->
     <div class="preview-wrapper">
         <div class="preview-header-bar">
-            <span style="font-weight: 600; color: var(--text-muted);">Voucher Blueprint Preview</span>
-            <button class="print-btn" onclick="window.print()">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9V2h12v7M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
-                Print Voucher
-            </button>
+            <span style="font-weight: 600; color: #64748b;">Voucher Blueprint Preview</span>
+            <div class="preview-controls">
+                <div class="font-size-control">
+                    <label for="fontSizeSlider">Font Size:</label>
+                    <input type="number" id="fontSizeSlider" min="8" max="24" value="13" step="0.5" oninput="adjustPreviewFontSize(this.value)">
+                </div>
+                <button class="print-btn" onclick="window.print()">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9V2h12v7M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
+                    Print Voucher
+                </button>
+            </div>
         </div>
 
         <div id="print-area">
-            <div class="doc-header">
-                <h1 id="viewHeadTitle">COMMISSION DISTRIBUTION</h1>
-                <p id="viewTagline">Batangas Branch</p>
+            <div class="print-page-block" id="unitPrintBlock">
+                <div class="doc-header">
+                    <h1 id="viewHeadTitle">COMMISSION DISTRIBUTION</h1>
+                    <p>Batangas Branch</p>
+                </div>
+
+                <div class="doc-meta-grid">
+                    <table class="doc-meta-table">
+                        <tr><td>Project Name</td><td>:</td><td id="lblProjName" style="font-weight:bold;"></td></tr>
+                        <tr><td>Block/Bldg</td><td>:</td><td id="lblBlock"></td></tr>
+                        <tr style="height: 12px;"><td></td><td></td><td></td></tr>
+                        <tr><td>Buyer's Name</td><td>:</td><td id="lblBuyer" style="font-weight:bold;"></td></tr>
+                        <tbody class="lblDynamicSlotsContainer"></tbody>
+                    </table>
+
+                    <table class="doc-meta-table">
+                        <tr><td>Reservation Date</td><td>:</td><td id="lblDate"></td></tr>
+                        <tr><td>UNIT</td><td>:</td><td id="lblUnit"></td></tr>
+                        <tr><td id="lblFinancing" style="font-weight: bold; text-transform: uppercase;">BANK</td><td></td><td></td></tr>
+                        <tr><td>Contract Price</td><td>:</td><td id="lblContractPrice" style="text-align: right; padding-right:20px;"></td></tr>
+                        <tr><td>Processing Cost1</td><td>:</td><td id="lblProcCost" style="text-align: right; padding-right:20px;"></td></tr>
+                        <tr><td>Total Commissionable Amnt.</td><td>:</td><td id="lblTotalCommAmnt" style="text-align: right; padding-right:20px; font-weight:bold;"></td></tr>
+                        <tr><td>Total Commission Payable..</td><td>:</td><td id="lblTotalCommPayable" style="text-align: right; padding-right:20px;"></td></tr>
+                        <tr><td>Commission Rate</td><td>:</td><td id="lblCommRate" style="text-align: right; padding-right:20px;"></td></tr>
+                    </table>
+                </div>
+
+                <table class="doc-main-table">
+                    <thead>
+                        <tr>
+                            <th style="width: 25%;">Hierarchy</th>
+                            <th style="width: 45%;">Name</th>
+                            <th style="width: 15%;">Percentage Sharing</th>
+                            <th style="width: 15%;">Add. Comm.</th>
+                        </tr>
+                    </thead>
+                    <tbody id="viewTableBody">
+                    </tbody>
+                    <tfoot>
+                        <tr class="total-row">
+                            <td colspan="2" style="text-align: right; font-style: italic; font-weight: normal;">*Total Percentage Sharing</td>
+                            <td id="lblTotalPercent" style="text-align: right;">0.00%</td>
+                            <td id="lblTotalAddComm" style="text-align: right;">0.00</td>
+                        </tr>
+                    </tfoot>
+                </table>
+                <div class="doc-footnote">*Must be equal to the Commission Rate</div>
+
+                <div class="doc-sign-grid">
+                    <div class="sign-block">
+                        <span class="sign-label">Prepared by:</span>
+                        <div class="sign-line lblSignPrep"></div>
+                        <div class="sign-title">Marketing Secretary</div>
+                    </div>
+                    <div class="sign-block">
+                        <span class="sign-label">Noted by:</span>
+                        <div class="sign-line lblSignNote"></div>
+                        <div class="sign-title">Unit Manager</div>
+                    </div>
+                    <div class="sign-block">
+                        <span class="sign-label">Approved by:</span>
+                        <div class="sign-line lblSignAppr"></div>
+                        <div class="sign-title">DECAGOLD</div>
+                    </div>
+                    <div class="sign-block">
+                        <span class="sign-label">Checked by:</span>
+                        <div class="sign-line">&nbsp;</div>
+                        <div class="sign-title">Sendout Coordinator</div>
+                    </div>
+                    <div class="sign-block">
+                        <span class="sign-label">Verified by:</span>
+                        <div class="sign-line">&nbsp;</div>
+                        <div class="sign-title">Sendout Manager</div>
+                    </div>
+                </div>
             </div>
 
-            <div class="doc-meta-grid">
-                <table class="doc-meta-table">
-                    <tr><td>Project Name</td><td>:</td><td id="lblProjName" style="font-weight:bold;"></td></tr>
-                    <tr><td>Block/Bldg</td><td>:</td><td id="lblBlock"></td></tr>
-                    <tr style="height: 12px;"><td></td><td></td><td></td></tr>
-                    <tr><td>Buyer's Name</td><td>:</td><td id="lblBuyer" style="font-weight:bold;"></td></tr>
-                    <tbody id="lblDynamicSlotsContainer"></tbody>
+            <div class="print-page-block" id="parkingPrintBlock" style="margin-top: 40px; border-top: 2px dashed #ccc; padding-top: 40px;">
+                <div class="doc-header">
+                    <h1>COMMISSION DISTRIBUTION (PARKING)</h1>
+                    <p>Batangas Branch</p>
+                </div>
+
+                <div class="doc-meta-grid">
+                    <table class="doc-meta-table">
+                        <tr><td>Project Name</td><td>:</td><td class="lblParkingProjName" style="font-weight:bold;"></td></tr>
+                        <tr><td>Block/Bldg</td><td>:</td><td class="lblParkingBlock"></td></tr>
+                        <tr style="height: 12px;"><td></td><td></td><td></td></tr>
+                        <tr><td>Buyer's Name</td><td>:</td><td class="lblParkingBuyer" style="font-weight:bold;"></td></tr>
+                        <tbody class="lblDynamicSlotsContainer"></tbody>
+                    </table>
+
+                    <table class="doc-meta-table">
+                        <tr><td>Reservation Date</td><td>:</td><td class="lblParkingDate"></td></tr>
+                        <tr><td>PARKING</td><td>:</td><td id="lblParkingDescView"></td></tr>
+                        <tr><td class="lblParkingFinancing" style="font-weight: bold; text-transform: uppercase;">BANK</td><td></td><td></td></tr>
+                        <tr><td>Contract Price</td><td>:</td><td id="lblParkingContractPriceView" style="text-align: right; padding-right:20px;"></td></tr>
+                        <tr><td>Processing Cost1</td><td>:</td><td id="lblParkingProcCostView" style="text-align: right; padding-right:20px;"></td></tr>
+                        <tr><td>Total Commissionable Amnt.</td><td>:</td><td id="lblParkingTotalCommAmntView" style="text-align: right; padding-right:20px; font-weight:bold;"></td></tr>
+                        <tr><td>Total Commission Payable..</td><td>:</td><td id="lblParkingTotalCommPayableView" style="text-align: right; padding-right:20px;"></td></tr>
+                        <tr><td>Commission Rate</td><td>:</td><td id="lblParkingCommRateView" style="text-align: right; padding-right:20px;"></td></tr>
+                    </table>
+                </div>
+
+                <table class="doc-main-table">
+                    <thead>
+                        <tr>
+                            <th style="width: 25%;">Hierarchy</th>
+                            <th style="width: 45%;">Name</th>
+                            <th style="width: 15%;">Percentage Sharing</th>
+                            <th style="width: 15%;">Add. Comm.</th>
+                        </tr>
+                    </thead>
+                    <tbody id="viewParkingTableBody">
+                    </tbody>
+                    <tfoot>
+                        <tr class="total-row">
+                            <td colspan="2" style="text-align: right; font-style: italic; font-weight: normal;">*Total Percentage Sharing</td>
+                            <td id="lblParkingTotalPercent" style="text-align: right;">0.00%</td>
+                            <td id="lblParkingTotalAddComm" style="text-align: right;">0.00</td>
+                        </tr>
+                    </tfoot>
                 </table>
+                <div class="doc-footnote">*Must be equal to the Commission Rate</div>
 
-                <table class="doc-meta-table">
-                    <tr><td>Reservation Date</td><td>:</td><td id="lblDate"></td></tr>
-                    <tr><td>UNIT/PARKING</td><td>:</td><td id="lblUnit"></td></tr>
-                    <tr><td id="lblFinancing" style="font-weight: bold; text-transform: uppercase;">BANK</td><td></td><td></td></tr>
-                    <tr><td>Contract Price</td><td>:</td><td id="lblContractPrice" style="text-align: right; padding-right:20px;"></td></tr>
-                    <tr><td>Processing Cost1</td><td>:</td><td id="lblProcCost" style="text-align: right; padding-right:20px;"></td></tr>
-                    <tr><td>Total Commissionable Amnt.</td><td>:</td><td id="lblTotalCommAmnt" style="text-align: right; padding-right:20px; font-weight:bold;"></td></tr>
-                    <tr><td>Total Commission Payable..</td><td>:</td><td id="lblTotalCommPayable" style="text-align: right; padding-right:20px;"></td></tr>
-                    <tr><td>Commission Rate</td><td>:</td><td id="lblCommRate" style="text-align: right; padding-right:20px;"></td></tr>
-                </table>
-            </div>
-
-            <table class="doc-main-table">
-                <thead>
-                    <tr>
-                        <th style="width: 25%;">Hierarchy</th>
-                        <th style="width: 45%;">Name</th>
-                        <th style="width: 15%;">Percentage Sharing</th>
-                        <th style="width: 15%;">Add. Comm.</th>
-                    </tr>
-                </thead>
-                <tbody id="viewTableBody">
-                </tbody>
-                <tfoot>
-                    <tr class="total-row">
-                        <td colspan="2" style="text-align: right; font-style: italic; font-weight: normal;">*Total Percentage Sharing</td>
-                        <td id="lblTotalPercent" style="text-align: right;">0.00%</td>
-                        <td id="lblTotalAddComm" style="text-align: right;">0.00</td>
-                    </tr>
-                </tfoot>
-            </table>
-            <div class="doc-footnote">*Must be equal to the Commission Rate</div>
-
-            <div class="doc-sign-grid">
-                <div class="sign-block">
-                    <span class="sign-label">Prepared by:</span>
-                    <div class="sign-line" id="lblSignPrep"></div>
-                    <div class="sign-title">Marketing Secretary</div>
-                </div>
-                <div class="sign-block">
-                    <span class="sign-label">Noted by:</span>
-                    <div class="sign-line" id="lblSignNote"></div>
-                    <div class="sign-title">Unit Manager</div>
-                </div>
-                <div class="sign-block">
-                    <span class="sign-label">Approved by:</span>
-                    <div class="sign-line" id="lblSignAppr"></div>
-                    <div class="sign-title">DECAGOLD</div>
-                </div>
-                <div class="sign-block">
-                    <span class="sign-label">Checked by:</span>
-                    <div class="sign-line">&nbsp;</div>
-                    <div class="sign-title">Sendout Coordinator</div>
-                </div>
-                <div class="sign-block">
-                    <span class="sign-label">Verified by:</span>
-                    <div class="sign-line">&nbsp;</div>
-                    <div class="sign-title">Sendout Manager</div>
+                <div class="doc-sign-grid">
+                    <div class="sign-block">
+                        <span class="sign-label">Prepared by:</span>
+                        <div class="sign-line lblSignPrep"></div>
+                        <div class="sign-title">Marketing Secretary</div>
+                    </div>
+                    <div class="sign-block">
+                        <span class="sign-label">Noted by:</span>
+                        <div class="sign-line lblSignNote"></div>
+                        <div class="sign-title">Unit Manager</div>
+                    </div>
+                    <div class="sign-block">
+                        <span class="sign-label">Approved by:</span>
+                        <div class="sign-line lblSignAppr"></div>
+                        <div class="sign-title">DECAGOLD</div>
+                    </div>
+                    <div class="sign-block">
+                        <span class="sign-label">Checked by:</span>
+                        <div class="sign-line">&nbsp;</div>
+                        <div class="sign-title">Sendout Coordinator</div>
+                    </div>
+                    <div class="sign-block">
+                        <span class="sign-label">Verified by:</span>
+                        <div class="sign-line">&nbsp;</div>
+                        <div class="sign-title">Sendout Manager</div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
+
+    <!-- modal container -->
+    <div id="modalContainer"></div>
 
     <script>
         // ----- DATA -----
@@ -652,9 +915,14 @@
             renderCoBorrowers();
             renderCoOwners();
             renderEditorTable();
+            toggleFocusType();
             calculateFinancials();
             loadTabList();
-            // no auto‑fill values (removed)
+            // default preview: unit visible, parking hidden
+            document.getElementById('unitPrintBlock').style.display = 'block';
+            document.getElementById('parkingPrintBlock').style.display = 'none';
+            // set initial font size
+            adjustPreviewFontSize(13);
         };
 
         // ----- HELPERS -----
@@ -666,6 +934,38 @@
             return (str || '').toUpperCase();
         }
 
+        function toggleFocusType() {
+            const type = document.getElementById('inputFocusType').value;
+            const unitSection = document.getElementById('unitFinancialsSection');
+            const parkingSection = document.getElementById('parkingFinancialsSection');
+            
+            const unitPrint = document.getElementById('unitPrintBlock');
+            const parkingPrint = document.getElementById('parkingPrintBlock');
+
+            if (type === 'UNIT') {
+                unitSection.classList.remove('hidden-config');
+                parkingSection.classList.add('hidden-config');
+                unitPrint.style.display = 'block';
+                parkingPrint.style.display = 'none';
+            } else if (type === 'PARKING') {
+                unitSection.classList.add('hidden-config');
+                parkingSection.classList.remove('hidden-config');
+                unitPrint.style.display = 'none';
+                parkingPrint.style.display = 'block';
+                parkingPrint.style.marginTop = '0px';
+                parkingPrint.style.borderTop = 'none';
+                parkingPrint.style.paddingTop = '0px';
+            } else {
+                unitSection.classList.remove('hidden-config');
+                parkingSection.classList.remove('hidden-config');
+                unitPrint.style.display = 'block';
+                parkingPrint.style.display = 'block';
+                parkingPrint.style.marginTop = '40px';
+                parkingPrint.style.borderTop = '2px dashed #ccc';
+                parkingPrint.style.paddingTop = '40px';
+            }
+        }
+
         // ----- CO-BORROWER / CO-OWNER -----
         function renderCoBorrowers() {
             const container = document.getElementById('coBorrowerContainer');
@@ -673,7 +973,7 @@
             coBorrowers.forEach((val, index) => {
                 container.innerHTML += `
                     <div class="dynamic-item">
-                        <input type="text" placeholder="Co-Borrower ${index + 1}" value="${val}" oninput="coBorrowers[${index}]=this.value; updatePreview();">
+                        <input type="text" placeholder="Co-Borrower ${index + 1}" value="${val}" oninput="coBorrowers[${index}]=this.value.toUpperCase(); this.value=this.value.toUpperCase(); updatePreview();">
                         <button class="btn-small btn-danger" onclick="removeCoBorrower(${index})">X</button>
                     </div>`;
             });
@@ -688,7 +988,7 @@
             coOwners.forEach((val, index) => {
                 container.innerHTML += `
                     <div class="dynamic-item">
-                        <input type="text" placeholder="Co-Owner ${index + 1}" value="${val}" oninput="coOwners[${index}]=this.value; updatePreview();">
+                        <input type="text" placeholder="Co-Owner ${index + 1}" value="${val}" oninput="coOwners[${index}]=this.value.toUpperCase(); this.value=this.value.toUpperCase(); updatePreview();">
                         <button class="btn-small btn-danger" onclick="removeCoOwner(${index})">X</button>
                     </div>`;
             });
@@ -708,7 +1008,7 @@
                 tbody.innerHTML += `
                     <tr>
                         <td><select onchange="shareRows[${index}].hierarchy=this.value; updatePreview();">${optionsHtml}</select></td>
-                        <td><input type="text" value="${row.name}" style="width:100%;" oninput="shareRows[${index}].name=this.value; updatePreview();"></td>
+                        <td><input type="text" value="${row.name}" style="width:100%;" oninput="shareRows[${index}].name=this.value.toUpperCase(); this.value=this.value.toUpperCase(); updatePreview();"></td>
                         <td><input type="number" step="0.01" value="${row.percentage}" style="width:100px;" oninput="shareRows[${index}].percentage=parseFloat(this.value)||0; calculateFinancials();"></td>
                         <td><button class="btn-small btn-danger" onclick="removeHierarchyRow(${index})">Delete</button></td>
                     </tr>`;
@@ -727,6 +1027,10 @@
 
         // ----- CALCULATE & PREVIEW -----
         function calculateFinancials() {
+            let accumulatedPercent = 0;
+            shareRows.forEach(row => { accumulatedPercent += row.percentage; });
+
+            // 1. Unit Calculations
             const cp = parseFloat(document.getElementById('inputContractPrice').value) || 0;
             const pc = parseFloat(document.getElementById('inputProcCost').value) || 0;
             const rate = parseFloat(document.getElementById('inputCommRate').value) || 0;
@@ -749,9 +1053,6 @@
             const viewTbody = document.getElementById('viewTableBody');
             viewTbody.innerHTML = '';
 
-            let accumulatedPercent = 0;
-            shareRows.forEach(row => { accumulatedPercent += row.percentage; });
-
             let accumulatedAddComm = 0;
             shareRows.forEach(row => {
                 const addCommShare = accumulatedPercent > 0 ? (rf80Base * (row.percentage / accumulatedPercent)) : 0;
@@ -770,70 +1071,164 @@
             } else {
                 viewTbody.innerHTML += `<tr><td>&nbsp;</td><td></td><td></td><td style="text-align: right;">0.00</td></tr>`;
             }
-
             document.getElementById('lblTotalPercent').innerText = accumulatedPercent.toFixed(2) + "%";
             document.getElementById('lblTotalAddComm').innerText = formatCurrency(accumulatedAddComm);
+
+            // 2. Parking Calculations
+            const pCp = parseFloat(document.getElementById('inputParkingContractPrice').value) || 0;
+            const pPc = parseFloat(document.getElementById('inputParkingProcCost').value) || 0;
+            const pRate = parseFloat(document.getElementById('inputParkingCommRate').value) || 0;
+            const pRf = parseFloat(document.getElementById('inputParkingRF').value) || 0;
+
+            const pTotalCommAmnt = pCp + pPc;
+            const pTotalPayable = (pTotalCommAmnt * (pRate / 100)) + pPc;
+            const pRf80Base = pRf * 0.80;
+
+            document.getElementById('inputParkingTotalCommAmnt').value = formatCurrency(pTotalCommAmnt);
+            document.getElementById('inputParkingTotalCommPayable').value = formatCurrency(pTotalPayable);
+            document.getElementById('inputParking80RF').value = formatCurrency(pRf80Base);
+
+            document.getElementById('lblParkingContractPriceView').innerText = formatCurrency(pCp);
+            document.getElementById('lblParkingProcCostView').innerText = formatCurrency(pPc);
+            document.getElementById('lblParkingTotalCommAmntView').innerText = formatCurrency(pTotalCommAmnt);
+            document.getElementById('lblParkingTotalCommPayableView').innerText = formatCurrency(pTotalPayable);
+            document.getElementById('lblParkingCommRateView').innerText = pRate.toFixed(2) + "%";
+
+            const viewParkingTbody = document.getElementById('viewParkingTableBody');
+            viewParkingTbody.innerHTML = '';
+
+            let accumulatedParkingAddComm = 0;
+            shareRows.forEach(row => {
+                const pAddCommShare = accumulatedPercent > 0 ? (pRf80Base * (row.percentage / accumulatedPercent)) : 0;
+                accumulatedParkingAddComm += pAddCommShare;
+                viewParkingTbody.innerHTML += `
+                    <tr>
+                        <td>${row.hierarchy}</td>
+                        <td>${row.name}</td>
+                        <td style="text-align: right;">${row.percentage.toFixed(2)}%</td>
+                        <td style="text-align: right;">${formatCurrency(pAddCommShare)}</td>
+                    </tr>`;
+            });
+
+            if (shareRows.length === 0) {
+                viewParkingTbody.innerHTML = `<tr><td colspan="4" style="text-align:center; color:#999;">No parameters specified.</td></tr>`;
+            } else {
+                viewParkingTbody.innerHTML += `<tr><td>&nbsp;</td><td></td><td></td><td style="text-align: right;">0.00</td></tr>`;
+            }
+            document.getElementById('lblParkingTotalPercent').innerText = accumulatedPercent.toFixed(2) + "%";
+            document.getElementById('lblParkingTotalAddComm').innerText = formatCurrency(accumulatedParkingAddComm);
 
             updatePreview();
         }
 
         function updatePreview() {
-            // auto uppercase on preview
-            document.getElementById('lblProjName').innerText = toUpper(document.getElementById('inputProjName').value);
-            document.getElementById('lblBlock').innerText = toUpper(document.getElementById('inputBlock').value);
-            document.getElementById('lblUnit').innerText = toUpper(document.getElementById('inputUnit').value);
-            document.getElementById('lblBuyer').innerText = toUpper(document.getElementById('inputBuyer').value);
-
-            const fin = document.getElementById('inputFinancing').value;
-            document.getElementById('lblFinancing').innerText = toUpper(fin);
-
+            const projName = toUpper(document.getElementById('inputProjName').value);
+            const block = toUpper(document.getElementById('inputBlock').value);
+            const buyer = toUpper(document.getElementById('inputBuyer').value);
+            const financing = toUpper(document.getElementById('inputFinancing').value);
+            
             const rawDate = document.getElementById('inputReservationDate').value;
+            let formattedDate = "N/A";
             if (rawDate) {
-                const dateObj = new Date(rawDate);
-                document.getElementById('lblDate').innerText = dateObj.toLocaleDateString('en-US');
-            } else {
-                document.getElementById('lblDate').innerText = "N/A";
+                formattedDate = new Date(rawDate).toLocaleDateString('en-US');
             }
 
-            // slots
-            const slotsContainer = document.getElementById('lblDynamicSlotsContainer');
-            slotsContainer.innerHTML = '';
-            if (coBorrowers.length === 0) {
-                slotsContainer.innerHTML += `<tr><td>Co-Borrower</td><td>:</td><td>N/A</td></tr>`;
-            } else {
-                coBorrowers.forEach((val, idx) => {
-                    slotsContainer.innerHTML += `<tr><td>Co-Borrower ${idx + 1}</td><td>:</td><td>${toUpper(val.trim()) || "N/A"}</td></tr>`;
-                });
-            }
-            if (coOwners.length === 0) {
-                slotsContainer.innerHTML += `<tr><td>Co-Owner</td><td>:</td><td>N/A</td></tr>`;
-            } else {
-                coOwners.forEach((val, idx) => {
-                    slotsContainer.innerHTML += `<tr><td>Co-Owner ${idx + 1}</td><td>:</td><td>${toUpper(val.trim()) || "N/A"}</td></tr>`;
-                });
-            }
+            // Sync shared outputs
+            document.getElementById('lblProjName').innerText = projName;
+            document.querySelectorAll('.lblParkingProjName').forEach(el => el.innerText = projName);
+            document.getElementById('lblBlock').innerText = block;
+            document.querySelectorAll('.lblParkingBlock').forEach(el => el.innerText = block);
+            document.getElementById('lblBuyer').innerText = buyer;
+            document.querySelectorAll('.lblParkingBuyer').forEach(el => el.innerText = buyer);
+            document.getElementById('lblFinancing').innerText = financing;
+            document.querySelectorAll('.lblParkingFinancing').forEach(el => el.innerText = financing);
+            document.getElementById('lblDate').innerText = formattedDate;
+            document.querySelectorAll('.lblParkingDate').forEach(el => el.innerText = formattedDate);
 
-            // signatories
-            document.getElementById('lblSignPrep').innerText = toUpper(document.getElementById('signPrep').value) || " ";
-            document.getElementById('lblSignNote').innerText = toUpper(document.getElementById('signNote').value) || " ";
-            document.getElementById('lblSignAppr').innerText = toUpper(document.getElementById('signAppr').value) || " ";
+            document.getElementById('lblUnit').innerText = toUpper(document.getElementById('inputUnit').value);
+            document.getElementById('lblParkingDescView').innerText = toUpper(document.getElementById('inputParkingDesc').value);
+
+            // Dynamic slots syncing
+            const slotContainers = document.querySelectorAll('.lblDynamicSlotsContainer');
+            slotContainers.forEach(container => {
+                container.innerHTML = '';
+                if (coBorrowers.length === 0) {
+                    container.innerHTML += `<tr><td>Co-Borrower</td><td>:</td><td>N/A</td></tr>`;
+                } else {
+                    coBorrowers.forEach((val, idx) => {
+                        container.innerHTML += `<tr><td>Co-Borrower ${idx + 1}</td><td>:</td><td>${toUpper(val.trim()) || "N/A"}</td></tr>`;
+                    });
+                }
+                if (coOwners.length === 0) {
+                    container.innerHTML += `<tr><td>Co-Owner</td><td>:</td><td>N/A</td></tr>`;
+                } else {
+                    coOwners.forEach((val, idx) => {
+                        container.innerHTML += `<tr><td>Co-Owner ${idx + 1}</td><td>:</td><td>${toUpper(val.trim()) || "N/A"}</td></tr>`;
+                    });
+                }
+            });
+
+            // Signatories sharing
+            const prepText = toUpper(document.getElementById('signPrep').value) || " ";
+            const noteText = toUpper(document.getElementById('signNote').value) || " ";
+            const apprText = toUpper(document.getElementById('signAppr').value) || " ";
+
+            document.querySelectorAll('.lblSignPrep').forEach(el => el.innerText = prepText);
+            document.querySelectorAll('.lblSignNote').forEach(el => el.innerText = noteText);
+            document.querySelectorAll('.lblSignAppr').forEach(el => el.innerText = apprText);
         }
 
-        // ----- TAB / SAVE FEATURE (localStorage) -----
+        // ----- FONT SIZE ADJUSTMENT -----
+        function adjustPreviewFontSize(val) {
+            const area = document.getElementById('print-area');
+            const size = parseFloat(val) || 13;
+            area.style.fontSize = size + 'px';
+            // update all child elements to inherit
+            area.querySelectorAll('*').forEach(el => {
+                el.style.fontSize = 'inherit';
+            });
+            // but we want table headers and cells to be slightly smaller
+            area.querySelectorAll('.doc-main-table th, .doc-main-table td').forEach(el => {
+                el.style.fontSize = Math.max(8, size - 1) + 'px';
+            });
+            area.querySelectorAll('.doc-meta-table td').forEach(el => {
+                el.style.fontSize = Math.max(8, size) + 'px';
+            });
+            area.querySelectorAll('.doc-footnote').forEach(el => {
+                el.style.fontSize = Math.max(8, size - 2) + 'px';
+            });
+            area.querySelectorAll('.sign-label, .sign-line, .sign-title').forEach(el => {
+                el.style.fontSize = Math.max(8, size - 1) + 'px';
+            });
+            area.querySelectorAll('.doc-header h1').forEach(el => {
+                el.style.fontSize = Math.max(10, size + 3) + 'px';
+            });
+            area.querySelectorAll('.doc-header p').forEach(el => {
+                el.style.fontSize = Math.max(9, size + 1) + 'px';
+            });
+        }
+
+        // ----- TEMPLATE STORAGE FEATURE (localStorage) -----
         function getCurrentSetup() {
             return {
+                focusType: document.getElementById('inputFocusType').value,
                 projName: document.getElementById('inputProjName').value,
                 block: document.getElementById('inputBlock').value,
-                unit: document.getElementById('inputUnit').value,
                 financing: document.getElementById('inputFinancing').value,
                 reservationDate: document.getElementById('inputReservationDate').value,
                 buyer: document.getElementById('inputBuyer').value,
                 coBorrowers: [...coBorrowers],
                 coOwners: [...coOwners],
+                unit: document.getElementById('inputUnit').value,
                 contractPrice: document.getElementById('inputContractPrice').value,
                 procCost: document.getElementById('inputProcCost').value,
                 commRate: document.getElementById('inputCommRate').value,
                 rf: document.getElementById('inputRF').value,
+                parkingDesc: document.getElementById('inputParkingDesc').value,
+                parkingContractPrice: document.getElementById('inputParkingContractPrice').value,
+                parkingProcCost: document.getElementById('inputParkingProcCost').value,
+                parkingCommRate: document.getElementById('inputParkingCommRate').value,
+                parkingRF: document.getElementById('inputParkingRF').value,
                 shareRows: shareRows.map(r => ({ ...r })),
                 signPrep: document.getElementById('signPrep').value,
                 signNote: document.getElementById('signNote').value,
@@ -842,18 +1237,27 @@
         }
 
         function loadSetup(data) {
+            document.getElementById('inputFocusType').value = data.focusType || 'UNIT';
             document.getElementById('inputProjName').value = data.projName || '';
             document.getElementById('inputBlock').value = data.block || '';
-            document.getElementById('inputUnit').value = data.unit || '';
             document.getElementById('inputFinancing').value = data.financing || 'BANK';
             document.getElementById('inputReservationDate').value = data.reservationDate || '';
             document.getElementById('inputBuyer').value = data.buyer || '';
             coBorrowers = data.coBorrowers ? [...data.coBorrowers] : [];
             coOwners = data.coOwners ? [...data.coOwners] : [];
+            
+            document.getElementById('inputUnit').value = data.unit || '';
             document.getElementById('inputContractPrice').value = data.contractPrice || '0';
             document.getElementById('inputProcCost').value = data.procCost || '0';
             document.getElementById('inputCommRate').value = data.commRate || '0';
             document.getElementById('inputRF').value = data.rf || '0';
+
+            document.getElementById('inputParkingDesc').value = data.parkingDesc || '';
+            document.getElementById('inputParkingContractPrice').value = data.parkingContractPrice || '0';
+            document.getElementById('inputParkingProcCost').value = data.parkingProcCost || '0';
+            document.getElementById('inputParkingCommRate').value = data.parkingCommRate || '0';
+            document.getElementById('inputParkingRF').value = data.parkingRF || '0';
+
             shareRows = data.shareRows ? data.shareRows.map(r => ({ ...r })) : [];
             document.getElementById('signPrep').value = data.signPrep || '';
             document.getElementById('signNote').value = data.signNote || '';
@@ -862,58 +1266,144 @@
             renderCoBorrowers();
             renderCoOwners();
             renderEditorTable();
+            toggleFocusType();
             calculateFinancials();
-            updatePreview();
         }
 
-        function saveCurrentSetup() {
-            const name = prompt("Enter a name for this setup:", "Setup " + (new Date().toLocaleDateString()));
+        // blank template: clear all fields
+        function getBlankSetup() {
+            return {
+                focusType: 'UNIT',
+                projName: '',
+                block: '',
+                financing: 'BANK',
+                reservationDate: '',
+                buyer: '',
+                coBorrowers: [],
+                coOwners: [],
+                unit: '',
+                contractPrice: '0',
+                procCost: '0',
+                commRate: '0',
+                rf: '0',
+                parkingDesc: '',
+                parkingContractPrice: '0',
+                parkingProcCost: '0',
+                parkingCommRate: '0',
+                parkingRF: '0',
+                shareRows: [{ hierarchy: "Agent", name: "", percentage: 0 }],
+                signPrep: '',
+                signNote: '',
+                signAppr: '',
+            };
+        }
+
+        function createBlankTemplate() {
+            const name = prompt("Enter new template name:", "Template " + (new Date().toLocaleDateString()));
             if (!name) return;
+            const setups = JSON.parse(localStorage.getItem('commSetups') || '{}');
+            setups[name] = getBlankSetup();
+            localStorage.setItem('commSetups', JSON.stringify(setups));
+            loadTabList();
+            switchTab(name);
+        }
+
+        // save current as template with modal
+        function saveCurrentSetup() {
+            // show modal
+            const modal = document.createElement('div');
+            modal.className = 'modal-overlay';
+            modal.id = 'templateModal';
+            modal.innerHTML = `
+                <div class="modal-box">
+                    <h3>Save as Template</h3>
+                    <p style="color: var(--text-muted); margin-bottom: 4px;">Enter a name for this template</p>
+                    <input type="text" id="templateNameInput" placeholder="Template name" value="Template ${new Date().toLocaleDateString()}">
+                    <div class="modal-actions">
+                        <button class="btn-cancel" onclick="closeModal()">Cancel</button>
+                        <button class="btn-confirm" onclick="confirmSaveTemplate()">Save</button>
+                    </div>
+                </div>
+            `;
+            document.getElementById('modalContainer').appendChild(modal);
+            document.getElementById('templateNameInput').focus();
+            document.getElementById('templateNameInput').select();
+        }
+
+        function closeModal() {
+            const modal = document.getElementById('templateModal');
+            if (modal) modal.remove();
+        }
+
+        function confirmSaveTemplate() {
+            const nameInput = document.getElementById('templateNameInput');
+            const name = nameInput ? nameInput.value.trim() : '';
+            if (!name) {
+                alert('Please enter a template name.');
+                return;
+            }
             const setups = JSON.parse(localStorage.getItem('commSetups') || '{}');
             setups[name] = getCurrentSetup();
             localStorage.setItem('commSetups', JSON.stringify(setups));
+            closeModal();
             loadTabList();
-            // activate the new tab
-            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-            const newBtn = document.querySelector(`.tab-btn[data-tab="${name}"]`);
-            if (newBtn) newBtn.classList.add('active');
+            switchTab(name);
+        }
+
+        function deleteTemplate(name, event) {
+            event.stopPropagation();
+            if(!confirm(`Are you sure you want to delete template "${name}"?`)) return;
+            const setups = JSON.parse(localStorage.getItem('commSetups') || '{}');
+            delete setups[name];
+            localStorage.setItem('commSetups', JSON.stringify(setups));
+            loadTabList();
+            switchTab('default');
         }
 
         function loadTabList() {
             const container = document.getElementById('tabContainer');
             const setups = JSON.parse(localStorage.getItem('commSetups') || '{}');
             const names = Object.keys(setups);
-            // keep default
-            container.innerHTML = `<button class="tab-btn active" data-tab="default" onclick="switchTab('default')">Default</button>`;
+            
+            container.innerHTML = `
+                <div class="template-tab-wrapper active" data-tab="default">
+                    <button class="template-btn" onclick="switchTab('default')">Default</button>
+                </div>`;
+                
             names.forEach(n => {
-                container.innerHTML += `<button class="tab-btn" data-tab="${n}" onclick="switchTab('${n}')">${n}</button>`;
+                container.innerHTML += `
+                    <div class="template-tab-wrapper" data-tab="${n}">
+                        <button class="template-btn" onclick="switchTab('${n}')">${n}</button>
+                        <button class="template-del-btn" onclick="deleteTemplate('${n}', event)" title="Delete Template">✕</button>
+                    </div>`;
             });
-            // if no active, set default
-            if (!document.querySelector('.tab-btn.active')) {
-                document.querySelector('.tab-btn[data-tab="default"]')?.classList.add('active');
-            }
         }
 
         function switchTab(name) {
-            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-            const btn = document.querySelector(`.tab-btn[data-tab="${name}"]`);
-            if (btn) btn.classList.add('active');
+            document.querySelectorAll('.template-tab-wrapper').forEach(b => b.classList.remove('active'));
+            const tabWrapper = document.querySelector(`.template-tab-wrapper[data-tab="${name}"]`);
+            if (tabWrapper) tabWrapper.classList.add('active');
 
             if (name === 'default') {
-                // reset to initial (but keep our default values)
                 loadSetup({
+                    focusType: "UNIT",
                     projName: "UDH BATANGAS",
                     block: "B0U0",
-                    unit: "2044",
                     financing: "BANK",
-                    reservationDate: document.getElementById('inputReservationDate').value, // keep today
+                    reservationDate: document.getElementById('inputReservationDate').value,
                     buyer: "MONTILLA, APRIL JOHN PITPITAN",
                     coBorrowers: [],
                     coOwners: [],
+                    unit: "2044",
                     contractPrice: "2339420.00",
                     procCost: "0.00",
                     commRate: "6.50",
                     rf: "10000.00",
+                    parkingDesc: "P-SLOT 01",
+                    parkingContractPrice: "0.00",
+                    parkingProcCost: "0.00",
+                    parkingCommRate: "6.50",
+                    parkingRF: "0.00",
                     shareRows: [
                         { hierarchy: "Unit Manager", name: "DECA GOLD REALTY AND DEVELOPMENT INC.", percentage: 1.10 },
                         { hierarchy: "Sales Director", name: "DENIM LIM", percentage: 0.25 },
@@ -929,16 +1419,8 @@
             const setups = JSON.parse(localStorage.getItem('commSetups') || '{}');
             if (setups[name]) {
                 loadSetup(setups[name]);
-            } else {
-                alert("Setup not found.");
             }
         }
-
-        // extra: ensure on first load default is active
-        setTimeout(() => {
-            const def = document.querySelector('.tab-btn[data-tab="default"]');
-            if (def) def.classList.add('active');
-        }, 100);
     </script>
 </body>
 </html>
