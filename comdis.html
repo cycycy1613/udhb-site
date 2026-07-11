@@ -534,7 +534,7 @@
 
     <div class="form-container" style="padding: 10px; background: transparent; box-shadow: none;">
         <div class="template-bar">
-            <div class="template-title-wrap">📑 Templates</div>
+            <div class="template-title-wrap">Templates</div>
             <div class="template-group" id="tabContainer">
                 <div class="template-tab-wrapper active" data-tab="default">
                     <button class="template-btn" onclick="switchTab('default')">Default</button>
@@ -550,7 +550,7 @@
 
         <div class="form-grid">
             <div class="form-group">
-                <label>Setup Focus Type</label>
+                <label>Item</label>
                 <select id="inputFocusType" onchange="toggleFocusType(); calculateFinancials();">
                     <option value="UNIT" selected>Unit Only</option>
                     <option value="PARKING">Parking Only</option>
@@ -568,8 +568,8 @@
             <div class="form-group">
                 <label>Financing Selection</label>
                 <select id="inputFinancing" onchange="updatePreview()">
-                    <option value="BANK" selected>BANK</option>
                     <option value="Pag-IBIG">Pag-IBIG</option>
+                    <option value="BANK" selected>BANK</option>
                     <option value="In-House">In-House</option>
                 </select>
             </div>
@@ -699,15 +699,15 @@
         <div class="form-grid">
             <div class="form-group">
                 <label>Prepared By (Marketing Secretary)</label>
-                <input type="text" id="signPrep" value="CYRON MATHEW PANGANIBAN" oninput="this.value = this.value.toUpperCase(); updatePreview()">
+                <input type="text" id="signPrep" value="Type Here" oninput="this.value = this.value.toUpperCase(); updatePreview()">
             </div>
             <div class="form-group">
                 <label>Noted By (Unit Manager)</label>
-                <input type="text" id="signNote" value="DECA GOLD REALTY & DEVELOPMENT INC." oninput="this.value = this.value.toUpperCase(); updatePreview()">
+                <input type="text" id="signNote" value="Type Here" oninput="this.value = this.value.toUpperCase(); updatePreview()">
             </div>
             <div class="form-group">
                 <label>Approved By (Decagold)</label>
-                <input type="text" id="signAppr" value="JHOVIE B. LAHER" oninput="this.value = this.value.toUpperCase(); updatePreview()">
+                <input type="text" id="signAppr" value="Type Here" oninput="this.value = this.value.toUpperCase(); updatePreview()">
             </div>
         </div>
         <!-- save button placed here -->
@@ -898,10 +898,10 @@
         const hierarchyOptions = ["Unit Manager", "Realty/Broker", "Sales Director", "Agent", "Sub Agent", "Business Owner"];
 
         let shareRows = [
-            { hierarchy: "Unit Manager", name: "DECA GOLD REALTY AND DEVELOPMENT INC.", percentage: 1.10 },
-            { hierarchy: "Sales Director", name: "DENIM LIM", percentage: 0.25 },
-            { hierarchy: "Sub Agent", name: "JHOVIE B. LAHER", percentage: 0.15 },
-            { hierarchy: "Realty/Broker", name: "HERDELYN GONZALO", percentage: 5.00 }
+            { hierarchy: "Unit Manager", name: "Type Here", percentage: 1.10 },
+            { hierarchy: "Sales Director", name: "Type Here", percentage: 0.25 },
+            { hierarchy: "Sub Agent", name: "Type Here", percentage: 0.15 },
+            { hierarchy: "Realty/Broker", name: "Type Here", percentage: 5.00 }
         ];
 
         // ----- INIT -----
@@ -1391,7 +1391,7 @@
                     block: "B0U0",
                     financing: "BANK",
                     reservationDate: document.getElementById('inputReservationDate').value,
-                    buyer: "MONTILLA, APRIL JOHN PITPITAN",
+                    buyer: "Type Here",
                     coBorrowers: [],
                     coOwners: [],
                     unit: "2044",
@@ -1399,20 +1399,20 @@
                     procCost: "0.00",
                     commRate: "6.50",
                     rf: "10000.00",
-                    parkingDesc: "P-SLOT 01",
+                    parkingDesc: "PS0U",
                     parkingContractPrice: "0.00",
                     parkingProcCost: "0.00",
                     parkingCommRate: "6.50",
                     parkingRF: "0.00",
                     shareRows: [
-                        { hierarchy: "Unit Manager", name: "DECA GOLD REALTY AND DEVELOPMENT INC.", percentage: 1.10 },
-                        { hierarchy: "Sales Director", name: "DENIM LIM", percentage: 0.25 },
-                        { hierarchy: "Sub Agent", name: "JHOVIE B. LAHER", percentage: 0.15 },
-                        { hierarchy: "Realty/Broker", name: "HERDELYN GONZALO", percentage: 5.00 }
+                        { hierarchy: "Unit Manager", name: "Type Here", percentage: 1.10 },
+                        { hierarchy: "Sales Director", name: "Type Here", percentage: 0.25 },
+                        { hierarchy: "Sub Agent", name: "Type Here", percentage: 0.15 },
+                        { hierarchy: "Realty/Broker", name: "Type Here", percentage: 5.00 }
                     ],
-                    signPrep: "CYRON MATHEW PANGANIBAN",
-                    signNote: "DECA GOLD REALTY & DEVELOPMENT INC.",
-                    signAppr: "JHOVIE B. LAHER",
+                    signPrep: "Type Here",
+                    signNote: "Type Here",
+                    signAppr: "Type Here",
                 });
                 return;
             }
