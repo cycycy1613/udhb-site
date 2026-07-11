@@ -179,24 +179,6 @@
             gap: 16px;
             flex-wrap: wrap;
         }
-        .font-size-control {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        .font-size-control label {
-            color: #334155;
-            font-weight: 600;
-            font-size: 0.85rem;
-        }
-        .font-size-control input {
-            width: 70px;
-            padding: 4px 8px;
-            border: 1px solid #cbd5e1;
-            border-radius: 4px;
-            background: #fff;
-            color: #000;
-        }
 
         .print-btn {
             display: flex;
@@ -221,9 +203,10 @@
             color: #000;
             padding: 20px 30px;
             font-family: Arial, Helvetica, sans-serif;
-            line-height: 1.4;
+            line-height: 1.2;          /* reduced line spacing globally */
             max-width: 100%;
             margin: 0 auto;
+            font-size: 16px;           /* increased base font size */
         }
         #print-area * {
             font-size: inherit;
@@ -238,23 +221,26 @@
 
         .doc-header {
             text-align: center;
-            margin-bottom: 20px;
+            margin-bottom: 12px;        /* reduced bottom margin */
         }
         .doc-header h1 {
             text-transform: uppercase;
             letter-spacing: 0.5px;
-            margin-bottom: 2px;
+            margin-bottom: 0px;          /* reduced */
             color: #000;
+            font-size: 20px;            /* larger */
         }
         .doc-header p {
             color: #000;
+            font-size: 15px;
+            margin-top: 2px;
         }
 
         .doc-meta-grid {
             display: grid;
             grid-template-columns: 1.2fr 1fr;
-            gap: 40px;
-            margin-bottom: 20px;
+            gap: 30px;
+            margin-bottom: 10px;         /* reduced */
         }
 
         .doc-meta-table {
@@ -263,8 +249,9 @@
             color: #000;
         }
         .doc-meta-table td {
-            padding: 3px 0;
+            padding: 2px 0;              /* reduced cell padding */
             vertical-align: top;
+            font-size: 15px;
         }
         .doc-meta-table td:first-child {
             width: 35%;
@@ -277,15 +264,16 @@
         .doc-main-table {
             width: 100%;
             border-collapse: collapse;
-            margin-top: 15px;
-            margin-bottom: 8px;
+            margin-top: 10px;
+            margin-bottom: 4px;
             color: #000;
         }
         .doc-main-table th,
         .doc-main-table td {
             border: 1px solid #000;
-            padding: 5px 8px;
+            padding: 3px 6px;            /* reduced inside margin */
             color: #000;
+            font-size: 15px;
         }
         .doc-main-table th {
             font-weight: normal;
@@ -305,33 +293,36 @@
 
         .doc-footnote {
             font-style: italic;
-            margin-bottom: 30px;
+            margin-bottom: 15px;          /* reduced */
             color: #000;
+            font-size: 14px;
         }
 
         .doc-sign-grid {
             display: grid;
             grid-template-columns: 1fr 1fr 1fr;
-            gap: 30px;
-            row-gap: 40px;
-            margin-top: 20px;
+            gap: 20px;                   /* reduced gap */
+            row-gap: 25px;
+            margin-top: 15px;            /* reduced */
         }
         .sign-block {
             display: flex;
             flex-direction: column;
         }
         .sign-label {
-            margin-bottom: 20px;
+            margin-bottom: 10px;          /* reduced */
             color: #000;
+            font-size: 15px;
         }
         .sign-line {
             border-top: 1px solid #000;
             text-align: center;
-            padding-top: 3px;
+            padding-top: 2px;
             font-weight: bold;
             text-transform: uppercase;
             min-height: 15px;
             color: #000;
+            font-size: 15px;
         }
         .sign-title {
             text-align: center;
@@ -339,6 +330,7 @@
             text-transform: none;
             font-weight: normal;
             margin-top: 2px;
+            font-size: 14px;
         }
 
         /* --- TEMPLATE FEATURE DESIGN --- */
@@ -507,14 +499,15 @@
             }
             #print-area {
                 display: block !important;
-                padding: 16px 20px !important;
+                padding: 12px 16px !important;
                 margin: 0 auto !important;
                 max-width: 100% !important;
+                font-size: 15px !important;
             }
             .doc-meta-grid {
                 display: flex !important;
                 justify-content: space-between !important;
-                gap: 20px !important;
+                gap: 15px !important;
             }
             .doc-meta-table {
                 width: 48% !important;
@@ -526,6 +519,10 @@
             }
             .sign-block {
                 width: 30% !important;
+            }
+            .doc-main-table th,
+            .doc-main-table td {
+                padding: 2px 4px !important;
             }
         }
     </style>
@@ -660,7 +657,6 @@
                     <label>Parking Reservation Fee (RF)</label>
                     <input type="number" step="0.01" id="inputParkingRF" value="0.00" oninput="calculateFinancials()">
                 </div>
-                <!-- NEW: Parking Block / Bldg input -->
                 <div class="form-group">
                     <label>Parking Block / Bldg</label>
                     <input type="text" id="inputParkingBlock" value="B0U0" oninput="this.value = this.value.toUpperCase(); updatePreview()">
@@ -715,7 +711,6 @@
                 <input type="text" id="signAppr" value="Type Here" oninput="this.value = this.value.toUpperCase(); updatePreview()">
             </div>
         </div>
-        <!-- save button placed here -->
         <div style="display: flex; justify-content: flex-end; margin-top: 12px;">
             <button class="print-btn" style="background: var(--primary);" onclick="saveCurrentSetup()">Save</button>
         </div>
@@ -725,10 +720,6 @@
         <div class="preview-header-bar">
             <span style="font-weight: 600; color: #64748b;">Blueprint Preview</span>
             <div class="preview-controls">
-                <div class="font-size-control">
-                    <label for="fontSizeSlider">Font Size:</label>
-                    <input type="number" id="fontSizeSlider" min="8" max="24" value="13" step="0.5" oninput="adjustPreviewFontSize(this.value)">
-                </div>
                 <button class="print-btn" onclick="window.print()">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9V2h12v7M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
                     Print
@@ -747,7 +738,7 @@
                     <table class="doc-meta-table">
                         <tr><td>Project Name</td><td>:</td><td id="lblProjName" style="font-weight:bold;"></td></tr>
                         <tr><td>Block/Bldg</td><td>:</td><td id="lblBlock"></td></tr>
-                        <tr style="height: 12px;"><td></td><td></td><td></td></tr>
+                        <tr style="height: 8px;"><td></td><td></td><td></td></tr>
                         <tr><td>Buyer's Name</td><td>:</td><td id="lblBuyer" style="font-weight:bold;"></td></tr>
                         <tbody class="lblDynamicSlotsContainer"></tbody>
                     </table>
@@ -814,7 +805,7 @@
                 </div>
             </div>
 
-            <div class="print-page-block" id="parkingPrintBlock" style="margin-top: 40px; border-top: 2px dashed #ccc; padding-top: 40px;">
+            <div class="print-page-block" id="parkingPrintBlock" style="margin-top: 30px; border-top: 2px dashed #ccc; padding-top: 30px;">
                 <div class="doc-header">
                     <h1>COMMISSION DISTRIBUTION</h1>
                     <p>Batangas Branch</p>
@@ -824,7 +815,7 @@
                     <table class="doc-meta-table">
                         <tr><td>Project Name</td><td>:</td><td class="lblParkingProjName" style="font-weight:bold;"></td></tr>
                         <tr><td>Block/Bldg</td><td>:</td><td id="lblParkingBlockView"></td></tr>
-                        <tr style="height: 12px;"><td></td><td></td><td></td></tr>
+                        <tr style="height: 8px;"><td></td><td></td><td></td></tr>
                         <tr><td>Buyer's Name</td><td>:</td><td class="lblParkingBuyer" style="font-weight:bold;"></td></tr>
                         <tbody class="lblDynamicSlotsContainer"></tbody>
                     </table>
@@ -893,7 +884,6 @@
         </div>
     </div>
 
-    <!-- modal container -->
     <div id="modalContainer"></div>
 
     <script>
@@ -923,11 +913,8 @@
             toggleFocusType();
             calculateFinancials();
             loadTabList();
-            // default preview: unit visible, parking hidden
             document.getElementById('unitPrintBlock').style.display = 'block';
             document.getElementById('parkingPrintBlock').style.display = 'none';
-            // set initial font size
-            adjustPreviewFontSize(13);
         };
 
         // ----- HELPERS -----
@@ -965,9 +952,9 @@
                 parkingSection.classList.remove('hidden-config');
                 unitPrint.style.display = 'block';
                 parkingPrint.style.display = 'block';
-                parkingPrint.style.marginTop = '40px';
+                parkingPrint.style.marginTop = '30px';
                 parkingPrint.style.borderTop = '2px dashed #ccc';
-                parkingPrint.style.paddingTop = '40px';
+                parkingPrint.style.paddingTop = '30px';
             }
         }
 
@@ -1139,7 +1126,6 @@
                 formattedDate = new Date(rawDate).toLocaleDateString('en-US');
             }
 
-            // Sync shared outputs
             document.getElementById('lblProjName').innerText = projName;
             document.querySelectorAll('.lblParkingProjName').forEach(el => el.innerText = projName);
             document.getElementById('lblBlock').innerText = block;
@@ -1154,7 +1140,6 @@
             document.getElementById('lblUnit').innerText = toUpper(document.getElementById('inputUnit').value);
             document.getElementById('lblParkingDescView').innerText = toUpper(document.getElementById('inputParkingDesc').value);
 
-            // Dynamic slots syncing
             const slotContainers = document.querySelectorAll('.lblDynamicSlotsContainer');
             slotContainers.forEach(container => {
                 container.innerHTML = '';
@@ -1174,7 +1159,6 @@
                 }
             });
 
-            // Signatories sharing
             const prepText = toUpper(document.getElementById('signPrep').value) || " ";
             const noteText = toUpper(document.getElementById('signNote').value) || " ";
             const apprText = toUpper(document.getElementById('signAppr').value) || " ";
@@ -1182,36 +1166,6 @@
             document.querySelectorAll('.lblSignPrep').forEach(el => el.innerText = prepText);
             document.querySelectorAll('.lblSignNote').forEach(el => el.innerText = noteText);
             document.querySelectorAll('.lblSignAppr').forEach(el => el.innerText = apprText);
-        }
-
-        // ----- FONT SIZE ADJUSTMENT -----
-        function adjustPreviewFontSize(val) {
-            const area = document.getElementById('print-area');
-            const size = parseFloat(val) || 13;
-            area.style.fontSize = size + 'px';
-            // update all child elements to inherit
-            area.querySelectorAll('*').forEach(el => {
-                el.style.fontSize = 'inherit';
-            });
-            // but we want table headers and cells to be slightly smaller
-            area.querySelectorAll('.doc-main-table th, .doc-main-table td').forEach(el => {
-                el.style.fontSize = Math.max(8, size - 1) + 'px';
-            });
-            area.querySelectorAll('.doc-meta-table td').forEach(el => {
-                el.style.fontSize = Math.max(8, size) + 'px';
-            });
-            area.querySelectorAll('.doc-footnote').forEach(el => {
-                el.style.fontSize = Math.max(8, size - 2) + 'px';
-            });
-            area.querySelectorAll('.sign-label, .sign-line, .sign-title').forEach(el => {
-                el.style.fontSize = Math.max(8, size - 1) + 'px';
-            });
-            area.querySelectorAll('.doc-header h1').forEach(el => {
-                el.style.fontSize = Math.max(10, size + 3) + 'px';
-            });
-            area.querySelectorAll('.doc-header p').forEach(el => {
-                el.style.fontSize = Math.max(9, size + 1) + 'px';
-            });
         }
 
         // ----- TEMPLATE STORAGE FEATURE (localStorage) -----
@@ -1235,7 +1189,7 @@
                 parkingProcCost: document.getElementById('inputParkingProcCost').value,
                 parkingCommRate: document.getElementById('inputParkingCommRate').value,
                 parkingRF: document.getElementById('inputParkingRF').value,
-                parkingBlock: document.getElementById('inputParkingBlock').value,  // added
+                parkingBlock: document.getElementById('inputParkingBlock').value,
                 shareRows: shareRows.map(r => ({ ...r })),
                 signPrep: document.getElementById('signPrep').value,
                 signNote: document.getElementById('signNote').value,
@@ -1278,7 +1232,6 @@
             calculateFinancials();
         }
 
-        // blank template: clear all fields
         function getBlankSetup() {
             return {
                 focusType: 'UNIT',
@@ -1308,7 +1261,7 @@
         }
 
         function createBlankTemplate() {
-            const name = prompt("Enter new template name:", "Template " + (new Date().toLocaleDateString()));
+            const name = prompt("Enter new template name:", "Template " + new Date().toLocaleDateString());
             if (!name) return;
             const setups = JSON.parse(localStorage.getItem('commSetups') || '{}');
             setups[name] = getBlankSetup();
@@ -1317,9 +1270,7 @@
             switchTab(name);
         }
 
-        // save current as template with modal
         function saveCurrentSetup() {
-            // show modal
             const modal = document.createElement('div');
             modal.className = 'modal-overlay';
             modal.id = 'templateModal';
