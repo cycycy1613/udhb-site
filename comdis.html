@@ -180,7 +180,7 @@
             flex-wrap: wrap;
         }
 
-        .print-btn, .pdf-btn {
+        .print-btn {
             display: flex;
             align-items: center;
             gap: 8px;
@@ -193,11 +193,8 @@
             font-weight: 600;
             transition: transform 0.2s;
         }
-        .print-btn:hover, .pdf-btn:hover {
+        .print-btn:hover {
             transform: scale(1.03);
-        }
-        .pdf-btn {
-            background: #2563eb;
         }
 
         /* --- PRINT AREA --- */
@@ -365,6 +362,8 @@
             flex-wrap: wrap;
             gap: 8px;
         }
+        
+        /* Draggable Tab Styles */
         .template-tab-wrapper {
             display: inline-flex;
             align-items: center;
@@ -373,7 +372,21 @@
             padding: 2px 4px 2px 12px;
             border: 1px solid transparent;
             transition: all 0.2s;
+            cursor: grab;
+            user-select: none;
         }
+        .template-tab-wrapper:active {
+            cursor: grabbing;
+        }
+        .template-tab-wrapper.dragging {
+            opacity: 0.4;
+            transform: scale(0.95);
+        }
+        .template-tab-wrapper.over {
+            border: 1px dashed var(--primary);
+            background: #1e3a8a;
+        }
+        
         .template-tab-wrapper.active {
             background: #1e3a8a;
             border-color: var(--primary);
@@ -389,6 +402,7 @@
             cursor: pointer;
             color: var(--text-main);
             padding: 4px 4px 4px 0;
+            pointer-events: none; /* Let the wrapper handle drag events */
         }
         .template-del-btn {
             background: transparent;
@@ -586,10 +600,7 @@
         <div class="template-bar">
             <div class="template-title-wrap">Templates</div>
             <div class="template-group" id="tabContainer">
-                <div class="template-tab-wrapper active" data-tab="default">
-                    <button class="template-btn" onclick="switchTab('default')">Default</button>
                 </div>
-            </div>
             <button class="add-template-btn" onclick="createBlankTemplate()" title="Create new blank template">+</button>
             <span class="disclaimer">⚠️ Templates stored in your local browser storage.</span>
         </div>
@@ -601,7 +612,7 @@
         <div class="form-grid">
             <div class="form-group">
                 <label>Item</label>
-                <select id="inputFocusType" onchange="toggleFocusType(); calculateFinancials();">
+                <select id="inputFocusType" oninput="toggleFocusType(); calculateFinancials();">
                     <option value="UNIT" selected>Unit Only</option>
                     <option value="PARKING">Parking Only</option>
                     <option value="BOTH">Both (Unit & Parking)</option>
@@ -617,7 +628,7 @@
             </div>
             <div class="form-group">
                 <label>Financing Selection</label>
-                <select id="inputFinancing" onchange="updatePreview()">
+                <select id="inputFinancing" oninput="updatePreview()">
                     <option value="Pag-IBIG">Pag-IBIG</option>
                     <option value="BANK" selected>BANK</option>
                     <option value="In-House">In-House</option>
@@ -625,7 +636,7 @@
             </div>
             <div class="form-group">
                 <label>Reservation Date</label>
-                <input type="date" id="inputReservationDate" onchange="updatePreview()">
+                <input type="date" id="inputReservationDate" oninput="updatePreview()">
             </div>
         </div>
 
@@ -765,7 +776,7 @@
             </div>
         </div>
         <div style="display: flex; justify-content: flex-end; margin-top: 12px;">
-            <button class="print-btn" style="background: var(--primary);" onclick="saveCurrentSetup()">Save</button>
+            <button class="print-btn" style="background: var(--primary);" onclick="saveCurrentSetup()">Save changes</button>
         </div>
     </div>
 
@@ -773,13 +784,9 @@
         <div class="preview-header-bar">
             <span style="font-weight: 600; color: #64748b;">Blueprint Preview</span>
             <div class="preview-controls">
-                <button class="pdf-btn" onclick="saveAsPDF()">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6z"/><path d="M14 2v6h6M12 18v-4M12 9v.01"/><path d="M9 15l3 3 3-3"/></svg>
-                    Save as PDF
-                </button>
                 <button class="print-btn" onclick="window.print()">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9V2h12v7M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
-                    Print
+                    Print Document
                 </button>
             </div>
         </div>
@@ -949,29 +956,21 @@
         // ----- DATA -----
         let coBorrowers = [];
         let coOwners = [];
-        const hierarchyOptions = ["Unit Manager", "Realty/Broker", "Sales Director", "Agent", "Sub Agent", "Business Owner"];
+        const hierarchyOptions = ["Unit Manager", "Realty/Broker", "Sales Director", "Sales Manager", "Agent", "Sub Agent", "Business Owner"];
 
-        let shareRows = [
-            { hierarchy: "Unit Manager", name: "Type Here", percentage: 1.10 },
-            { hierarchy: "Sales Director", name: "Type Here", percentage: 0.25 },
-            { hierarchy: "Sub Agent", name: "Type Here", percentage: 0.15 },
-            { hierarchy: "Realty/Broker", name: "Type Here", percentage: 5.00 }
-        ];
+        let shareRows = [];
+        window.currentActiveTab = null;
 
         // ----- INIT -----
         window.onload = function() {
-            const today = new Date();
-            const y = today.getFullYear();
-            const m = String(today.getMonth() + 1).padStart(2, '0');
-            const d = String(today.getDate()).padStart(2, '0');
-            document.getElementById('inputReservationDate').value = `${y}-${m}-${d}`;
-
-            renderCoBorrowers();
-            renderCoOwners();
-            renderEditorTable();
-            toggleFocusType();
-            calculateFinancials();
+            initStorage();
             loadTabList();
+            
+            if (!window.currentActiveTab) {
+                let order = JSON.parse(localStorage.getItem('commTabOrder') || '[]');
+                if (order.length > 0) switchTab(order[0]);
+            }
+            
             document.getElementById('unitPrintBlock').style.display = 'block';
             document.getElementById('parkingPrintBlock').style.display = 'none';
         };
@@ -1058,7 +1057,7 @@
                 ).join('');
                 tbody.innerHTML += `
                     <tr>
-                        <td><select onchange="shareRows[${index}].hierarchy=this.value; updatePreview();">${optionsHtml}</select></td>
+                        <td><select oninput="shareRows[${index}].hierarchy=this.value; updatePreview();">${optionsHtml}</select></td>
                         <td><input type="text" value="${row.name}" style="width:100%;" oninput="shareRows[${index}].name=this.value.toUpperCase(); this.value=this.value.toUpperCase(); updatePreview();"></td>
                         <td><input type="number" step="0.01" value="${row.percentage}" style="width:100px;" oninput="shareRows[${index}].percentage=parseFloat(this.value)||0; calculateFinancials();"></td>
                         <td><button class="btn-small btn-danger" onclick="removeHierarchyRow(${index})">Delete</button></td>
@@ -1242,6 +1241,56 @@
         }
 
         // ----- TEMPLATE STORAGE FEATURE (localStorage) -----
+        function initStorage() {
+            let setups = JSON.parse(localStorage.getItem('commSetups') || 'null');
+            let order = JSON.parse(localStorage.getItem('commTabOrder') || 'null');
+            
+            if (!setups || !order || order.length === 0 || Object.keys(setups).length === 0) {
+                setups = { "Default": getDefaultSetupData() };
+                order = ["Default"];
+                localStorage.setItem('commSetups', JSON.stringify(setups));
+                localStorage.setItem('commTabOrder', JSON.stringify(order));
+            }
+        }
+
+        function getDefaultSetupData() {
+            const today = new Date();
+            const y = today.getFullYear();
+            const m = String(today.getMonth() + 1).padStart(2, '0');
+            const d = String(today.getDate()).padStart(2, '0');
+            
+            return {
+                focusType: "UNIT",
+                projName: "UDH BATANGAS",
+                block: "B0U0",
+                financing: "BANK",
+                reservationDate: `${y}-${m}-${d}`,
+                buyer: "Type Here",
+                coBorrowers: [],
+                coOwners: [],
+                unit: "2044",
+                contractPrice: "2339420.00",
+                procCost: "0.00",
+                commRate: "6.50",
+                rf: "10000.00",
+                parkingDesc: "PS0U",
+                parkingContractPrice: "0.00",
+                parkingProcCost: "0.00",
+                parkingCommRate: "6.50",
+                parkingRF: "0.00",
+                parkingBlock: "PS0T",
+                shareRows: [
+                    { hierarchy: "Unit Manager", name: "Type Here", percentage: 1.10 },
+                    { hierarchy: "Sales Director", name: "Type Here", percentage: 0.25 },
+                    { hierarchy: "Sub Agent", name: "Type Here", percentage: 0.15 },
+                    { hierarchy: "Realty/Broker", name: "Type Here", percentage: 5.00 }
+                ],
+                signPrep: "Type Here",
+                signNote: "Type Here",
+                signAppr: "Type Here",
+            };
+        }
+
         function getCurrentSetup() {
             return {
                 focusType: document.getElementById('inputFocusType').value,
@@ -1337,10 +1386,62 @@
             const name = prompt("Enter new template name:", "Template " + new Date().toLocaleDateString());
             if (!name) return;
             const setups = JSON.parse(localStorage.getItem('commSetups') || '{}');
+            let order = JSON.parse(localStorage.getItem('commTabOrder') || '[]');
+            
             setups[name] = getBlankSetup();
+            if(!order.includes(name)) order.push(name);
+
             localStorage.setItem('commSetups', JSON.stringify(setups));
+            localStorage.setItem('commTabOrder', JSON.stringify(order));
+            
             loadTabList();
             switchTab(name);
+        }
+
+        // ----- TAB DRAG & DROP LOGIC -----
+        let draggedTabName = null;
+
+        function handleDragStart(e) {
+            draggedTabName = this.getAttribute('data-tab');
+            e.dataTransfer.effectAllowed = 'move';
+            this.classList.add('dragging');
+        }
+        function handleDragOver(e) {
+            e.preventDefault(); 
+            this.classList.add('over');
+            return false;
+        }
+        function handleDragEnter(e) {
+            e.preventDefault();
+            this.classList.add('over');
+        }
+        function handleDragLeave(e) {
+            this.classList.remove('over');
+        }
+        function handleDrop(e) {
+            e.stopPropagation();
+            this.classList.remove('over');
+            
+            const targetTabName = this.getAttribute('data-tab');
+            if (draggedTabName !== targetTabName) {
+                let order = JSON.parse(localStorage.getItem('commTabOrder') || '[]');
+                const draggedIdx = order.indexOf(draggedTabName);
+                const targetIdx = order.indexOf(targetTabName);
+                
+                if (draggedIdx > -1 && targetIdx > -1) {
+                    order.splice(draggedIdx, 1);
+                    order.splice(targetIdx, 0, draggedTabName);
+                    localStorage.setItem('commTabOrder', JSON.stringify(order));
+                    loadTabList();
+                }
+            }
+            return false;
+        }
+        function handleDragEnd(e) {
+            this.classList.remove('dragging');
+            document.querySelectorAll('.template-tab-wrapper').forEach(tab => {
+                tab.classList.remove('over');
+            });
         }
 
         // ----- DIALOG MODAL INTERFACES -----
@@ -1352,7 +1453,7 @@
                 <div class="modal-box">
                     <h3>Save as Template</h3>
                     <p style="color: var(--text-muted); margin-bottom: 4px;">Enter a name for this template</p>
-                    <input type="text" id="templateNameInput" placeholder="Template name" value="Template ${new Date().toLocaleDateString()}">
+                    <input type="text" id="templateNameInput" placeholder="Template name" value="${window.currentActiveTab || 'Template ' + new Date().toLocaleDateString()}">
                     <div class="modal-actions">
                         <button class="btn-cancel" onclick="closeModal()">Cancel</button>
                         <button class="btn-confirm" onclick="confirmSaveTemplate()">Save</button>
@@ -1377,8 +1478,14 @@
                 return;
             }
             const setups = JSON.parse(localStorage.getItem('commSetups') || '{}');
+            let order = JSON.parse(localStorage.getItem('commTabOrder') || '[]');
+
             setups[name] = getCurrentSetup();
+            if(!order.includes(name)) order.push(name);
+
             localStorage.setItem('commSetups', JSON.stringify(setups));
+            localStorage.setItem('commTabOrder', JSON.stringify(order));
+
             closeModal();
             loadTabList();
             switchTab(name);
@@ -1386,200 +1493,76 @@
 
         function deleteTemplate(name, event) {
             event.stopPropagation();
+            let order = JSON.parse(localStorage.getItem('commTabOrder') || '[]');
+            if (order.length <= 1) return; // Cannot delete last tab
+
             if(!confirm(`Are you sure you want to delete template "${name}"?`)) return;
+            
             const setups = JSON.parse(localStorage.getItem('commSetups') || '{}');
             delete setups[name];
+            order = order.filter(n => n !== name);
+            
             localStorage.setItem('commSetups', JSON.stringify(setups));
-            loadTabList();
-            switchTab('default');
+            localStorage.setItem('commTabOrder', JSON.stringify(order));
+            
+            if (window.currentActiveTab === name) {
+                switchTab(order[0]);
+            } else {
+                loadTabList();
+            }
         }
 
         function loadTabList() {
             const container = document.getElementById('tabContainer');
+            let order = JSON.parse(localStorage.getItem('commTabOrder') || '[]');
             const setups = JSON.parse(localStorage.getItem('commSetups') || '{}');
-            const names = Object.keys(setups);
             
-            container.innerHTML = `
-                <div class="template-tab-wrapper active" data-tab="default">
-                    <button class="template-btn" onclick="switchTab('default')">Default</button>
-                </div>`;
+            // Cleanup any discrepancy
+            order = order.filter(n => setups[n]); 
+            Object.keys(setups).forEach(n => { if(!order.includes(n)) order.push(n); });
+            localStorage.setItem('commTabOrder', JSON.stringify(order));
+
+            container.innerHTML = '';
+            
+            // Only show delete button if there's more than 1 tab
+            const showDelete = order.length > 1;
+
+            order.forEach(n => {
+                const delBtn = showDelete ? `<button class="template-del-btn" onclick="deleteTemplate('${n}', event)" title="Delete Template">✕</button>` : '';
                 
-            names.forEach(n => {
-                container.innerHTML += `
-                    <div class="template-tab-wrapper" data-tab="${n}">
-                        <button class="template-btn" onclick="switchTab('${n}')">${n}</button>
-                        <button class="template-del-btn" onclick="deleteTemplate('${n}', event)" title="Delete Template">✕</button>
-                    </div>`;
+                const tab = document.createElement('div');
+                tab.className = 'template-tab-wrapper';
+                if(n === window.currentActiveTab) tab.classList.add('active');
+                tab.setAttribute('data-tab', n);
+                tab.setAttribute('draggable', 'true');
+                tab.innerHTML = `
+                    <button class="template-btn" onclick="switchTab('${n}')" onmousedown="event.stopPropagation()">${n}</button>
+                    ${delBtn}
+                `;
+                
+                tab.addEventListener('dragstart', handleDragStart);
+                tab.addEventListener('dragover', handleDragOver);
+                tab.addEventListener('dragenter', handleDragEnter);
+                tab.addEventListener('dragleave', handleDragLeave);
+                tab.addEventListener('drop', handleDrop);
+                tab.addEventListener('dragend', handleDragEnd);
+
+                // Make entire wrapper clickable to switch tab easily
+                tab.addEventListener('click', () => switchTab(n));
+
+                container.appendChild(tab);
             });
         }
 
         function switchTab(name) {
+            window.currentActiveTab = name;
             document.querySelectorAll('.template-tab-wrapper').forEach(b => b.classList.remove('active'));
             const tabWrapper = document.querySelector(`.template-tab-wrapper[data-tab="${name}"]`);
             if (tabWrapper) tabWrapper.classList.add('active');
 
-            if (name === 'default') {
-                loadSetup({
-                    focusType: "UNIT",
-                    projName: "UDH BATANGAS",
-                    block: "B0U0",
-                    financing: "BANK",
-                    reservationDate: document.getElementById('inputReservationDate').value,
-                    buyer: "Type Here",
-                    coBorrowers: [],
-                    coOwners: [],
-                    unit: "2044",
-                    contractPrice: "2339420.00",
-                    procCost: "0.00",
-                    commRate: "6.50",
-                    rf: "10000.00",
-                    parkingDesc: "PS0U",
-                    parkingContractPrice: "0.00",
-                    parkingProcCost: "0.00",
-                    parkingCommRate: "6.50",
-                    parkingRF: "0.00",
-                    parkingBlock: "PS0T",
-                    shareRows: [
-                        { hierarchy: "Unit Manager", name: "Type Here", percentage: 1.10 },
-                        { hierarchy: "Sales Director", name: "Type Here", percentage: 0.25 },
-                        { hierarchy: "Sub Agent", name: "Type Here", percentage: 0.15 },
-                        { hierarchy: "Realty/Broker", name: "Type Here", percentage: 5.00 }
-                    ],
-                    signPrep: "Type Here",
-                    signNote: "Type Here",
-                    signAppr: "Type Here",
-                });
-                return;
-            }
             const setups = JSON.parse(localStorage.getItem('commSetups') || '{}');
             if (setups[name]) {
                 loadSetup(setups[name]);
-            }
-        }
-
-        // ----- SAVE AS PDF (html2canvas + jsPDF) -----
-        function saveAsPDF() {
-            const btn = document.querySelector('.pdf-btn');
-            const origText = btn.innerHTML;
-            btn.innerHTML = '⏳ Generating...';
-            btn.disabled = true;
-
-            if (typeof html2canvas === 'undefined') {
-                const script = document.createElement('script');
-                script.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js';
-                script.onload = function() {
-                    if (typeof jspdf === 'undefined') {
-                        const script2 = document.createElement('script');
-                        script2.src = 'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js';
-                        script2.onload = function() { captureAndDownload(); };
-                        document.head.appendChild(script2);
-                    } else {
-                        captureAndDownload();
-                    }
-                };
-                document.head.appendChild(script);
-            } else if (typeof jspdf === 'undefined') {
-                const script2 = document.createElement('script');
-                script2.src = 'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js';
-                script2.onload = function() { captureAndDownload(); };
-                document.head.appendChild(script2);
-            } else {
-                captureAndDownload();
-            }
-
-            function captureAndDownload() {
-                const focusType = document.getElementById('inputFocusType').value;
-                const unitBlock = document.getElementById('unitPrintBlock');
-                const parkingBlock = document.getElementById('parkingPrintBlock');
-
-                const unitDisplay = unitBlock.style.display;
-                const parkingDisplay = parkingBlock.style.display;
-                const parkingMargin = parkingBlock.style.marginTop;
-                const parkingBorder = parkingBlock.style.borderTop;
-                const parkingPadding = parkingBlock.style.paddingTop;
-
-                if (focusType === 'BOTH') {
-                    unitBlock.style.display = 'block';
-                    parkingBlock.style.display = 'block';
-                    parkingBlock.style.marginTop = '0px';
-                    parkingBlock.style.borderTop = 'none';
-                    parkingBlock.style.paddingTop = '0px';
-                } else if (focusType === 'UNIT') {
-                    unitBlock.style.display = 'block';
-                    parkingBlock.style.display = 'none';
-                } else {
-                    unitBlock.style.display = 'none';
-                    parkingBlock.style.display = 'block';
-                    parkingBlock.style.marginTop = '0px';
-                    parkingBlock.style.borderTop = 'none';
-                    parkingBlock.style.paddingTop = '0px';
-                }
-
-                const printArea = document.getElementById('print-area');
-                const originalTransform = printArea.style.transform;
-                const originalWidth = printArea.style.width;
-                printArea.style.transform = 'scale(1)';
-                printArea.style.width = '100%';
-
-                html2canvas(printArea, {
-                    scale: 3,
-                    useCORS: true,
-                    backgroundColor: '#ffffff',
-                    logging: false,
-                    width: printArea.scrollWidth,
-                    height: printArea.scrollHeight,
-                    windowWidth: printArea.scrollWidth,
-                    windowHeight: printArea.scrollHeight
-                }).then(canvas => {
-                    printArea.style.transform = originalTransform;
-                    printArea.style.width = originalWidth;
-                    unitBlock.style.display = unitDisplay;
-                    parkingBlock.style.display = parkingDisplay;
-                    parkingBlock.style.marginTop = parkingMargin;
-                    parkingBlock.style.borderTop = parkingBorder;
-                    parkingBlock.style.paddingTop = parkingPadding;
-
-                    const imgData = canvas.toDataURL('image/png');
-                    const { jsPDF } = window.jspdf;
-                    const pdfWidth = 210;
-                    const pdf = new jsPDF('p', 'mm', 'a4');
-
-                    if (focusType === 'BOTH') {
-                        const captureBlock = (block, pageIndex, totalPages, callback) => {
-                            html2canvas(block, {
-                                scale: 3,
-                                useCORS: true,
-                                backgroundColor: '#ffffff',
-                                logging: false,
-                            }).then(bCanvas => {
-                                const bImg = bCanvas.toDataURL('image/png');
-                                const bHeight = (bCanvas.height / bCanvas.width) * pdfWidth;
-                                if (pageIndex > 0) pdf.addPage();
-                                pdf.addImage(bImg, 'PNG', 0, 0, pdfWidth, bHeight);
-                                callback();
-                            });
-                        };
-
-                        captureBlock(unitBlock, 0, 2, () => {
-                            captureBlock(parkingBlock, 1, 2, () => {
-                                pdf.save('commission_distribution.pdf');
-                                btn.innerHTML = origText;
-                                btn.disabled = false;
-                            });
-                        });
-                    } else {
-                        const imgHeight = (canvas.height / canvas.width) * pdfWidth;
-                        pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, imgHeight);
-                        pdf.save('commission_distribution.pdf');
-                        btn.innerHTML = origText;
-                        btn.disabled = false;
-                    }
-                }).catch(err => {
-                    console.error(err);
-                    alert('Error generating PDF. Please try again.');
-                    btn.innerHTML = origText;
-                    btn.disabled = false;
-                });
             }
         }
     </script>
