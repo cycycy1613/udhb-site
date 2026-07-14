@@ -1088,8 +1088,8 @@
             const rf = parseFloat(document.getElementById('inputRF').value) || 0;
 
             const totalCommAmnt = cp + pc;
-            const totalPayable = (totalCommAmnt * (rate / 100)) + pc;
-            const rf80Base = rf * 0.80;
+            const totalPayable = totalCommAmnt * (rate / 100);
+            const rf80Base = Math.round((rf * 0.80) * 100) / 100;
 
             document.getElementById('inputTotalCommAmnt').value = formatCurrency(totalCommAmnt);
             document.getElementById('inputTotalCommPayable').value = formatCurrency(totalPayable);
@@ -1105,8 +1105,15 @@
             viewTbody.innerHTML = '';
 
             let accumulatedAddComm = 0;
-            shareRows.forEach(row => {
-                const addCommShare = accumulatedPercent > 0 ? (rf80Base * (row.percentage / accumulatedPercent)) : 0;
+            shareRows.forEach((row, index) => {
+                let addCommShare = 0;
+                if (accumulatedPercent > 0) {
+                    if (index === shareRows.length - 1) {
+                        addCommShare = Math.round((rf80Base - accumulatedAddComm) * 100) / 100;
+                    } else {
+                        addCommShare = Math.round((rf80Base * (row.percentage / accumulatedPercent)) * 100) / 100;
+                    }
+                }
                 accumulatedAddComm += addCommShare;
                 viewTbody.innerHTML += `
                     <tr>
@@ -1132,8 +1139,8 @@
             const pRf = parseFloat(document.getElementById('inputParkingRF').value) || 0;
 
             const pTotalCommAmnt = pCp + pPc;
-            const pTotalPayable = (pTotalCommAmnt * (pRate / 100)) + pPc;
-            const pRf80Base = pRf * 0.80;
+            const pTotalPayable = pTotalCommAmnt * (pRate / 100);
+            const pRf80Base = Math.round((pRf * 0.80) * 100) / 100;
 
             document.getElementById('inputParkingTotalCommAmnt').value = formatCurrency(pTotalCommAmnt);
             document.getElementById('inputParkingTotalCommPayable').value = formatCurrency(pTotalPayable);
@@ -1149,8 +1156,15 @@
             viewParkingTbody.innerHTML = '';
 
             let accumulatedParkingAddComm = 0;
-            shareRows.forEach(row => {
-                const pAddCommShare = accumulatedPercent > 0 ? (pRf80Base * (row.percentage / accumulatedPercent)) : 0;
+            shareRows.forEach((row, index) => {
+                let pAddCommShare = 0;
+                if (accumulatedPercent > 0) {
+                    if (index === shareRows.length - 1) {
+                        pAddCommShare = Math.round((pRf80Base - accumulatedParkingAddComm) * 100) / 100;
+                    } else {
+                        pAddCommShare = Math.round((pRf80Base * (row.percentage / accumulatedPercent)) * 100) / 100;
+                    }
+                }
                 accumulatedParkingAddComm += pAddCommShare;
                 viewParkingTbody.innerHTML += `
                     <tr>
@@ -1329,6 +1343,7 @@
             switchTab(name);
         }
 
+        // ----- DIALOG MODAL INTERFACES -----
         function saveCurrentSetup() {
             const modal = document.createElement('div');
             modal.className = 'modal-overlay';
@@ -1442,7 +1457,7 @@
             }
         }
 
-        // ----- SAVE AS PDF (html2canvas + jsPDF) - Improved: no blank pages, content at top -----
+        // ----- SAVE AS PDF (html2canvas + jsPDF) -----
         function saveAsPDF() {
             const btn = document.querySelector('.pdf-btn');
             const origText = btn.innerHTML;
@@ -1477,14 +1492,12 @@
                 const unitBlock = document.getElementById('unitPrintBlock');
                 const parkingBlock = document.getElementById('parkingPrintBlock');
 
-                // Store original display values
                 const unitDisplay = unitBlock.style.display;
                 const parkingDisplay = parkingBlock.style.display;
                 const parkingMargin = parkingBlock.style.marginTop;
                 const parkingBorder = parkingBlock.style.borderTop;
                 const parkingPadding = parkingBlock.style.paddingTop;
 
-                // Prepare for capture: show only relevant blocks
                 if (focusType === 'BOTH') {
                     unitBlock.style.display = 'block';
                     parkingBlock.style.display = 'block';
@@ -1508,7 +1521,6 @@
                 printArea.style.transform = 'scale(1)';
                 printArea.style.width = '100%';
 
-                // Use a higher scale for quality, but keep content at top
                 html2canvas(printArea, {
                     scale: 3,
                     useCORS: true,
@@ -1519,7 +1531,6 @@
                     windowWidth: printArea.scrollWidth,
                     windowHeight: printArea.scrollHeight
                 }).then(canvas => {
-                    // Restore original styles
                     printArea.style.transform = originalTransform;
                     printArea.style.width = originalWidth;
                     unitBlock.style.display = unitDisplay;
@@ -1530,13 +1541,10 @@
 
                     const imgData = canvas.toDataURL('image/png');
                     const { jsPDF } = window.jspdf;
-                    const pdfWidth = 210; // A4 width in mm
-                    const maxHeight = 297; // A4 height in mm
-
+                    const pdfWidth = 210;
                     const pdf = new jsPDF('p', 'mm', 'a4');
 
                     if (focusType === 'BOTH') {
-                        // Capture each block separately for clean page breaks
                         const captureBlock = (block, pageIndex, totalPages, callback) => {
                             html2canvas(block, {
                                 scale: 3,
@@ -1546,9 +1554,7 @@
                             }).then(bCanvas => {
                                 const bImg = bCanvas.toDataURL('image/png');
                                 const bHeight = (bCanvas.height / bCanvas.width) * pdfWidth;
-                                // Add page for second block
                                 if (pageIndex > 0) pdf.addPage();
-                                // Place at top (y=0)
                                 pdf.addImage(bImg, 'PNG', 0, 0, pdfWidth, bHeight);
                                 callback();
                             });
@@ -1562,7 +1568,6 @@
                             });
                         });
                     } else {
-                        // Single block: place at top (y=0)
                         const imgHeight = (canvas.height / canvas.width) * pdfWidth;
                         pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, imgHeight);
                         pdf.save('commission_distribution.pdf');
