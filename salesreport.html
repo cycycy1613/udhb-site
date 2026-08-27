@@ -54,7 +54,7 @@
 
         .chart-container { background: white; border-radius: 12px; padding: 15px; box-shadow: var(--shadow); margin-bottom: 25px; height: 350px; width: 100%; position: relative; }
 
-        .leaderboard { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; margin-bottom: 25px; }
+        .leaderboard { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-bottom: 25px; }
         .leaderboard-card { background: white; border-radius: 12px; padding: 20px; box-shadow: var(--shadow); }
         .leaderboard-title { color: var(--primary-red); border-bottom: 1px solid #eee; padding-bottom: 12px; margin-bottom: 12px; font-size: 17px; display: flex; align-items: center; justify-content: flex-start; gap: 10px; }
         .leader-item { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px dashed #eee; font-size: 15px; }
@@ -205,6 +205,10 @@
                 <div id="listRealty"></div>
             </div>
             <div class="leaderboard-card">
+                <h3 class="leaderboard-title">Top Unit Manager</h3>
+                <div id="listUnitManagers"></div>
+            </div>
+            <div class="leaderboard-card">
                 <h3 class="leaderboard-title">Top Sellers</h3>
                 <div id="listSellers"></div>
             </div>
@@ -287,6 +291,11 @@
                     <datalist id="dlRealty"></datalist>
                 </div>
                 <div class="form-group">
+                    <label class="form-label">Unit Manager Name</label>
+                    <input type="text" id="inpUnitManager" class="form-input" list="dlUnitManager">
+                    <datalist id="dlUnitManager"></datalist>
+                </div>
+                <div class="form-group">
                     <label class="form-label">Seller Name</label>
                     <input type="text" id="inpSeller" class="form-input" list="dlSeller">
                     <datalist id="dlSeller"></datalist>
@@ -328,6 +337,7 @@
                             <tr>
                                 <th>Date</th>
                                 <th>Realty</th>
+                                <th>UM</th>
                                 <th>Seller</th>
                                 <th>Coordinator</th>
                                 <th>Units</th>
@@ -416,7 +426,12 @@
         }
 
         function updateDatalists() {
-            const keys = [{ id: 'dlRealty', field: 'realtyName' }, { id: 'dlSeller', field: 'sellerName' }, { id: 'dlCoord', field: 'coordinatorName' }];
+            const keys = [
+                { id: 'dlRealty', field: 'realtyName' }, 
+                { id: 'dlUnitManager', field: 'unitManagerName' },
+                { id: 'dlSeller', field: 'sellerName' }, 
+                { id: 'dlCoord', field: 'coordinatorName' }
+            ];
             keys.forEach(k => {
                 const set = [...new Set(allSales.map(s => s[k.field]))].filter(v => v).sort();
                 document.getElementById(k.id).innerHTML = set.map(v => `<option value="${v}">`).join('');
@@ -485,7 +500,12 @@
 
         function updateLists(data) {
             const mapper = (key) => {
-                const map = data.reduce((acc, c) => { acc[c[key]] = (acc[c[key]] || 0) + (parseFloat(c.totalAmount) || 0); return acc; }, {});
+                const map = data.reduce((acc, c) => { 
+                    if (c[key]) {
+                        acc[c[key]] = (acc[c[key]] || 0) + (parseFloat(c.totalAmount) || 0); 
+                    }
+                    return acc; 
+                }, {});
                 return Object.entries(map).sort((a,b) => b[1]-a[1]).slice(0, 5);
             };
             const render = (id, items) => {
@@ -493,6 +513,7 @@
                 el.innerHTML = items.length ? items.map(([n, v]) => `<div class="leader-item"><span>${n}</span><b>₱${v.toLocaleString()}</b></div>`).join('') : '<p style="font-size:13px;color:#999">No data available for this period</p>';
             };
             render('listRealty', mapper('realtyName'));
+            render('listUnitManagers', mapper('unitManagerName'));
             render('listSellers', mapper('sellerName'));
             render('listCoords', mapper('coordinatorName'));
         }
@@ -595,6 +616,7 @@
         async function saveNewSale() {
             const sale = {
                 realtyName: document.getElementById('inpRealty').value,
+                unitManagerName: document.getElementById('inpUnitManager').value,
                 sellerName: document.getElementById('inpSeller').value,
                 coordinatorName: document.getElementById('inpCoord').value,
                 dateEntry: document.getElementById('inpDate').value,
@@ -620,12 +642,13 @@
                 const tr = document.createElement('tr');
                 tr.id = `row-${s.id}`;
                 tr.innerHTML = `
-                    <td><div class="editable-cell" data-f="dateEntry">${s.dateEntry}</div></td>
-                    <td><div class="editable-cell" data-f="realtyName">${s.realtyName}</div></td>
-                    <td><div class="editable-cell" data-f="sellerName">${s.sellerName}</div></td>
-                    <td><div class="editable-cell" data-f="coordinatorName">${s.coordinatorName}</div></td>
-                    <td><div class="editable-cell" data-f="totalUnits">${s.totalUnits}</div></td>
-                    <td><div class="editable-cell" data-f="totalParking">${s.totalParking}</div></td>
+                    <td><div class="editable-cell" data-f="dateEntry">${s.dateEntry || ''}</div></td>
+                    <td><div class="editable-cell" data-f="realtyName">${s.realtyName || ''}</div></td>
+                    <td><div class="editable-cell" data-f="unitManagerName">${s.unitManagerName || ''}</div></td>
+                    <td><div class="editable-cell" data-f="sellerName">${s.sellerName || ''}</div></td>
+                    <td><div class="editable-cell" data-f="coordinatorName">${s.coordinatorName || ''}</div></td>
+                    <td><div class="editable-cell" data-f="totalUnits">${s.totalUnits || 0}</div></td>
+                    <td><div class="editable-cell" data-f="totalParking">${s.totalParking || 0}</div></td>
                     <td>₱<span class="editable-cell" data-f="totalAmount">${(parseFloat(s.totalAmount) || 0).toLocaleString()}</span></td>
                     <td class="action-cell">
                         <button class="dots-btn" onclick="toggleActionMenu(event, '${s.id}')"><i class="fas fa-ellipsis-v"></i></button>
@@ -689,7 +712,7 @@
                 document.getElementById('inventoryGridContainer').classList.remove('edit-mode-active');
             }
         }
-        function resetForm() { ['inpRealty', 'inpSeller', 'inpCoord', 'inpDate', 'inpUnits', 'inpParking', 'inpAmount'].forEach(i => document.getElementById(i).value = (i.includes('Units') || i.includes('Parking')) ? 0 : ''); }
+        function resetForm() { ['inpRealty', 'inpUnitManager', 'inpSeller', 'inpCoord', 'inpDate', 'inpUnits', 'inpParking', 'inpAmount'].forEach(i => document.getElementById(i).value = (i.includes('Units') || i.includes('Parking')) ? 0 : ''); }
         
         window.onclick = function() { document.querySelectorAll('.action-menu').forEach(m => m.style.display = 'none'); };
     </script>
