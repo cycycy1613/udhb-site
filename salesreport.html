@@ -9,6 +9,8 @@
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <!-- Library for capturing and downloading HTML as image -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <style>
         :root {
             --primary-red: #8B0000;
@@ -53,6 +55,23 @@
         .card-value { font-size: 28px; font-weight: 700; color: var(--primary-red); word-break: break-word; }
 
         .chart-container { background: white; border-radius: 12px; padding: 15px; box-shadow: var(--shadow); margin-bottom: 25px; height: 350px; width: 100%; position: relative; }
+
+        /* UM's To-Date Production Section Styling */
+        .um-production-section { background: white; border-radius: 12px; padding: 20px; box-shadow: var(--shadow); margin-bottom: 25px; width: 100%; position: relative; }
+        .um-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #333; padding-bottom: 10px; margin-bottom: 15px; }
+        .um-header h3 { font-size: 16px; font-weight: 700; color: #000; text-transform: uppercase; letter-spacing: 0.5px; }
+        .download-btn { background: #f0f0f0; border: 1px solid #ccc; color: #333; width: 36px; height: 36px; border-radius: 6px; cursor: pointer; transition: 0.3s; display: flex; align-items: center; justify-content: center; font-size: 16px; }
+        .download-btn:hover { background: var(--primary-red); color: white; border-color: var(--primary-red); }
+
+        .um-table-wrapper { overflow-x: auto; width: 100%; -webkit-overflow-scrolling: touch; }
+        .um-table { width: 100%; border-collapse: collapse; font-size: 13px; text-align: right; min-width: 850px; border: 1px solid #000; }
+        .um-table th, .um-table td { border: 1px solid #000; padding: 6px 8px; white-space: nowrap; }
+        .um-table th { background-color: #f2f2f2; color: #000; font-weight: 700; text-transform: uppercase; }
+        .um-table th.um-col-header { background-color: #666; color: white; text-align: left; }
+        .um-table td.um-name { text-align: left; font-weight: 600; }
+        .um-table th.bg-beige, .um-table td.bg-beige { background-color: #fdf2e9; }
+        .um-table tr.total-row { font-weight: 800; background-color: #e6e6e6; }
+        .um-table tr.total-row td { border-top: 2px solid #000; }
 
         .leaderboard { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-bottom: 25px; }
         .leaderboard-card { background: white; border-radius: 12px; padding: 20px; box-shadow: var(--shadow); }
@@ -197,6 +216,36 @@
 
         <div class="chart-container">
             <canvas id="salesChart"></canvas>
+        </div>
+
+        <!-- NEW FEATURE: UM's To-Date Production Section -->
+        <div class="um-production-section" id="umProductionSection">
+            <div class="um-header">
+                <h3 id="umHeaderTitle">UNIT MANAGERS' TO-DATE PRODUCTION AS OF TODAY</h3>
+                <button class="download-btn" title="Download Section as JPEG" onclick="downloadUMProductionJPEG()">
+                    <i class="fas fa-download"></i>
+                </button>
+            </div>
+            <div class="um-table-wrapper">
+                <table class="um-table">
+                    <thead>
+                        <tr>
+                            <th class="um-col-header">UNIT MANAGER</th>
+                            <th>UNIT</th>
+                            <th>DAY (TOO)</th>
+                            <th>UNIT</th>
+                            <th class="bg-beige">WTD (TOO)</th>
+                            <th>UNIT</th>
+                            <th class="bg-beige">MTD (TOO)</th>
+                            <th>UNIT</th>
+                            <th>NET YTD (TOO)</th>
+                        </tr>
+                    </thead>
+                    <tbody id="umProductionTbody">
+                        <!-- Dynamic rows or fallback display inserted here -->
+                    </tbody>
+                </table>
+            </div>
         </div>
 
         <div class="leaderboard">
@@ -456,6 +505,7 @@
             updateChart(filtered);
             updateLists(filtered);
             updateInactivity();
+            updateUMProductionTable();
         }
 
         function updateStats(data) {
@@ -495,6 +545,143 @@
                     }]
                 },
                 options: { responsive: true, maintainAspectRatio: false }
+            });
+        }
+
+        /* Calculate and Render "UM's To-Date Production" Section */
+        function updateUMProductionTable() {
+            const now = new Date();
+            const todayStr = now.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+            document.getElementById('umHeaderTitle').textContent = `UNIT MANAGERS' TO-DATE PRODUCTION AS OF ${todayStr.toUpperCase()}`;
+
+            // Helper dates
+            const todayISO = now.toISOString().split('T')[0];
+            
+            // Start of Week (Sunday)
+            const startOfWeek = new Date(now);
+            startOfWeek.setDate(now.getDate() - now.getDay());
+            startOfWeek.setHours(0,0,0,0);
+
+            // Start of Month
+            const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+
+            // Start of Year
+            const startOfYear = new Date(now.getFullYear(), 0, 1);
+
+            const umMap = {};
+
+            allSales.forEach(s => {
+                let umName = (s.unitManagerName || '').trim();
+                if (!umName) return; // Skip entries without UM data
+
+                if (!umMap[umName]) {
+                    umMap[umName] = {
+                        dtdUnits: 0, dtdSales: 0,
+                        wtdUnits: 0, wtdSales: 0,
+                        mtdUnits: 0, mtdSales: 0,
+                        ytdUnits: 0, ytdSales: 0
+                    };
+                }
+
+                const d = new Date(s.dateEntry + 'T00:00:00');
+                const units = parseInt(s.totalUnits) || 0;
+                const sales = parseFloat(s.totalAmount) || 0;
+
+                // Check DTD (Today)
+                if (s.dateEntry === todayISO) {
+                    umMap[umName].dtdUnits += units;
+                    umMap[umName].dtdSales += sales;
+                }
+
+                // Check WTD (Week to Date)
+                if (d >= startOfWeek && d <= now) {
+                    umMap[umName].wtdUnits += units;
+                    umMap[umName].wtdSales += sales;
+                }
+
+                // Check MTD (Month to Date)
+                if (d >= startOfMonth && d <= now) {
+                    umMap[umName].mtdUnits += units;
+                    umMap[umName].mtdSales += sales;
+                }
+
+                // Check YTD (Year to Date)
+                if (d >= startOfYear && d <= now) {
+                    umMap[umName].ytdUnits += units;
+                    umMap[umName].ytdSales += sales;
+                }
+            });
+
+            // Convert map to array and sort from GREATEST to LEAST based on Net YTD Sales
+            const sortedUMs = Object.keys(umMap).map(name => ({
+                name,
+                ...umMap[name]
+            })).sort((a, b) => b.ytdSales - a.ytdSales);
+
+            const tbody = document.getElementById('umProductionTbody');
+            tbody.innerHTML = '';
+
+            if (sortedUMs.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="9" style="text-align:center; padding:20px; color:#888;">Unit Manager data not yet available</td></tr>`;
+                return;
+            }
+
+            let totDtdU = 0, totDtdS = 0, totWtdU = 0, totWtdS = 0, totMtdU = 0, totMtdS = 0, totYtdU = 0, totYtdS = 0;
+
+            sortedUMs.forEach(um => {
+                totDtdU += um.dtdUnits; totDtdS += um.dtdSales;
+                totWtdU += um.wtdUnits; totWtdS += um.wtdSales;
+                totMtdU += um.mtdUnits; totMtdS += um.mtdSales;
+                totYtdU += um.ytdUnits; totYtdS += um.ytdSales;
+
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td class="um-name">${um.name}</td>
+                    <td>${um.dtdUnits}</td>
+                    <td>${um.dtdSales.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
+                    <td>${um.wtdUnits}</td>
+                    <td class="bg-beige">${um.wtdSales.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
+                    <td>${um.mtdUnits}</td>
+                    <td class="bg-beige">${um.mtdSales.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
+                    <td>${um.ytdUnits}</td>
+                    <td>${um.ytdSales.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+
+            // Total Row
+            const totalTr = document.createElement('tr');
+            totalTr.className = 'total-row';
+            totalTr.innerHTML = `
+                <td class="um-name">TOTAL</td>
+                <td>${totDtdU}</td>
+                <td>${totDtdS.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
+                <td>${totWtdU}</td>
+                <td class="bg-beige">${totWtdS.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
+                <td>${totMtdU}</td>
+                <td class="bg-beige">${totMtdS.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
+                <td>${totYtdU}</td>
+                <td>${totYtdS.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
+            `;
+            tbody.appendChild(totalTr);
+        }
+
+        /* Download Section as JPEG Function */
+        function downloadUMProductionJPEG() {
+            const el = document.getElementById('umProductionSection');
+            const downloadBtn = el.querySelector('.download-btn');
+            downloadBtn.style.visibility = 'hidden'; // Hide download button in screenshot
+
+            html2canvas(el, { scale: 2, backgroundColor: '#ffffff' }).then(canvas => {
+                downloadBtn.style.visibility = 'visible';
+                const link = document.createElement('a');
+                const now = new Date().toISOString().split('T')[0];
+                link.download = `UM_To_Date_Production_${now}.jpg`;
+                link.href = canvas.toDataURL('image/jpeg', 0.95);
+                link.click();
+            }).catch(err => {
+                downloadBtn.style.visibility = 'visible';
+                Swal.fire('Error', 'Failed to generate JPEG image', 'error');
             });
         }
 
