@@ -1,1359 +1,1222 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="scroll-smooth">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
-    <title>Urban Deca Homes Batangas</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-    @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&family=Poppins:wght@400;500;600&display=swap');
-    
-    :root {
-        --primary-color: #2C3E50; /* Dark Slate Gray */
-        --secondary-color: #E74C3C; /* Terracotta */
-        --background-color: #F4F6F7; /* Light Grayish Blue */
-        --text-color: #555555; /* Medium Gray */
-        --light-gray: #BDC3C7; /* Light Silver */
-        --white: #FFFFFF;
-        --glow-color: #ff6b4a;
-        --shadow-glow: 0 0 12px rgba(231, 76, 60, 0.7), 0 0 8px rgba(231, 76, 60, 0.5);
-    }
-    
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title id="meta-doc-title">URBAN DECA HOMES BATANGAS</title>
+  <meta name="description" id="meta-doc-desc" content="a residential community located in Barangay Balagtas, Batangas City. It is designed to offer affordable, comfortable, and modern living spaces for families, professionals, and first-time homebuyers." />
+  <meta property="og:type" content="website" />
+  <meta property="og:title" id="og-title" content="URBAN DECA HOMES BATANGAS" />
+  <meta property="og:description" id="og-desc" content="a residential community located in Barangay Balagtas, Batangas City. It is designed to offer affordable, comfortable, and modern living spaces for families, professionals, and first-time homebuyers." />
+  <meta property="og:image" id="og-image" content="https://proudtobeinc.wordpress.com/wp-content/uploads/2026/09/screenshot-2025-09-02-091838.png?auto=format&fit=crop&w=1600&q=80" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" id="tw-title" content="URBAN DECA HOMES BATANGAS" />
+  <meta name="twitter:description" id="tw-desc" content="a residential community located in Barangay Balagtas, Batangas City. It is designed to offer affordable, comfortable, and modern living spaces for families, professionals, and first-time homebuyers." />
+  <meta name="twitter:image" id="tw-image" content="https://proudtobeinc.wordpress.com/wp-content/uploads/2026/09/screenshot-2025-09-02-091838.png?auto=format&fit=crop&w=1600&q=80" />
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@10/swiper-bundle.min.css" />
+
+  <style>
+    /* ===== HIGH REFRESH & SMOOTH SCROLL ===== */
     * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-        scroll-behavior: smooth; 
+      -webkit-tap-highlight-color: transparent;
     }
-    
-    body {
-        background-color: var(--background-color);
-        color: var(--text-color);
-        line-height: 1.8;
-        font-family: 'Poppins', sans-serif;
-        overflow-x: hidden;
-        width: 100%;
-    }
-    
-    h1, h2, h3 {
-        color: var(--primary-color);
-        font-family: 'Montserrat', sans-serif;
-        word-break: break-word;
-    }
-    
-    /* Header Styles */
-    header {
-        background-color: var(--white);
-        color: var(--primary-color);
-        padding: 0.8rem 1rem;
-        position: fixed;
-        width: 100%;
-        top: 0;
-        z-index: 1000;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-        transition: background-color 0.3s ease;
-    }
-    
-    .header-container {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        width: 100%;
-        max-width: 1400px;
-        margin: 0 auto;
-        gap: 0.5rem;
+    html {
+      scroll-behavior: smooth;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
     }
 
-    /* Left Side Header Wrapper */
-    .header-left {
-        display: flex;
-        align-items: center;
-        gap: clamp(0.5rem, 2vw, 20px);
-        flex-wrap: wrap;
+    /* ===== ENHANCED ANIMATIONS ===== */
+    @keyframes floatLight { 0%,100%{transform:translateY(0) scale(1)} 50%{transform:translateY(-12px) scale(1.02)} }
+    .animate-float { animation: floatLight 8s ease-in-out infinite; }
+    @keyframes pulseGlow { 0%,100%{opacity:.15;transform:scale(1)} 50%{opacity:.35;transform:scale(1.05)} }
+    .animate-pulse-glow { animation: pulseGlow 6s ease-in-out infinite; }
+
+    /* New shimmer effect for loading */
+    @keyframes shimmer {
+      0% { background-position: -1000px 0; }
+      100% { background-position: 1000px 0; }
     }
-    
-    .logo {
-        font-size: clamp(1.3rem, 4vw, 1.8rem);
-        font-weight: 700;
-        display: flex;
-        align-items: center;
-        white-space: nowrap;
-    }
-    
-    .logo i {
-        margin-right: 5px;
-        font-size: clamp(1.5rem, 4vw, 2rem);
-        color: var(--secondary-color);
+    .shimmer {
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+      background-size: 1000px 100%;
+      animation: shimmer 2s infinite linear;
     }
 
-    .logo span {
-        color: var(--primary-color);
+    /* Card entrance animations */
+    @keyframes cardIn {
+      0% { opacity: 0; transform: translateY(30px) scale(0.98); }
+      100% { opacity: 1; transform: translateY(0) scale(1); }
+    }
+    .card-enter {
+      animation: cardIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
     }
 
-    /* Search Bar Styles */
-    .search-container {
-        position: relative;
-        display: flex;
-        align-items: center;
-        width: auto;
-        min-width: 120px;
+    /* Floating label effect */
+    @keyframes floatLabel {
+      0% { transform: translateY(0); }
+      50% { transform: translateY(-3px); }
+      100% { transform: translateY(0); }
+    }
+    .float-label {
+      animation: floatLabel 2s ease-in-out infinite;
     }
 
-    .search-container input {
-        padding: 8px 12px;
-        border: 1px solid var(--light-gray);
-        border-radius: 30px;
-        outline: none;
-        font-family: 'Poppins', sans-serif;
-        width: 140px;
-        transition: width 0.3s ease;
-        font-size: 0.9rem;
+    /* ===== GLASS PANELS ===== */
+    .glass-panel { 
+      background: rgba(255,255,255,.85); 
+      backdrop-filter: blur(16px); 
+      -webkit-backdrop-filter: blur(16px); 
+      border: 1px solid rgba(255,255,255,.8); 
+      box-shadow: 0 8px 32px 0 rgba(0,51,102,.06);
+    }
+    .glass-panel-dark { 
+      background: rgba(0,51,102,.88); 
+      backdrop-filter: blur(20px); 
+      -webkit-backdrop-filter: blur(20px); 
+      border: 1px solid rgba(255,255,255,.2);
     }
 
-    .search-container input:focus {
-        border-color: var(--secondary-color);
-        width: 170px;
+    /* ===== HOVER LIFT ===== */
+    .hover-lift { 
+      transition: transform .3s cubic-bezier(.16,1,.3,1), box-shadow .3s ease; 
+    }
+    .hover-lift:hover { 
+      transform: translateY(-6px) scale(1.01); 
+      box-shadow: 0 20px 40px -12px rgba(0,51,102,.12);
     }
 
-    .search-results {
-        position: absolute;
-        top: 45px;
-        left: 0;
-        width: 220px;
-        max-width: 80vw;
-        background: var(--white);
-        border-radius: 8px;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-        display: none;
-        z-index: 1001;
-        overflow: hidden;
+    /* ===== CUSTOM SCROLLBAR ===== */
+    .custom-scrollbar::-webkit-scrollbar { height:6px; width:6px; }
+    .custom-scrollbar::-webkit-scrollbar-track { background:#f1f5f9; border-radius:4px; }
+    .custom-scrollbar::-webkit-scrollbar-thumb { background:#cbd5e1; border-radius:4px; }
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover { background:#94a3b8; }
+
+    /* ===== SWIPER ===== */
+    .swiper-pagination-bullet-active { background:#f1c40f !important; width:20px !important; border-radius:4px !important; }
+    .draggable-item { cursor:grab; }
+    .draggable-item:active { cursor:grabbing; }
+    .dragging { opacity:.4; }
+    .reelsSwiper .swiper-slide { transition: transform .3s ease, box-shadow .3s ease; }
+    .reelsSwiper .swiper-slide-active { transform:scale(1.02); z-index:2; }
+    .reel-video-el { width:100%; height:100%; object-fit:cover; background:#0f172a; }
+    .reel-embed-el { width:100%; height:100%; border:0; display:block; background:#0f172a; }
+    .swiper-wrapper { transition-timing-function: cubic-bezier(.25,.46,.45,.94); }
+
+    /* ===== BLOG CONTENT ===== */
+    .blog-content a { color:#003366; text-decoration:underline; font-weight:600; }
+    .blog-content b,.blog-content strong { font-weight:700; color:#003366; }
+    .blog-content i,.blog-content em { font-style:italic; }
+    .blog-content h1,.blog-content h2,.blog-content h3 { font-weight:700; color:#003366; margin:.5rem 0; }
+    .blog-content ul,.blog-content ol { padding-left:1.5rem; margin:.5rem 0; }
+    .blog-content blockquote { border-left:3px solid #f1c40f; padding-left:1rem; color:#475569; margin:.5rem 0; }
+    .blog-card-excerpt { display:-webkit-box; -webkit-box-orient:vertical; -webkit-line-clamp:3; overflow:hidden; overflow-wrap:anywhere; }
+    .blog-content { overflow-wrap:anywhere; white-space:pre-wrap; }
+    .blog-content p,.blog-content div { margin:.35rem 0; }
+    .blog-content ul,.blog-content ol { white-space:normal; }
+    .blog-content a { overflow-wrap:anywhere; }
+
+    /* ===== RICH EDITOR ===== */
+    .rich-editor { min-height:150px; max-height:280px; overflow-y:auto; outline:none; white-space:pre-wrap; }
+    .rich-editor:empty::before { content:attr(data-placeholder); color:#94a3b8; pointer-events:none; }
+    .rich-toolbar button { width:30px; height:30px; border-radius:6px; display:inline-flex; align-items:center; justify-content:center; color:#334155; background:#f8fafc; border:1px solid #e2e8f0; transition:.15s ease; }
+    .rich-toolbar button:hover { background:#e2e8f0; color:#003366; }
+
+    /* ===== BLOG IMAGES ===== */
+    .blog-card-image { width:100%; height:auto; max-height:520px; object-fit:contain; object-position:center; background:#f8fafc; display:block; }
+    .blog-detail-image { width:100%; height:auto; max-height:75vh; object-fit:contain; object-position:center; background:#f8fafc; display:block; }
+
+    /* ===== POPUP ANIMATIONS ===== */
+    @keyframes popupScaleIn { 0%{opacity:0;transform:scale(.85) translateY(20px)} 100%{opacity:1;transform:scale(1) translateY(0)} }
+    @keyframes popupScaleOut { 0%{opacity:1;transform:scale(1) translateY(0)} 100%{opacity:0;transform:scale(.85) translateY(20px)} }
+    .popup-animate-in { animation:popupScaleIn .4s cubic-bezier(.16,1,.3,1) forwards; }
+    .popup-animate-out { animation:popupScaleOut .3s cubic-bezier(.16,1,.3,1) forwards; }
+
+    /* ===== NEW: SEARCH BAR ===== */
+    .profile-search-wrap {
+      width: min(280px, calc(100vw - 120px));
+    }
+    .profile-search {
+      background: rgba(255,255,255,.2);
+      border: 1px solid rgba(255,255,255,.5);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      box-shadow: 0 8px 24px rgba(15,23,42,.15);
+      border-radius: 40px;
+      padding: 4px 12px 4px 14px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: box-shadow .3s ease, border-color .3s ease;
+    }
+    .profile-search:focus-within {
+      border-color: rgba(241,196,15,.8);
+      box-shadow: 0 8px 32px rgba(241,196,15,.2);
+    }
+    .profile-search input {
+      background: transparent;
+      border: 0;
+      outline: none;
+      font-size: 0.75rem;
+      color: white;
+      width: 100%;
+      padding: 6px 0;
+    }
+    .profile-search input::placeholder { color: rgba(255,255,255,.85); }
+    .profile-search .search-icon {
+      color: rgba(255,255,255,.85);
+      font-size: 0.75rem;
+    }
+    #global-search-clear { display: none !important; }
+
+    .profile-search-results {
+      margin-top: 6px;
+      border-radius: 14px;
+      background: rgba(255,255,255,.96);
+      border: 1px solid rgba(255,255,255,.6);
+      box-shadow: 0 12px 28px rgba(15,23,42,.18);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      overflow: hidden;
+      max-height: 240px;
+      overflow-y: auto;
+    }
+    .profile-search-result {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 14px;
+      text-align: left;
+      color: #003366;
+      background: transparent;
+      transition: background .12s ease;
+      border-bottom: 1px solid rgba(0,0,0,.03);
+      cursor: pointer;
+    }
+    .profile-search-result:last-child { border-bottom: 0; }
+    .profile-search-result:hover { background: #f1f5f9; }
+    .profile-search-result .keyword-badge {
+      min-width: 34px;
+      height: 26px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 30px;
+      background: rgba(0,51,102,.08);
+      color: #003366;
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: .04em;
+      padding: 0 8px;
+    }
+    .profile-search-result .result-label {
+      font-size: 0.8rem;
+      font-weight: 600;
+      flex:1;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .profile-search-result .result-hint {
+      font-size: 0.65rem;
+      color: #94a3b8;
+      margin-left: auto;
+      padding-left: 8px;
+    }
+    .search-spinner {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 16px 0;
+      gap: 10px;
+      color: #003366;
+      font-size: 0.75rem;
+    }
+    .search-spinner .spinner {
+      width: 20px;
+      height: 20px;
+      border: 2px solid #e2e8f0;
+      border-top-color: #003366;
+      border-radius: 50%;
+      animation: spin .8s linear infinite;
+    }
+    @keyframes spin { to { transform:rotate(360deg); } }
+
+    /* ===== NEW: ENHANCED MENU ===== */
+    .menu-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,.3);
+      backdrop-filter: blur(4px);
+      -webkit-backdrop-filter: blur(4px);
+      z-index: 40;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .3s ease;
+    }
+    .menu-backdrop.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+    .menu-panel {
+      position: fixed;
+      top: 0;
+      right: 0;
+      height: 100vh;
+      width: min(360px, 85vw);
+      background: rgba(255,255,255,.98);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      z-index: 50;
+      transform: translateX(100%);
+      transition: transform .4s cubic-bezier(.16,1,.3,1);
+      box-shadow: -20px 0 60px rgba(0,0,0,.15);
+      display: flex;
+      flex-direction: column;
+      overflow-y: auto;
+    }
+    .menu-panel.open {
+      transform: translateX(0);
+    }
+    .menu-item {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 14px 20px;
+      color: #1e293b;
+      font-size: 0.85rem;
+      font-weight: 500;
+      border-radius: 12px;
+      transition: all .2s ease;
+      position: relative;
+      overflow: hidden;
+    }
+    .menu-item::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0;
+      height: 100%;
+      width: 3px;
+      background: #f1c40f;
+      transform: scaleY(0);
+      transition: transform .3s ease;
+      transform-origin: bottom;
+    }
+    .menu-item:hover::before {
+      transform: scaleY(1);
+    }
+    .menu-item:hover {
+      background: rgba(0,51,102,.05);
+      padding-left: 26px;
+    }
+    .menu-item i {
+      width: 20px;
+      text-align: center;
+      color: #003366;
+      font-size: 0.9rem;
     }
 
-    .search-results div {
-        padding: 10px 15px;
-        cursor: pointer;
-        font-size: 0.9rem;
-        transition: background 0.2s;
-        border-bottom: 1px solid #f1f1f1;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
+    /* ===== NEW: SHARE BUTTON ===== */
+    .share-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 14px;
+      border-radius: 30px;
+      background: rgba(0,51,102,.06);
+      color: #003366;
+      font-size: 0.7rem;
+      font-weight: 600;
+      border: 1px solid rgba(0,51,102,.1);
+      transition: all .25s ease;
+      cursor: pointer;
+    }
+    .share-btn:hover {
+      background: #003366;
+      color: white;
+      border-color: #003366;
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(0,51,102,.2);
+    }
+    .share-btn i {
+      font-size: 0.7rem;
+    }
+    .copy-toast {
+      position: fixed;
+      bottom: 30px;
+      left: 50%;
+      transform: translateX(-50%) translateY(100px);
+      background: #003366;
+      color: white;
+      padding: 12px 24px;
+      border-radius: 50px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      box-shadow: 0 12px 32px rgba(0,51,102,.3);
+      z-index: 9999;
+      opacity: 0;
+      transition: all .4s cubic-bezier(.16,1,.3,1);
+      pointer-events: none;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .copy-toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+    .copy-toast i {
+      color: #f1c40f;
     }
 
-    .search-results div:last-child {
-        border-bottom: none;
+    /* ===== NEW: TESTIMONIALS ===== */
+    .testimonial-card {
+      transition: all .4s cubic-bezier(.16,1,.3,1);
+    }
+    .testimonial-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 20px 40px -12px rgba(0,51,102,.12);
+    }
+    .testimonial-avatar {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 2px solid white;
+      box-shadow: 0 4px 12px rgba(0,0,0,.08);
+    }
+    .star-filled { color: #f1c40f; }
+    .star-empty { color: #e2e8f0; }
+
+    /* ===== NEW: STATS BADGES ===== */
+    .stat-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 14px;
+      border-radius: 30px;
+      background: rgba(255,255,255,.15);
+      border: 1px solid rgba(255,255,255,.25);
+      backdrop-filter: blur(8px);
+      font-size: 0.7rem;
+      color: white;
+      font-weight: 500;
+    }
+    .stat-badge i {
+      color: #f1c40f;
     }
 
-    .search-results div:hover {
-        background-color: var(--background-color);
-        color: var(--secondary-color);
+    /* ===== NEW: SCROLL REVEAL ===== */
+    .reveal {
+      opacity: 0;
+      transform: translateY(30px);
+      transition: opacity .8s cubic-bezier(.16,1,.3,1), transform .8s cubic-bezier(.16,1,.3,1);
     }
-    
-    /* Sidebar/Navigation */
-    .sidebar-toggle {
-        display: none;
-        background: none;
-        border: none;
-        color: var(--primary-color);
-        font-size: 1.8rem;
-        cursor: pointer;
-        line-height: 1;
-    }
-    
-    .nav-menu {
-        display: flex;
-        list-style: none;
-        gap: 1rem;
-        align-items: center;
-        flex-wrap: wrap;
-    }
-    
-    .nav-menu li {
-        margin-left: 0;
-    }
-    
-    .nav-menu a {
-        color: var(--primary-color);
-        text-decoration: none;
-        font-weight: 600;
-        transition: color 0.3s;
-        position: relative;
-        font-size: clamp(0.85rem, 2vw, 1rem);
-        white-space: nowrap;
-    }
-    
-    .nav-menu a:hover {
-        color: var(--secondary-color);
-    }
-    
-    .nav-menu a::after {
-        content: '';
-        position: absolute;
-        width: 0;
-        height: 2px;
-        bottom: -5px;
-        left: 0;
-        background-color: var(--secondary-color);
-        transition: width 0.3s ease;
-    }
-    
-    .nav-menu a:hover::after {
-        width: 100%;
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
     }
 
-    .nav-menu .prices-link a {
-        color: var(--secondary-color);
-        font-weight: 700;
+    /* ===== PROFILE SECTION ENHANCEMENTS ===== */
+    .profile-cover-overlay {
+      background: linear-gradient(to top, rgba(0,31,63,.9) 0%, rgba(0,31,63,.3) 50%, transparent 100%);
     }
 
-    .nav-menu .prices-link a:hover {
-        color: var(--primary-color);
-    }
-
-    .nav-menu .prices-link a::after {
-        background-color: var(--primary-color);
-    }
-
-    .nav-menu .prices-link a:hover::after {
-        background-color: var(--secondary-color);
-    }
-    
-    /* Hero Section */
-    .hero {
-        min-height: 100vh;
-        height: auto;
-        background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('https://dgcyron.wordpress.com/wp-content/uploads/2026/02/photo_2026-02-05_09-12-17.jpg');
-        background-size: cover;
-        background-position: center;
-        background-attachment: fixed; /* optional, fine on most devices */
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        text-align: center;
-        color: var(--white);
-        padding: 6rem 1rem 4rem;
-        margin-top: 70px;
-        position: relative;
-        overflow: hidden;
-    }
-
-    .hero-content {
-        max-width: 900px;
-        animation: heroFadeIn 1.5s ease-in-out forwards;
-        opacity: 0;
-    }
-
-    @keyframes heroFadeIn {
-        from { opacity: 0; transform: translateY(20px); }
-        to { opacity: 1; transform: translateY(0); }
-    }
-    
-    .hero h1 {
-        font-size: clamp(2rem, 8vw, 3.5rem);
-        margin-bottom: 1rem;
-        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
-        color: var(--white);
-        line-height: 1.2;
-    }
-    
-    .hero p {
-        font-size: clamp(1rem, 3vw, 1.3rem);
-        margin-bottom: 2rem;
-    }
-    
-    .hero-buttons {
-        display: flex;
-        justify-content: center;
-        gap: 1rem;
-        flex-wrap: wrap;
-    }
-    
-    .btn {
-        padding: 0.7rem 1.5rem;
-        border: none;
-        border-radius: 8px;
-        font-size: 1rem;
-        font-weight: 600;
-        cursor: pointer;
-        transition: all 0.3s ease;
-        text-decoration: none;
-        display: inline-block;
-        text-align: center;
-        position: relative;
-    }
-    
-    .btn-primary {
-        background-color: var(--secondary-color);
-        color: var(--white);
-    }
-    
-    .btn-primary:hover {
-        background-color: #C0392B;
-        transform: translateY(-5px);
-        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
-    }
-
-    /* ========= GLOWING ANIMATION FOR ALL CTA BUTTONS ========= */
-    .btn-primary.glow-cta, 
-    .btn-primary.glow-cta:focus {
-        animation: pulseGlow 1.5s infinite ease-in-out;
-        box-shadow: 0 0 0 0 rgba(231, 76, 60, 0.6);
-    }
-
-    @keyframes pulseGlow {
-        0% {
-            box-shadow: 0 0 0 0 rgba(231, 76, 60, 0.7);
-            background-color: var(--secondary-color);
-        }
-        50% {
-            box-shadow: 0 0 0 12px rgba(231, 76, 60, 0.2);
-            background-color: #e35f4a;
-        }
-        70% {
-            box-shadow: 0 0 0 6px rgba(231, 76, 60, 0.3);
-        }
-        100% {
-            box-shadow: 0 0 0 0 rgba(231, 76, 60, 0);
-            background-color: var(--secondary-color);
-        }
-    }
-
-    /* Ensure contact area button also gets the glow effect */
-    .contact-info .btn-primary {
-        animation: pulseGlow 1.5s infinite ease-in-out;
-        border: none;
-        transition: transform 0.3s, background 0.2s;
-    }
-    .contact-info .btn-primary:hover {
-        transform: translateY(-3px);
-        background-color: #C0392B;
-        animation: none;
-        box-shadow: 0 8px 18px rgba(0,0,0,0.2);
-    }
-    
-    .btn-secondary {
-        background-color: transparent;
-        border: 2px solid var(--white);
-        color: var(--white);
-    }
-    
-    .btn-secondary:hover {
-        background-color: var(--white);
-        color: var(--primary-color);
-        transform: translateY(-5px);
-        box-shadow: 0 8px 20px rgba(255, 255, 255, 0.4);
-    }
-    
-    /* Section Styles */
-    section {
-        padding: 5rem 1rem;
-        width: 100%;
-    }
-
-    .section-content-container {
-        max-width: 1200px;
-        margin: 0 auto;
-        width: 100%;
-    }
-    
-    .section-title {
-        text-align: center;
-        margin-bottom: 3rem;
-        position: relative;
-    }
-    
-    .section-title h2 {
-        font-size: clamp(2rem, 6vw, 2.8rem);
-        color: var(--primary-color);
-        display: inline-block;
-        line-height: 1.2;
-    }
-    
-    .section-title h2::after {
-        content: '';
-        position: absolute;
-        width: 80px;
-        height: 4px;
-        background-color: var(--secondary-color);
-        bottom: -15px;
-        left: 50%;
-        transform: translateX(-50%);
-    }
-    
-    /* Gallery Section */
-    .gallery-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-        gap: 1.5rem;
-    }
-    
-    .gallery-item {
-        position: relative;
-        overflow: hidden;
-        border-radius: 12px;
-        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
-        height: 250px;
-        cursor: pointer;
-        transition: transform 0.4s ease;
-    }
-
-    .gallery-item:hover {
-        transform: scale(1.02);
-    }
-    
-    .gallery-item img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-        transition: transform 0.5s;
-    }
-    
-    .gallery-item:hover img {
-        transform: scale(1.1);
-    }
-    
-    /* Modal */
-    .modal {
-        display: none;
-        position: fixed;
-        z-index: 2000;
-        left: 0;
-        top: 0;
-        width: 100%;
-        height: 100%;
-        background-color: rgba(0, 0, 0, 0.9);
-        overflow: auto;
-    }
-    
-    .modal-content {
-        margin: auto;
-        display: block;
-        width: 90%;
-        max-width: 900px;
-        max-height: 90%;
-        margin-top: 2%;
-        animation: modalZoomIn 0.6s ease-out;
-        object-fit: contain;
-    }
-
-    @keyframes modalZoomIn {
-        from { transform: scale(0.8); opacity: 0; }
-        to { transform: scale(1); opacity: 1; }
-    }
-    
-    .close {
-        position: absolute;
-        top: 20px;
-        right: 35px;
-        color: var(--white);
-        font-size: 40px;
-        font-weight: bold;
-        cursor: pointer;
-        transition: color 0.3s;
-        z-index: 2001;
-    }
-
-    .close:hover {
-        color: var(--secondary-color);
-    }
-    
-    /* Amenities Section */
-    .amenities-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-        gap: 2rem;
-    }
-    
-    .amenity-item {
-        text-align: center;
-        padding: 2rem 1rem;
-        background-color: var(--white);
-        border-radius: 12px;
-        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
-        transition: transform 0.4s ease, box-shadow 0.4s ease;
-    }
-    
-    .amenity-item:hover {
-        transform: translateY(-8px);
-        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-    }
-    
-    .amenity-item i {
-        font-size: clamp(2.5rem, 5vw, 3.5rem);
-        color: var(--secondary-color);
-        margin-bottom: 1rem;
-        transition: transform 0.4s ease;
-    }
-
-    .amenity-item:hover i {
-        transform: rotateY(180deg);
-    }
-    
-    .amenity-item h3 {
-        font-size: clamp(1.2rem, 3vw, 1.5rem);
-        margin-bottom: 0.8rem;
-    }
-    
-    /* Project Details */
-    .details-list ul {
-        list-style: none;
-        max-width: 900px;
-        margin: 0 auto;
-    }
-    
-    .details-list li {
-        margin-bottom: 1.2rem;
-        padding-left: 2rem;
-        position: relative;
-        font-size: clamp(0.95rem, 2.5vw, 1.1rem);
-        word-break: break-word;
-    }
-    
-    .details-list li::before {
-        content: '•';
-        color: var(--secondary-color);
-        font-size: 1.8rem;
-        position: absolute;
-        left: 0;
-        top: -4px;
-    }
-    
-    /* Carousel */
-    .carousel {
-        position: relative;
-        max-width: 800px;
-        margin: 0 auto;
-        overflow: hidden;
-        border-radius: 12px;
-        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
-    }
-    
-    .carousel-inner {
-        display: flex;
-        transition: transform 0.5s ease;
-    }
-    
-    .carousel-item {
-        min-width: 100%;
-    }
-    
-    .carousel-item img {
-        width: 100%;
-        height: auto;
-        aspect-ratio: 16/9;
-        object-fit: cover;
-        display: block;
-    }
-    
-    .carousel-control {
-        position: absolute;
-        top: 50%;
-        transform: translateY(-50%);
-        background-color: rgba(0, 0, 0, 0.5);
-        color: var(--white);
-        border: none;
-        padding: 0.8rem;
-        cursor: pointer;
-        font-size: 1.3rem;
-        z-index: 10;
-        border-radius: 50%;
-        width: 44px;
-        height: 44px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        transition: background-color 0.3s;
-    }
-    
-    .carousel-control:hover {
-        background-color: rgba(0, 0, 0, 0.8);
-    }
-
-    .carousel-control.prev { left: 10px; }
-    .carousel-control.next { right: 10px; }
-    
-    /* Unit Specifications */
-    .specs-container {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 2rem;
-        align-items: flex-start;
-        justify-content: center;
-    }
-    
-    .specs-images {
-        display: flex;
-        gap: 1.5rem;
-        flex: 1 1 300px;
-        flex-wrap: wrap;
-        min-width: 260px;
-    }
-    
-    .specs-image {
-        flex: 1 1 200px;
-        border-radius: 12px;
-        overflow: hidden;
-        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-        cursor: pointer;
-        transition: transform 0.4s ease;
-    }
-
-    .specs-image:hover {
-        transform: translateY(-5px);
-    }
-    
-    .specs-image img {
-        width: 100%;
-        height: auto;
-        aspect-ratio: 4/3;
-        object-fit: cover;
-        display: block;
-    }
-    
-    .specs-list {
-        flex: 1.2 1 300px;
-        min-width: 260px;
-    }
-    
-    .specs-list ul {
-        list-style-type: none;
-    }
-    
-    .specs-list li {
-        margin-bottom: 1rem;
-        padding-left: 2rem;
-        position: relative;
-        word-break: break-word;
-    }
-    
-    .specs-list li::before {
-        content: '✓';
-        color: var(--secondary-color);
-        font-weight: bold;
-        position: absolute;
-        left: 0;
-    }
-    
-    /* Video Sections */
-    .video-container {
-        position: relative;
-        padding-bottom: 56.25%;
-        height: 0;
-        overflow: hidden;
-        max-width: 100%;
-        background: #000;
-        border-radius: 12px;
-        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.15);
-    }
-
-    .video-container iframe {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        border: none;
-    }
-
-    .video-section {
-        background-color: var(--white);
-        text-align: center;
-    }
-    
-    /* Map Section */
-    .map-container {
-        height: auto;
-        min-height: 400px;
-        border-radius: 12px;
-        overflow: hidden;
-        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
-    }
-    
-    .map-container iframe {
-        width: 100%;
-        height: 400px;
-        border: none;
-        display: block;
-    }
-    
-    /* Nearby Section */
-    .nearby-categories {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-        gap: 2rem;
-    }
-    
-    .nearby-category {
-        background-color: var(--white);
-        padding: 2rem;
-        border-radius: 12px;
-        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
-        transition: transform 0.4s ease, box-shadow 0.4s ease;
-    }
-    
-    .nearby-category:hover {
-        transform: translateY(-8px);
-        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-    }
-
-    .nearby-category h3 {
-        color: var(--secondary-color);
-        margin-bottom: 1rem;
-        display: flex;
-        align-items: center;
-        font-size: clamp(1.1rem, 2.5vw, 1.3rem);
-        word-break: break-word;
-    }
-    
-    .nearby-category h3 i {
-        margin-right: 10px;
-        font-size: 1.3rem;
-    }
-    
-    .nearby-category ul {
-        list-style-type: none;
-    }
-    
-    .nearby-category li {
-        margin-bottom: 0.7rem;
-        padding-left: 1.5rem;
-        position: relative;
-        font-size: 0.95rem;
-        word-break: break-word;
-    }
-    
-    .nearby-category li::before {
-        content: '•';
-        color: var(--secondary-color);
-        position: absolute;
-        left: 0;
-    }
-    
-    /* Articles Section */
-    .articles-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-        gap: 2rem;
-    }
-    
-    .article-card {
-        background-color: var(--white);
-        border-radius: 12px;
-        overflow: hidden;
-        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
-        transition: transform 0.4s ease, box-shadow 0.4s ease;
-        display: flex;
-        flex-direction: column;
-    }
-    
-    .article-card:hover {
-        transform: translateY(-8px);
-        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-    }
-    
-    .article-image {
-        height: 200px;
-        overflow: hidden;
-    }
-    
-    .article-image img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-        transition: transform 0.5s;
-    }
-    
-    .article-card:hover .article-image img {
-        transform: scale(1.1);
-    }
-    
-    .article-content {
-        padding: 1.5rem;
-        flex: 1;
-    }
-    
-    .article-content h3 {
-        margin-bottom: 0.8rem;
-        color: var(--primary-color);
-        font-size: clamp(1.1rem, 2.5vw, 1.3rem);
-    }
-    
-    .article-content p {
-        margin-bottom: 1.2rem;
-        color: var(--text-color);
-        font-size: 0.95rem;
-    }
-    
-    /* Contact Section */
-    .contact-container {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-    }
-    
-    .contact-info {
-        flex: 0 1 600px;
-        padding: 2rem;
-        background-color: var(--white);
-        border-radius: 12px;
-        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
-        width: 100%;
-    }
-    
-    .contact-item {
-        display: flex;
-        align-items: flex-start;
-        margin-bottom: 1.5rem;
-        text-align: left;
-        gap: 1rem;
-    }
-    
-    .contact-item i {
-        font-size: 1.8rem;
-        color: var(--secondary-color);
-        min-width: 35px;
-        margin-top: 4px;
-    }
-
-    .contact-item div {
-        flex: 1;
-    }
-
-    .contact-item h3 {
-        font-size: 1.2rem;
-        margin-bottom: 0.2rem;
-    }
-
-    .contact-item p {
-        word-break: break-word;
-    }
-    
-    /* ========= FLOATING MESSENGER ICON STYLES ========= */
-    .messenger-float {
-        position: fixed;
-        bottom: 24px;
-        right: 24px;
-        background-color: #0084ff;
-        color: white;
-        width: 60px;
-        height: 60px;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 32px;
-        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
-        z-index: 999;
-        transition: all 0.3s ease;
-        text-decoration: none;
-        cursor: pointer;
-        animation: floatPulse 1.8s infinite ease-in-out;
-    }
-
-    .messenger-float:hover {
-        transform: scale(1.12);
-        background-color: #006eff;
-        box-shadow: 0 10px 28px rgba(0, 132, 255, 0.4);
-        animation: none;
-    }
-
-    @keyframes floatPulse {
-        0% {
-            box-shadow: 0 0 0 0 rgba(0, 132, 255, 0.6);
-        }
-        70% {
-            box-shadow: 0 0 0 14px rgba(0, 132, 255, 0);
-        }
-        100% {
-            box-shadow: 0 0 0 0 rgba(0, 132, 255, 0);
-        }
-    }
-
-    @media (max-width: 600px) {
-        .messenger-float {
-            width: 52px;
-            height: 52px;
-            font-size: 28px;
-            bottom: 18px;
-            right: 18px;
-        }
-    }
-    
-    /* Footer */
-    footer {
-        background-color: var(--primary-color);
-        color: var(--white);
-        padding: 2.5rem 1rem;
-        text-align: center;
-    }
-    
-    .footer-content {
-        max-width: 1200px;
-        margin: 0 auto;
-    }
-    
-    .social-icons {
-        margin: 1.2rem 0;
-    }
-    
-    .social-icons a {
-        color: var(--white);
-        font-size: 2rem;
-        margin: 0 0.8rem;
-        transition: color 0.3s;
-        display: inline-block;
-    }
-    
-    .social-icons a:hover {
-        color: var(--secondary-color);
-    }
-
-    /* Responsive breakpoints */
-    @media (max-width: 992px) {
-        .header-container {
-            flex-wrap: wrap;
-        }
-        .nav-menu {
-            gap: 0.8rem;
-        }
-    }
-
-    @media (max-width: 768px) {
-        .header-left {
-            width: auto;
-            flex: 1;
-        }
-
-        .search-container input {
-            width: 110px;
-        }
-        .search-container input:focus {
-            width: 140px;
-        }
-
-        .sidebar-toggle {
-            display: block;
-            order: 3;
-        }
-        
-        .nav-menu {
-            position: absolute;
-            top: 70px;
-            left: 0;
-            width: 100%;
-            max-height: 0;
-            background-color: var(--white);
-            flex-direction: column;
-            align-items: flex-start;
-            padding: 0 2rem;
-            transition: max-height 0.5s ease-in-out, padding 0.3s ease-in-out;
-            overflow: hidden;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-            gap: 0;
-        }
-        
-        .nav-menu.active {
-            max-height: 550px;
-            padding: 1.5rem 2rem;
-        }
-
-        .nav-menu li {
-            margin: 0.7rem 0;
-            width: 100%;
-        }
-
-        .nav-menu a {
-            white-space: normal;
-            display: inline-block;
-        }
-
-        .hero {
-            margin-top: 60px;
-            background-attachment: scroll;
-        }
-
-        .map-container iframe {
-            height: 350px;
-        }
-
-        .carousel-control {
-            width: 38px;
-            height: 38px;
-            font-size: 1.2rem;
-        }
-    }
-
-    @media (max-width: 480px) {
-        .logo span {
-            font-size: 1rem;
-        }
-        .logo i {
-            font-size: 1.5rem;
-        }
-        .search-container input {
-            width: 90px;
-            padding: 6px 8px;
-        }
-        .search-container input:focus {
-            width: 120px;
-        }
-        .header-left {
-            gap: 5px;
-        }
-        .btn {
-            padding: 0.6rem 1.2rem;
-            font-size: 0.9rem;
-        }
-        .contact-item {
-            flex-wrap: wrap;
-        }
-        .messenger-float {
-            width: 48px;
-            height: 48px;
-            font-size: 26px;
-        }
-    }
-    
-    </style>
-    <!-- Google tag (gtag.js) -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=AW-18057538192"></script>
-    <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-      gtag('config', 'AW-18057538192');
-    </script>
+    /* ===== BLOG SHARE ICON ANIMATION ===== */
+    @keyframes sharePop {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.3); }
+      100% { transform: scale(1); }
+    }
+    .share-pop {
+      animation: sharePop .3s ease;
+    }
+  </style>
 </head>
-<body>
-    <header>
-        <div class="header-container">
-            <div class="header-left">
-                <div class="logo">
-                    <i class="fas fa-home"></i>
-                    <span>UDHB</span>
-                </div>
-                <div class="search-container">
-                    <input type="text" id="headerSearch" placeholder="enter keywords" autocomplete="off">
-                    <div id="searchResults" class="search-results"></div>
-                </div>
-            </div>
+<body class="bg-slate-50 text-slate-700 font-sans antialiased selection:bg-[#003366] selection:text-white flex flex-col min-h-screen relative overflow-x-hidden">
 
-            <button class="sidebar-toggle" aria-label="Toggle menu">
-                <i class="fas fa-bars"></i>
-            </button>
-            <ul class="nav-menu">
-                <li><a href="#home">Home</a></li>
-                <li><a href="#gallery">Gallery</a></li>
-                <li><a href="#amenities">Amenities</a></li>
-                <li><a href="#location">Location</a></li>
-                <li><a href="#contact">Contact</a></li>
-                <li class="prices-link"><a href="https://urbandecahomesbatangas.com/price" target="_blank" rel="noopener noreferrer">Prices</a></li>
-            </ul>
+  <!-- LOADING SCREEN -->
+  <div id="loading-screen" class="fixed inset-0 bg-slate-900 z-[9999] flex flex-col items-center justify-center transition-opacity duration-500">
+    <div class="relative flex items-center justify-center">
+      <div class="w-20 h-20 border-4 border-slate-700 border-t-[#f1c40f] rounded-full animate-spin"></div>
+      <div class="absolute text-[#f1c40f] font-bold text-xl"><i class="fa-solid fa-house"></i></div>
+    </div>
+    <p class="mt-4 text-white text-sm font-semibold tracking-wide animate-pulse">Loading Data...</p>
+  </div>
+
+  <!-- Ambient Background -->
+  <div class="fixed top-[-10%] left-[-10%] w-[45vw] h-[45vw] bg-sky-200/40 rounded-full blur-3xl pointer-events-none animate-float"></div>
+  <div class="fixed bottom-[-10%] right-[-10%] w-[45vw] h-[45vw] bg-amber-100/50 rounded-full blur-3xl pointer-events-none animate-pulse-glow"></div>
+
+  <!-- ========== SIDE MENU (NEW) ========== -->
+  <div id="menu-backdrop" class="menu-backdrop" onclick="toggleBurgerMenu()"></div>
+  <div id="menu-panel" class="menu-panel">
+    <div class="p-6 border-b border-slate-100 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <img id="menu-logo" src="https://images.unsplash.com/photo-1560518883-ce09059eeffa?auto=format&fit=crop&w=100&q=80" alt="Logo" class="w-10 h-10 rounded-lg object-cover bg-white ring-2 ring-[#f1c40f]/30" />
+        <div>
+          <div class="text-sm font-bold text-[#003366]" id="menu-brand">Agentech</div>
+          <div class="text-[10px] text-slate-400">Real Estate</div>
         </div>
-    </header>
+      </div>
+      <button onclick="toggleBurgerMenu()" class="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 flex items-center justify-center text-slate-500 transition">
+        <i class="fa-solid fa-xmark text-sm"></i>
+      </button>
+    </div>
+    <nav class="flex-1 p-4 space-y-1">
+      <a href="#hero" onclick="toggleBurgerMenu()" class="menu-item"><i class="fa-solid fa-house"></i> Home</a>
+      <a href="#projects" onclick="toggleBurgerMenu()" class="menu-item"><i class="fa-solid fa-building"></i> Projects</a>
+      <a href="#reels" onclick="toggleBurgerMenu()" class="menu-item"><i class="fa-solid fa-clapperboard"></i> Reels</a>
+      <a href="#updates" onclick="toggleBurgerMenu()" class="menu-item"><i class="fa-solid fa-newspaper"></i> Updates</a>
+      <a href="#testimonials" onclick="toggleBurgerMenu()" class="menu-item"><i class="fa-solid fa-star"></i> Testimonials</a>
+      <a href="#connect" onclick="toggleBurgerMenu()" class="menu-item"><i class="fa-solid fa-paper-plane"></i> Connect</a>
+      <a href="#lead-capture" onclick="toggleBurgerMenu()" class="menu-item"><i class="fa-solid fa-calendar-check"></i> Inquiry</a>
+    </nav>
+    <div class="p-4 border-t border-slate-100">
+      <button id="menu-auth-btn" onclick="toggleBurgerMenu(); handleAuthClick();" class="w-full flex items-center justify-center gap-2.5 px-4 py-3 rounded-xl text-xs font-bold transition text-emerald-600 bg-emerald-50 hover:bg-emerald-100">
+        <i class="fa-solid fa-lock"></i> <span id="menu-auth-label">Login</span>
+      </button>
+      <div class="mt-3 text-center text-[10px] text-slate-400">
+        &copy; <span id="menu-year"></span> Agentech
+      </div>
+    </div>
+  </div>
 
-    <section class="hero" id="home">
-        <div class="hero-content">
-            <h1>Urban Deca Homes Batangas</h1>
-            <p>a residential community located in Barangay Balagtas, Batangas City. It is designed to offer affordable, comfortable, and modern living spaces for families, professionals, and first-time homebuyers.</p>
-            <div class="hero-buttons">
-                <a href="https://facebook.com/urbandecahomesbatangas.8990" class="btn btn-primary glow-cta">CHECK AVAILABLE UNITS TODAY</a>
-            </div>
+  <!-- ========== PROFILE SECTION ========== -->
+  <header id="hero" class="relative mb-8 sm:mb-12">
+    <!-- Cover -->
+    <div class="relative h-60 sm:h-72 md:h-80 w-full bg-slate-900 overflow-hidden">
+      <img id="cover-photo" src="https://images.unsplash.com/photo-1560518883-ce09059eeffa?auto=format&fit=crop&w=1600&q=80" alt="Cover" class="w-full h-full object-cover transition-opacity duration-500 opacity-80" />
+      <div class="absolute inset-0 profile-cover-overlay"></div>
+
+      <!-- Change Cover (admin) -->
+      <button onclick="editProfileField('cover')" class="admin-only hidden absolute top-4 left-4 bg-white/90 hover:bg-white text-[#003366] px-3 py-1.5 rounded-md shadow text-xs font-semibold transition backdrop-blur-md flex items-center gap-1.5 active:scale-95 z-20">
+        <i class="fa-solid fa-camera text-[#f1c40f]"></i> Change Cover
+      </button>
+
+      <!-- Search Bar + Menu Button -->
+      <div class="absolute top-4 right-4 z-30 flex items-center gap-2">
+        <div class="profile-search-wrap">
+          <div class="profile-search">
+            <i class="fa-solid fa-magnifying-glass search-icon"></i>
+            <input id="global-search" type="search" placeholder="keyword" aria-label="Search" autocomplete="off" oninput="handleGlobalSearch(this.value)" />
+          </div>
+          <div id="global-search-results" class="profile-search-results hidden" role="listbox" aria-label="Keyword shortcuts"></div>
         </div>
-    </section>
+        <button id="burger-menu-btn" onclick="toggleBurgerMenu()" class="bg-white/90 hover:bg-white text-[#003366] border border-white/50 px-3.5 py-2 rounded-md shadow-md flex items-center gap-2 text-xs font-semibold backdrop-blur-md transition active:scale-95">
+          <i class="fa-solid fa-bars text-[#003366]"></i> Menu
+        </button>
+      </div>
+    </div>
 
-    <section class="gallery" id="gallery">
-        <div class="section-content-container">
-            <div class="section-title">
-                <h2>Gallery</h2>
+    <!-- Profile info block -->
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="glass-panel rounded-xl p-5 sm:p-6 -mt-16 sm:-mt-20 relative z-10 shadow-lg flex flex-col md:flex-row items-center md:items-start justify-between gap-6 card-enter">
+        <div class="flex flex-col sm:flex-row items-center sm:items-start gap-5 text-center sm:text-left w-full md:w-auto">
+          <div class="relative group flex-shrink-0">
+            <img id="profile-photo" src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=400&q=80" alt="Profile" class="w-28 h-28 sm:w-32 sm:h-32 md:w-36 md:h-36 rounded-lg border-2 border-white shadow-md object-cover bg-white" />
+            <button onclick="editProfileField('avatar')" class="admin-only hidden absolute bottom-1 right-1 bg-[#003366] hover:bg-[#002244] text-[#f1c40f] p-2 rounded-md shadow transition active:scale-95"><i class="fa-solid fa-camera text-xs"></i></button>
+          </div>
+          <div class="space-y-1.5 max-w-xl">
+            <div class="flex items-center justify-center sm:justify-start gap-2">
+              <h1 id="profile-name" class="text-2xl sm:text-3xl font-bold tracking-tight text-[#003366]">Urban Deca Homes Batangas</h1>
+              <button onclick="editProfileField('name')" class="admin-only hidden text-slate-400 hover:text-[#003366] text-sm transition p-1"><i class="fa-solid fa-pen"></i></button>
             </div>
-            <div class="gallery-grid">
-                <div class="gallery-item"><img src="https://dgcyron.wordpress.com/wp-content/uploads/2026/02/screenshot-2025-09-26-184253.png" alt="Gate Entrance"></div>
-                <div class="gallery-item"><img src="https://dgcyron.wordpress.com/wp-content/uploads/2026/02/screenshot-2025-09-26-184542.png" alt="Clubhouse"></div>
-                <div class="gallery-item"><img src="https://dgcyron.wordpress.com/wp-content/uploads/2026/02/screenshot-2025-09-26-184415.png" alt="Basketball Court"></div>
-                <div class="gallery-item"><img src="https://dgcyron.wordpress.com/wp-content/uploads/2026/02/screenshot-2025-09-26-184503.png" alt="Playground"></div>
-                <div class="gallery-item"><img src="https://dgcyron.wordpress.com/wp-content/uploads/2026/02/screenshot-2025-09-26-184715.png" alt="Complex aerial view"></div>
-                <div class="gallery-item"><img src="https://dgcyron.wordpress.com/wp-content/uploads/2026/01/photo_3_2025-09-14_20-10-35.jpg" alt="2 Bedroom Unit"></div>
-            </div>
-        </div>
-    </section>
-
-    <section class="amenities" id="amenities">
-        <div class="section-content-container">
-            <div class="section-title">
-                <h2>Amenities</h2>
-            </div>
-            <div class="amenities-grid">
-                <div class="amenity-item"><i class="fas fa-building"></i><h3>Multipurpose Building</h3><p>Versatile space for community events and gatherings</p></div>
-                <div class="amenity-item"><i class="fas fa-basketball-ball"></i><h3>Covered Basketball Court</h3><p>Enjoy sports activities regardless of weather conditions</p></div>
-                <div class="amenity-item"><i class="fas fa-child"></i><h3>Children's Playground with Parks</h3><p>Safe and fun play areas for children of all ages</p></div>
-                <div class="amenity-item"><i class="fas fa-shield-alt"></i><h3>Security Guard House</h3><p>24/7 security for your peace of mind</p></div>
-            </div>
-        </div>
-    </section>
-
-    <section class="project-details">
-        <div class="section-content-container">
-            <div class="section-title"><h2>Project Details</h2></div>
-            <div class="details-list">
-                <ul>
-                    <li><strong>Land Area:</strong> 89,403 sqm</li>
-                    <li><strong>Total of Buildings:</strong> 21 (2nd - 6th floor: residential, Ground floor: Parking area)</li>
-                    <li><strong>Total of Units:</strong> 4,170 <strong>Parking slots:</strong> 2,291 for car & motorcycle</li>
-                    <li><strong>Owner & Developer:</strong> 8990 Housing Development Corporation</li>
-                    <li><strong>Contractor:</strong> 819 Cabalantian Construction Corp.</li>
-                </ul>
-            </div>
-        </div>
-    </section>
-
-    <section class="unit-photos" id="units">
-        <div class="section-content-container">
-            <div class="section-title"><h2>Unit Photos</h2></div>
-            <div class="carousel">
-                <div class="carousel-inner">
-                    <div class="carousel-item"><img src="https://dgcyron.wordpress.com/wp-content/uploads/2026/02/photo_7_2026-02-05_09-26-47.jpg" alt="Living Area"></div>
-                    <div class="carousel-item"><img src="https://dgcyron.wordpress.com/wp-content/uploads/2026/02/photo_6_2026-02-05_09-26-47.jpg" alt="Living Area"></div>
-                    <div class="carousel-item"><img src="https://dgcyron.wordpress.com/wp-content/uploads/2026/02/photo_5_2026-02-05_09-26-47.jpg" alt="Kitchen Area"></div>
-                    <div class="carousel-item"><img src="https://dgcyron.wordpress.com/wp-content/uploads/2026/02/photo_3_2026-02-05_09-26-47.jpg" alt="Bedroom 1"></div>
-                    <div class="carousel-item"><img src="https://dgcyron.wordpress.com/wp-content/uploads/2026/02/photo_4_2026-02-05_09-26-47.jpg" alt="Bedroom 2"></div>
-                    <div class="carousel-item"><img src="https://dgcyron.wordpress.com/wp-content/uploads/2026/02/photo_1_2026-02-05_09-26-47.jpg" alt="Comfort room"></div>
-                </div>
-                <button class="carousel-control prev">❮</button>
-                <button class="carousel-control next">❯</button>
-            </div>
-        </div>
-    </section>
-
-    <section class="unit-specs">
-        <div class="section-content-container">
-            <div class="section-title"><h2>Unit Specifications</h2></div>
-            <div class="specs-container">
-                <div class="specs-images">
-                    <div class="specs-image"><img src="https://dgcyron.wordpress.com/wp-content/uploads/2026/01/2br-typical.jpg" alt="2 Bedroom Floor Plan"></div>
-                    <div class="specs-image"><img src="https://dgcyron.wordpress.com/wp-content/uploads/2026/01/3br-b.jpg" alt="3 Bedroom Floor Plan 2"></div>
-                </div>
-                <div class="specs-list">
-                    <ul>
-                        <li><strong>2 Bedroom</strong> Typical size: 36.34 - 37.11 sqm</li>
-                        <li><strong>3 Bedroom</strong> Typical size: 44.85 - 53.64 sqm</li>
-                        <li>Painted Walls</li>
-                        <li>Aluminum sliding transparent windows</li>
-                        <li>Flooring: High Quality Vinyl, Tiled floor on Balcony</li>
-                        <li>AC Provisions: 1 window type each rooms</li>
-                        <li>Kitchen: Granite with Cabinet with grease trap</li>
-                        <li>CR: complete fixtures with exhaust pan and tiled flooring</li>
-                        <li>Equipped with smoke detector and water sprinkler</li>
-                    </ul>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <section class="video-section">
-        <div class="section-content-container">
-            <div class="section-title"><h2>Imagine a community that fits your dreams and lifestyle</h2></div>
-            <div class="video-container">
-                <iframe src="https://drive.google.com/file/d/1CsZcSeZjZ5Mr5DPRnNKUJueNpHwEGMPs/preview" frameborder="0" allow="autoplay" allowfullscreen></iframe>
-            </div>
-        </div>
-    </section>
-
-    <section class="project-maps" id="location">
-        <div class="section-content-container">
-            <div class="section-title">
-                <h2>Project Location</h2>
-                <p>behind SM Hypermarket - Barangay Balagtas, Batangas City</p>
-            </div>
-            <div class="map-container">
-                <iframe src="https://maps.google.com/maps?width=600&height=400&hl=en&q=urban%20decahomes%20batangas%20-%20Sales%20Office&t=&z=14&ie=UTF8&iwloc=B&output=embed" allowfullscreen="" loading="lazy"></iframe>
-            </div>
-        </div>
-    </section>
-
-    <section class="nearby">
-        <div class="section-content-container">
-            <div class="section-title"><h2>Nearby Establishments</h2></div>
-            <div class="nearby-categories">
-                <div class="nearby-category"><h3><i class="fas fa-shopping-cart"></i> Grocery Store & Malls</h3><ul><li>SM Hypermarket</li><li>SM City Batangas</li></ul></div>
-                <div class="nearby-category"><h3><i class="fas fa-graduation-cap"></i> Universities</h3><ul><li>Batangas State University</li><li>University of Batangas</li><li>Lyceum of the Philippines – Batangas</li></ul></div>
-                <div class="nearby-category"><h3><i class="fas fa-hospital"></i> Hospitals</h3><ul><li>Batangas Healthcare Specialists Medical Center</li><li>United Doctors of St. Camillus de Lellis Hospital and Medical Center</li><li>Jesus of Nazareth Hospital</li></ul></div>
-                <div class="nearby-category"><h3><i class="fas fa-bus"></i> Terminal</h3><ul><li>Batangas Grand Terminal</li><li>Batangas Port</li></ul></div>
-            </div>
-        </div>
-    </section>
-
-    <section class="articles">
-        <div class="section-content-container">
-            <div class="section-title"><h2>Latest Articles</h2></div>
-            <div class="articles-grid">
-                <div class="article-card">
-                    <div class="article-image"><img src="https://dgcyron.wordpress.com/wp-content/uploads/2026/02/screenshot-2025-09-02-091838.png" alt="Real Estate Investment"></div>
-                    <div class="article-content"><h3>How to Avail a Unit in Urban Deca Homes Batangas</h3><p>Follow these simple steps to secure your affordable condo unit.</p><a href="https://urbandecahomesbatangas.com/how-to-avail" class="btn btn-primary glow-cta">Learn More</a></div>
-                </div>
-                <div class="article-card">
-                    <div class="article-image"><img src="https://dgcyron.wordpress.com/wp-content/uploads/2026/02/screenshot-2025-09-02-091838.png" alt="Community Living"></div>
-                    <div class="article-content"><h3>Essential Requirements for Buying a Condo or House & Lot</h3><p>Purchasing property—whether a condominium or a house-and-lot, is a major commitment.</p><a href="https://urbandecahomesbatangas.com/requirements" class="btn btn-primary glow-cta">Learn More</a></div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <section class="contact" id="contact">
-        <div class="section-content-container">
-            <div class="section-title"><h2>Reach Us</h2></div>
-            <div class="contact-container">
-                <div class="contact-info">
-                    <div class="contact-item"><i class="fas fa-map-marker-alt"></i><div><h3>Location</h3><p><b>Sales Office</b> beside the Urban Deca Homes Batangas Entrance</p></div></div>
-                    <div class="contact-item"><i class="fas fa-user"></i><div><h3>Contact Person</h3><p>Jhovie B. Laher - Broker sales officer</p><p>Cyron B. Panganiban - Assistant sales officer</p></div></div>
-                    <div class="contact-item"><i class="fas fa-envelope"></i><div><h3>Email</h3><p>cyron.panganiban@decagold.com</p></div></div>
-                    <div class="contact-item"><i class="fas fa-phone"></i><div><h3>Phone Number</h3><p>0991-382-7663 (DITO)</p></div></div>
-                    <a href="https://facebook.com/urbandecahomesbatangas.8990" class="btn btn-primary glow-cta" style="width: 100%; text-align: center; margin-top: 1rem;">CHECK AVAILABLE UNITS TODAY</a>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <section class="video-section">
-        <div class="section-content-container">
-            <div class="section-title"><h2>Invest in comfort, live in Batangas</h2></div>
-            <div class="video-container">
-                <iframe src="https://www.youtube.com/embed/GlrFoTW4ce0" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-            </div>
-        </div>
-    </section>
-
-    <footer>
-        <div class="footer-content">
-            <p>www.urbandecahomesbatangas.com</p>
-            <div class="social-icons"><a href="https://facebook.com/urbandecahomesbatangas.8990"><i class="fab fa-facebook"></i></a></div>
-            <p>© 2025 All rights reserved.</p>
-        </div>
-    </footer>
-
-    <!-- Floating Messenger Icon -->
-    <a href="https://m.me/urbandecahomesbatangas.8990" target="_blank" rel="noopener noreferrer" class="messenger-float" aria-label="Chat on Messenger">
-        <i class="fab fa-facebook-messenger"></i>
-    </a>
-
-    <div id="imageModal" class="modal"><span class="close">×</span><img class="modal-content" id="modalImage"></div>
-
-    <script>
-        // Search functionality
-        const searchInput = document.getElementById('headerSearch');
-        const searchResults = document.getElementById('searchResults');
-        
-        const links = [
-            { keyword: "PL", name: "DS Pricelist", url: "https://urbandecahomesbatangas.com/pl" },
-            { keyword: "EC", name: "E-Calculator", url: "https://urbandecahomesbatangas.com/e-cal" },
-            { keyword: "SR", name: "Daily Sales Report", url: "https://urbandecahomesbatangas.com/salesreport" },
-            { keyword: "GC", name: "General Computations", url: "https://docs.google.com/spreadsheets/d/1AD2KlyHsBuOfE8voOaPYwaCQEHt-AIRUy0IOw9qTx2U/edit?gid=0#gid=0" },
-            { keyword: "TH", name: "Tracker Hub", url: "https://urbandecahomesbatangas.com/tracker-hub" },
-            { keyword: "IH", name: "Inventory Host", url: "https://docs.google.com/spreadsheets/d/1oc4VaogQ_50WeGWiUd0U9c8pMBT-LyWaC8IboNFPr5k/edit?gid=1669256709#gid=1669256709" },
-            { keyword: "CD", name: "Comm-Dis", url: "https://urbandecahomesbatangas.com/comdis" },
-            { keyword: "GD", name: "Google Drive", url: "https://urbandecahomesbatangas.com/members" }
-        ];
-
-        searchInput.addEventListener('input', function() {
-            const val = this.value.toUpperCase().trim();
-            searchResults.innerHTML = '';
+            <p id="profile-bio" class="text-slate-600 text-xs sm:text-sm leading-relaxed">a residential community located in Barangay Balagtas, Batangas City. It is designed to offer affordable, comfortable, and modern living spaces for families, professionals, and first-time homebuyers.</p>
+            <button onclick="editProfileField('bio')" class="admin-only hidden text-[11px] font-medium text-[#003366] hover:underline inline-block">Edit Bio</button>
+            <!-- Stats badges -->
             
-            if (!val) {
-                searchResults.style.display = 'none';
-                return;
-            }
+          </div>
+        </div>
+        <div class="flex items-center gap-2.5 w-full md:w-auto justify-center sm:justify-start pt-2 md:pt-0 border-t md:border-t-0 border-slate-200/60">
+          <a id="contact-email" href="mailto:agent@example.com" class="px-4 py-2 rounded-md bg-[#003366] text-white hover:bg-[#002244] text-xs font-semibold flex items-center gap-2 shadow-sm transition active:scale-95"><i class="fa-solid fa-envelope text-[#f1c40f]"></i> <span>Email</span></a>
+          <a id="contact-phone" href="tel:+1234567890" class="px-4 py-2 rounded-md bg-[#f1c40f] text-[#003366] hover:bg-[#d4ac0d] text-xs font-semibold flex items-center gap-2 shadow-sm transition active:scale-95"><i class="fa-solid fa-phone"></i> <span>Call</span></a>
+          <button onclick="editProfileField('contact')" class="admin-only hidden p-2 rounded-md bg-slate-100 text-[#003366] hover:bg-slate-200 text-xs transition shadow-sm active:scale-95"><i class="fa-solid fa-gear"></i></button>
+        </div>
+      </div>
+    </div>
+  </header>
 
-            const filtered = links.filter(item => item.keyword === val);
+  <!-- ========== MAIN ========== -->
+  <main class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12 sm:space-y-16 pb-16 flex-grow w-full relative z-10">
 
-            if (filtered.length > 0) {
-                filtered.forEach(item => {
-                    const div = document.createElement('div');
-                    div.textContent = item.name;
-                    div.onclick = () => {
-                        window.open(item.url, '_blank');
-                        searchResults.style.display = 'none';
-                        searchInput.value = '';
-                    };
-                    searchResults.appendChild(div);
-                });
-                searchResults.style.display = 'block';
-            } else {
-                searchResults.style.display = 'none';
-            }
-        });
+    <!-- Projects -->
+    <section id="projects" class="reveal">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6">
+        <div>
+          <h2 class="text-2xl font-bold text-[#003366] tracking-tight">Featured Projects</h2>
+          <p class="text-slate-500 text-xs mt-0.5">Quality Homes, Convenient Locations, and Amenities Designed for Your Lifestyle</p>
+        </div>
+        <button onclick="openModal('listing-modal')" class="admin-only hidden bg-[#003366] hover:bg-[#002244] text-white px-3.5 py-2 rounded-md font-medium shadow transition text-xs active:scale-95 self-start sm:self-auto flex items-center gap-1.5"><i class="fa-solid fa-plus text-[#f1c40f]"></i> Add Project Listing</button>
+      </div>
+      <div id="listings-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+    </section>
 
-        document.addEventListener('click', (e) => {
-            if (!searchInput.contains(e.target) && !searchResults.contains(e.target)) {
-                searchResults.style.display = 'none';
-            }
-        });
+    <!-- Reels -->
+    <section id="reels" class="glass-panel-dark text-white rounded-xl p-5 sm:p-7 shadow-xl relative overflow-hidden reveal">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6 relative z-10">
+        <div>
+          <h2 class="text-2xl font-bold tracking-tight">Reels Carousel</h2>
+          <p class="text-slate-300 text-xs mt-0.5">Explore our projects through videos, walkthroughs, and virtual tours.</p>
+        </div>
+        <button onclick="openReelModal()" class="admin-only hidden bg-white/10 hover:bg-white/20 border border-white/20 text-white px-3.5 py-2 rounded-md font-medium text-xs transition flex items-center justify-center gap-1.5 backdrop-blur-md active:scale-95 self-start sm:self-auto"><i class="fa-solid fa-video text-[#f1c40f]"></i> Add Video Reel</button>
+      </div>
+      <div class="swiper reelsSwiper relative z-10 py-1">
+        <div class="swiper-wrapper" id="reels-container"></div>
+        <div class="swiper-pagination !-bottom-1"></div>
+        <button id="reels-prev-btn" class="absolute left-2 top-1/2 -translate-y-1/2 z-30 w-9 h-9 rounded-full bg-slate-900/70 hover:bg-slate-900 border border-white/20 text-white flex items-center justify-center backdrop-blur-md transition active:scale-95 shadow"><i class="fa-solid fa-chevron-left text-xs"></i></button>
+        <button id="reels-next-btn" class="absolute right-2 top-1/2 -translate-y-1/2 z-30 w-9 h-9 rounded-full bg-slate-900/70 hover:bg-slate-900 border border-white/20 text-white flex items-center justify-center backdrop-blur-md transition active:scale-95 shadow"><i class="fa-solid fa-chevron-right text-xs"></i></button>
+      </div>
+    </section>
 
-        // Mobile Navigation Toggle
-        document.querySelector('.sidebar-toggle').addEventListener('click', function() {
-            document.querySelector('.nav-menu').classList.toggle('active');
-        });
+    <!-- Updates -->
+    <section id="updates" class="max-w-4xl mx-auto w-full reveal">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6">
+        <div>
+          <h2 class="text-2xl font-bold text-[#003366] tracking-tight">Latest Updates & News</h2>
+          <p class="text-slate-500 text-xs mt-0.5">Real estate market updates, advisories, and announcements</p>
+        </div>
+        <button onclick="openModal('blog-modal')" class="admin-only hidden bg-[#003366] hover:bg-[#002244] text-white px-3.5 py-2 rounded-md font-medium shadow transition text-xs active:scale-95 self-start sm:self-auto flex items-center gap-1.5"><i class="fa-solid fa-pen-to-square text-[#f1c40f]"></i> Create Post</button>
+      </div>
+      <div id="blog-container" class="space-y-5"></div>
+      <div id="blog-pagination" class="flex justify-between items-center mt-6 pt-4 border-t border-slate-200">
+        <button id="btn-prev-page" onclick="changeBlogPage(-1)" class="px-3 py-1.5 rounded-md border border-slate-300 text-slate-600 hover:bg-slate-100 disabled:opacity-40 disabled:cursor-not-allowed font-medium text-xs transition active:scale-95"><i class="fa-solid fa-arrow-left mr-1"></i> Previous</button>
+        <span id="blog-page-info" class="text-xs text-slate-500 font-medium">Page 1</span>
+        <button id="btn-next-page" onclick="changeBlogPage(1)" class="px-3 py-1.5 rounded-md border border-slate-300 text-slate-600 hover:bg-slate-100 disabled:opacity-40 disabled:cursor-not-allowed font-medium text-xs transition active:scale-95">Next <i class="fa-solid fa-arrow-right ml-1"></i></button>
+      </div>
+    </section>
 
-        document.querySelectorAll('.nav-menu a').forEach(link => {
-            link.addEventListener('click', function() {
-                setTimeout(() => {
-                    document.querySelector('.nav-menu').classList.remove('active');
-                }, 300);
-            });
-        });
+    <!-- Testimonials (NEW) -->
+    <section id="testimonials" class="reveal">
+      <div class="text-center mb-8">
+        <h2 class="text-2xl font-bold text-[#003366] tracking-tight">What Our Clients Say</h2>
+        <p class="text-slate-500 text-xs mt-1">Trusted by home buyers and investors across the region</p>
+      </div>
+      <div id="testimonials-container" class="grid grid-cols-1 md:grid-cols-3 gap-6"></div>
+    </section>
 
-        // Image Modal
-        const modal = document.getElementById('imageModal');
-        const modalImg = document.getElementById('modalImage');
-        const closeModal = document.querySelector('.close');
+    <!-- Connect -->
+    <section id="connect" class="glass-panel rounded-xl p-6 sm:p-8 text-center max-w-4xl mx-auto w-full reveal">
+      <div class="flex items-center justify-center gap-2 mb-1">
+        <h2 class="text-2xl font-bold text-[#003366] tracking-tight">Connect With Us</h2>
+        <button onclick="openModal('social-modal')" class="admin-only hidden text-[#003366] hover:text-[#002244] text-xs font-semibold transition"><i class="fa-solid fa-plus-circle mr-1"></i> Add Link</button>
+      </div>
+      <p class="text-slate-500 text-xs mb-6">Follow our official social media profiles and channels</p>
+      <div id="socials-container" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3"></div>
+    </section>
 
-        document.querySelectorAll('.gallery-item img, .specs-image img').forEach(img => {
-            img.addEventListener('click', function() {
-                modal.style.display = 'block';
-                modalImg.src = this.src;
-            });
-        });
+    <!-- Lead -->
+    <section id="lead-capture" class="glass-panel-dark text-white rounded-xl p-6 sm:p-8 shadow-xl relative overflow-hidden reveal">
+      <div class="max-w-3xl mx-auto relative z-10">
+        <div class="flex justify-between items-start gap-4 mb-5">
+          <div>
+            <span class="bg-[#f1c40f]/20 text-[#f1c40f] border border-[#f1c40f]/30 px-2.5 py-0.5 rounded text-[10px] font-semibold tracking-wider">Fast Response</span>
+            <h2 class="text-2xl font-bold mt-1 tracking-tight">Request Property Information</h2>
+            <p class="text-slate-300 text-xs mt-0.5">Leave your contact details and our agent will connect with you shortly.</p>
+          </div>
+          <button onclick="openModal('lead-settings-modal')" class="admin-only hidden bg-white/10 hover:bg-white/20 text-white p-2 rounded-md border border-white/20 text-xs"><i class="fa-solid fa-sliders"></i></button>
+        </div>
+        <form onsubmit="submitLeadForm(event)" class="space-y-3.5">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+            <div><label class="block text-[11px] font-medium text-slate-300 mb-1 tracking-wider uppercase">Your Full Name</label><input type="text" id="lead-name" required placeholder="e.g. John Smith" class="w-full px-3.5 py-2.5 bg-white/10 border border-white/20 rounded-md text-white placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-[#f1c40f] text-xs" /></div>
+            <div><label class="block text-[11px] font-medium text-slate-300 mb-1 tracking-wider uppercase">Contact Number</label><input type="tel" id="lead-phone" required placeholder="e.g. +63 912 345 6789" class="w-full px-3.5 py-2.5 bg-white/10 border border-white/20 rounded-md text-white placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-[#f1c40f] text-xs" /></div>
+          </div>
+          <div><label class="block text-[11px] font-medium text-slate-300 mb-1 tracking-wider uppercase">Email Address</label><input type="email" id="lead-email" required placeholder="e.g. john@example.com" class="w-full px-3.5 py-2.5 bg-white/10 border border-white/20 rounded-md text-white placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-[#f1c40f] text-xs" /></div>
+          <div><label class="block text-[11px] font-medium text-slate-300 mb-1 tracking-wider uppercase">Message (Optional)</label><textarea id="lead-message" rows="2" placeholder="I am interested in learning about..." class="w-full px-3.5 py-2.5 bg-white/10 border border-white/20 rounded-md text-white placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-[#f1c40f] text-xs"></textarea></div>
+          <button type="submit" class="w-full py-3 bg-[#f1c40f] hover:bg-[#d4ac0d] text-[#003366] font-bold rounded-md shadow transition text-xs sm:text-sm flex items-center justify-center gap-2 active:scale-[0.99]"><i class="fa-solid fa-paper-plane"></i> Submit Request</button>
+        </form>
+      </div>
+    </section>
+  </main>
 
-        closeModal.addEventListener('click', () => modal.style.display = 'none');
-        window.addEventListener('click', e => { if (e.target === modal) modal.style.display = 'none'; });
+  <!-- Footer -->
+  <footer id="footer-section" class="bg-[#001f3f] text-slate-300 pt-10 pb-6 border-t border-[#001a33] mt-auto relative z-10">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
+      <div>
+        <div class="flex items-center gap-2.5 mb-3">
+          <img id="footer-logo" src="https://images.unsplash.com/photo-1560518883-ce09059eeffa?auto=format&fit=crop&w=100&q=80" alt="Logo" class="w-9 h-9 rounded-md object-cover bg-white ring-1 ring-[#f1c40f]" />
+          <span id="footer-brand-name" class="text-lg font-bold text-white tracking-wide">Realty Name</span>
+        </div>
+        <p id="footer-about" class="text-xs text-slate-400 leading-relaxed">Providing top-tier real estate services with integrity, transparency, and professional expertise.</p>
+        <button onclick="editFooterDetails()" class="admin-only hidden mt-2 text-[11px] font-medium text-[#f1c40f] hover:underline">Edit Footer Info</button>
+      </div>
+      <div>
+        <h4 class="text-white font-semibold mb-3 text-xs uppercase tracking-wider">Related Links</h4>
+        <ul id="footer-links-container" class="space-y-2 text-xs"></ul>
+        <button onclick="openModal('footer-link-modal')" class="admin-only hidden mt-2 text-[11px] font-medium text-[#f1c40f] hover:underline">+ Add Related Link</button>
+      </div>
+      <div class="flex flex-col justify-between">
+        <div>
+          <h4 class="text-white font-semibold mb-3 text-xs uppercase tracking-wider">Platform</h4>
+          <p class="text-xs text-slate-400 mb-3 leading-relaxed">Dedicated professional platform designed to provide top-tier real estate services with integrity, transparency, and professional expertise.</p>
+        </div>
+      </div>
+    </div>
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 border-t border-white/10 pt-5 flex flex-col sm:flex-row justify-between items-center text-xs text-slate-400 gap-2">
+      <p>&copy; <span id="year"></span> All Rights Reserved.</p>
+      <p class="flex items-center gap-1">Powered by Agentech</p>
+    </div>
+  </footer>
 
-        // Carousel
-        const carouselInner = document.querySelector('.carousel-inner');
-        const carouselItems = document.querySelectorAll('.carousel-item');
-        const prevButton = document.querySelector('.carousel-control.prev');
-        const nextButton = document.querySelector('.carousel-control.next');
-        let currentIndex = 0;
+  <!-- ========== MODALS ========== -->
+  <!-- Lead popup -->
+  <div id="lead-popup-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4 transition-opacity duration-300">
+    <div id="lead-popup-card" class="glass-panel bg-white/95 rounded-xl p-6 max-w-md w-full shadow-2xl relative border border-slate-200">
+      <button onclick="closePopupModalAnimated('lead-popup-modal')" class="absolute top-3 right-3 text-slate-400 hover:text-slate-600 text-base p-1"><i class="fa-solid fa-xmark"></i></button>
+      <div class="text-center mb-5">
+        <div class="w-12 h-12 bg-sky-50 text-[#003366] rounded-md flex items-center justify-center mx-auto mb-2 text-xl shadow-inner"><i class="fa-solid fa-house-user"></i></div>
+        <h3 class="text-lg font-bold text-slate-800">Request Call or Message</h3>
+        <p class="text-xs text-slate-500 mt-0.5">Leave your details to receive personalized property consultations.</p>
+      </div>
+      <form onsubmit="submitLeadForm(event, true)" class="space-y-3">
+        <div><label class="block text-[11px] font-medium text-slate-600 mb-1 uppercase tracking-wider">Full Name</label><input type="text" id="popup-lead-name" required placeholder="e.g. John Doe" class="w-full px-3 py-2 border border-slate-300 rounded-md text-xs focus:ring-1 focus:ring-[#003366] focus:outline-none" /></div>
+        <div><label class="block text-[11px] font-medium text-slate-600 mb-1 uppercase tracking-wider">Contact Number</label><input type="tel" id="popup-lead-phone" required placeholder="e.g. +63 912 345 6789" class="w-full px-3 py-2 border border-slate-300 rounded-md text-xs focus:ring-1 focus:ring-[#003366] focus:outline-none" /></div>
+        <div><label class="block text-[11px] font-medium text-slate-600 mb-1 uppercase tracking-wider">Email Address</label><input type="email" id="popup-lead-email" required placeholder="e.g. john@example.com" class="w-full px-3 py-2 border border-slate-300 rounded-md text-xs focus:ring-1 focus:ring-[#003366] focus:outline-none" /></div>
+        <div class="flex gap-2.5 pt-1">
+          <button type="button" onclick="closePopupModalAnimated('lead-popup-modal')" class="w-1/2 py-2 rounded-md border border-slate-300 text-slate-600 text-xs font-medium hover:bg-slate-50">Skip to Browse</button>
+          <button type="submit" class="w-1/2 py-2 rounded-md bg-[#003366] hover:bg-[#002244] text-white text-xs font-semibold shadow active:scale-95 transition">Send Request</button>
+        </div>
+      </form>
+    </div>
+  </div>
 
-        function updateCarousel() {
-            carouselInner.style.transform = `translateX(-${currentIndex * 100}%)`;
+  <!-- Lead settings -->
+  <div id="lead-settings-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-xl p-6 max-w-lg w-full shadow-2xl border border-slate-200">
+      <h3 class="text-base font-bold text-slate-800 mb-1">Lead Capture & Integrations Settings</h3>
+      <p class="text-xs text-slate-500 mb-4">Configure recipient parameters, Google Sheets Apps Script URL, and optional Telegram Bot integrations.</p>
+      <form onsubmit="saveLeadSettings(event)" class="space-y-3.5">
+        <div><label class="block text-[11px] font-medium text-slate-600 mb-1 uppercase tracking-wider">Notification Email</label><input type="email" id="setting-lead-email" required class="w-full px-3 py-2 border border-slate-300 rounded-md text-xs focus:ring-1 focus:ring-[#003366] focus:outline-none" /></div>
+        <div><label class="block text-[11px] font-medium text-slate-600 mb-1 uppercase tracking-wider">Notification Phone Number</label><input type="text" id="setting-lead-phone" required class="w-full px-3 py-2 border border-slate-300 rounded-md text-xs focus:ring-1 focus:ring-[#003366] focus:outline-none" /></div>
+        <div><label class="block text-[11px] font-medium text-slate-600 mb-1 uppercase tracking-wider">Google Spreadsheet Webhook URL (Apps Script Endpoint)</label><input type="url" id="setting-sheet-url" placeholder="https://script.google.com/macros/s/.../exec" class="w-full px-3 py-2 border border-slate-300 rounded-md text-xs focus:ring-1 focus:ring-[#003366] focus:outline-none" /><span class="text-[10px] text-slate-400 mt-0.5 block">Captured form submissions will be encoded to this Google Sheet.</span></div>
+        <div class="border-t border-slate-200 pt-3">
+          <h4 class="text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">Telegram Bot Integration (Optional)</h4>
+          <div class="space-y-2">
+            <div><label class="block text-[10px] font-semibold text-slate-500 uppercase">Telegram Bot Token API</label><input type="text" id="setting-tg-token" placeholder="123456789:ABCdefGhIJKlmNoPQRsTUVwxyZ" class="w-full px-3 py-1.5 border border-slate-300 rounded-md text-xs focus:ring-1 focus:ring-[#003366] focus:outline-none" /></div>
+            <div><label class="block text-[10px] font-semibold text-slate-500 uppercase">Telegram Chat ID</label><input type="text" id="setting-tg-chatid" placeholder="-1001234567890 or User ID" class="w-full px-3 py-1.5 border border-slate-300 rounded-md text-xs focus:ring-1 focus:ring-[#003366] focus:outline-none" /></div>
+          </div>
+        </div>
+        <div class="flex gap-2.5 pt-2">
+          <button type="button" onclick="closeModal('lead-settings-modal')" class="w-1/2 py-2 rounded-md border border-slate-300 text-slate-600 text-xs font-medium">Cancel</button>
+          <button type="submit" class="w-1/2 py-2 rounded-md bg-[#003366] hover:bg-[#002244] text-white text-xs font-semibold shadow active:scale-95 transition">Save Integrations</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Login -->
+  <div id="login-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-xl p-6 max-w-sm w-full shadow-2xl border border-slate-100">
+      <div class="text-center mb-5">
+        <div class="w-12 h-12 bg-sky-50 text-[#003366] rounded-md flex items-center justify-center mx-auto mb-2 text-xl shadow-inner"><i class="fa-solid fa-user-shield"></i></div>
+        <h3 class="text-lg font-bold text-slate-800">Administrator</h3>
+        <p class="text-xs text-slate-500 mt-0.5">Enter credentials to get access.</p>
+      </div>
+      <form onsubmit="submitLogin(event)" class="space-y-3.5">
+        <div><label class="block text-[11px] font-medium text-slate-600 mb-1 uppercase tracking-wider">Username</label><input type="text" id="login-user" required class="w-full px-3 py-2 border border-slate-300 rounded-md focus:ring-1 focus:ring-[#003366] focus:outline-none text-xs" /></div>
+        <div><label class="block text-[11px] font-medium text-slate-600 mb-1 uppercase tracking-wider">Password</label><input type="password" id="login-pass" required class="w-full px-3 py-2 border border-slate-300 rounded-md focus:ring-1 focus:ring-[#003366] focus:outline-none text-xs" /></div>
+        <p id="login-error" class="text-xs text-red-500 hidden text-center font-medium"></p>
+        <div class="flex gap-2.5 pt-1">
+          <button type="button" onclick="closeModal('login-modal')" class="w-1/2 py-2 rounded-md border border-slate-300 text-slate-600 text-xs font-medium hover:bg-slate-50">Cancel</button>
+          <button type="submit" class="w-1/2 py-2 rounded-md bg-[#003366] hover:bg-[#002244] text-white text-xs font-semibold shadow active:scale-95 transition">Sign In</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Listing details -->
+  <div id="listing-details-modal" class="fixed inset-0 bg-slate-900/70 backdrop-blur-sm hidden z-50 flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
+    <div class="bg-white rounded-xl max-w-3xl w-full max-h-[90vh] overflow-y-auto custom-scrollbar shadow-2xl my-auto relative border border-slate-100">
+      <button onclick="closeModal('listing-details-modal')" class="absolute top-3 right-3 z-30 bg-slate-900/60 hover:bg-slate-900 text-white w-8 h-8 rounded-full flex items-center justify-center backdrop-blur-md transition active:scale-95 shadow"><i class="fa-solid fa-xmark text-sm"></i></button>
+      <div id="listing-details-content"></div>
+    </div>
+  </div>
+
+  <!-- Blog details -->
+  <div id="blog-details-modal" class="fixed inset-0 bg-slate-900/70 backdrop-blur-sm hidden z-50 flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
+    <div class="bg-white rounded-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto custom-scrollbar shadow-2xl my-auto relative border border-slate-100 p-5 sm:p-7">
+      <button onclick="closeModal('blog-details-modal')" class="absolute top-3 right-3 z-30 bg-slate-100 hover:bg-slate-200 text-slate-700 w-8 h-8 rounded-full flex items-center justify-center transition active:scale-95"><i class="fa-solid fa-xmark text-sm"></i></button>
+      <div id="blog-details-content" class="space-y-4 max-h-[75vh] overflow-y-auto custom-scrollbar pr-2"></div>
+    </div>
+  </div>
+
+  <!-- Edit blog -->
+  <div id="edit-blog-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-xl p-6 max-w-lg w-full shadow-2xl border border-slate-100">
+      <h3 class="text-base font-bold text-slate-800 mb-3">Edit Post Update</h3>
+      <input type="hidden" id="edit-blog-id" />
+      <form onsubmit="saveEditedBlog(event)" class="space-y-3.5">
+        <div><label class="block text-[11px] font-medium text-slate-600 mb-1 uppercase tracking-wider">Headline Title</label><input type="text" id="edit-blog-title" required class="w-full px-3 py-2 border border-slate-300 rounded-md text-xs focus:ring-1 focus:ring-[#003366] focus:outline-none" /></div>
+        <div><label class="block text-[11px] font-medium text-slate-600 mb-1 uppercase tracking-wider">Thumbnail & Image URLs (Comma-separated)</label><textarea id="edit-blog-img" rows="2" class="w-full px-3 py-2 border border-slate-300 rounded-md text-xs focus:ring-1 focus:ring-[#003366] focus:outline-none"></textarea></div>
+        <div>
+          <label class="block text-[11px] font-medium text-slate-600 mb-1 uppercase tracking-wider">Post Caption / Announcement</label>
+          <div class="rich-toolbar flex flex-wrap gap-1.5 p-2 border border-slate-200 border-b-0 rounded-t-md bg-slate-50">
+            <button type="button" onclick="formatBlogText('bold','edit-blog-caption-editor')" title="Bold"><i class="fa-solid fa-bold text-xs"></i></button>
+            <button type="button" onclick="formatBlogText('italic','edit-blog-caption-editor')" title="Italic"><i class="fa-solid fa-italic text-xs"></i></button>
+            <button type="button" onclick="formatBlogText('underline','edit-blog-caption-editor')" title="Underline"><i class="fa-solid fa-underline text-xs"></i></button>
+            <button type="button" onclick="formatBlogText('insertUnorderedList','edit-blog-caption-editor')" title="Bullet list"><i class="fa-solid fa-list-ul text-xs"></i></button>
+            <button type="button" onclick="formatBlogText('insertOrderedList','edit-blog-caption-editor')" title="Numbered list"><i class="fa-solid fa-list-ol text-xs"></i></button>
+            <button type="button" onclick="insertBlogLink('edit-blog-caption-editor')" title="Hyperlink"><i class="fa-solid fa-link text-xs"></i></button>
+            <button type="button" onclick="formatBlogText('justifyLeft','edit-blog-caption-editor')" title="Align left"><i class="fa-solid fa-align-left text-xs"></i></button>
+            <button type="button" onclick="formatBlogText('justifyCenter','edit-blog-caption-editor')" title="Align center"><i class="fa-solid fa-align-center text-xs"></i></button>
+            <button type="button" onclick="formatBlogText('justifyRight','edit-blog-caption-editor')" title="Align right"><i class="fa-solid fa-align-right text-xs"></i></button>
+            <button type="button" onclick="formatBlogText('removeFormat','edit-blog-caption-editor')" title="Clear formatting"><i class="fa-solid fa-eraser text-xs"></i></button>
+          </div>
+          <div id="edit-blog-caption-editor" class="rich-editor w-full px-3 py-2 border border-slate-300 rounded-b-md text-xs focus:ring-1 focus:ring-[#003366] focus:outline-none" contenteditable="true" data-placeholder="Edit your update here..."></div>
+          <textarea id="edit-blog-caption" class="hidden"></textarea>
+        </div>
+        <div class="flex gap-2.5 pt-1">
+          <button type="button" onclick="closeModal('edit-blog-modal')" class="w-1/2 py-2 rounded-md border border-slate-300 text-slate-600 text-xs font-medium">Cancel</button>
+          <button type="submit" class="w-1/2 py-2 rounded-md bg-[#003366] hover:bg-[#002244] text-white text-xs font-semibold shadow active:scale-95 transition">Update Post</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Listing modal -->
+  <div id="listing-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4 overflow-y-auto">
+    <div class="bg-white rounded-xl p-6 max-w-xl w-full max-h-[90vh] overflow-y-auto custom-scrollbar shadow-2xl my-auto border border-slate-100">
+      <h3 id="listing-modal-title" class="text-lg font-bold text-slate-800 mb-3">Add Project Listing</h3>
+      <input type="hidden" id="list-edit-id" />
+      <form onsubmit="saveListing(event)" class="space-y-3.5">
+        <div><label class="block text-[11px] font-medium text-slate-600 mb-1 uppercase tracking-wider">Project Name</label><input type="text" id="list-name" required class="w-full px-3 py-2 border border-slate-300 rounded-md text-xs focus:ring-1 focus:ring-[#003366] focus:outline-none" /></div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div><label class="block text-[11px] font-medium text-slate-600 mb-1 uppercase tracking-wider">Location</label><input type="text" id="list-location" required class="w-full px-3 py-2 border border-slate-300 rounded-md text-xs focus:ring-1 focus:ring-[#003366] focus:outline-none" /></div>
+          <div><label class="block text-[11px] font-medium text-slate-600 mb-1 uppercase tracking-wider">Total Price (₱ Peso)</label><input type="text" id="list-tcp" placeholder="3,500,000" required class="w-full px-3 py-2 border border-slate-300 rounded-md text-xs focus:ring-1 focus:ring-[#003366] focus:outline-none" /></div>
+        </div>
+        <div><label class="block text-[11px] font-medium text-slate-600 mb-1 uppercase tracking-wider">Monthly Amortization</label><input type="text" id="list-amort" placeholder="15,000 / month" required class="w-full px-3 py-2 border border-slate-300 rounded-md text-xs focus:ring-1 focus:ring-[#003366] focus:outline-none" /></div>
+        <div><label class="block text-[11px] font-medium text-slate-600 mb-1 uppercase tracking-wider">Description (HTML, Spacing, Bold, Links, Emojis Enabled)</label><textarea id="list-desc" rows="3" required placeholder="Enter description... <b>Bold</b> or <a href='...'>Links</a>" class="w-full px-3 py-2 border border-slate-300 rounded-md text-xs focus:ring-1 focus:ring-[#003366] focus:outline-none"></textarea></div>
+        <div><label class="block text-[11px] font-medium text-slate-600 mb-1 uppercase tracking-wider">Photo URLs (Comma-separated)</label><textarea id="list-photos" rows="2" placeholder="https://..., https://..." required class="w-full px-3 py-2 border border-slate-300 rounded-md text-xs focus:ring-1 focus:ring-[#003366] focus:outline-none"></textarea></div>
+        <div class="border-t border-slate-200 pt-3">
+          <label class="block text-[11px] font-medium text-slate-600 mb-2 uppercase tracking-wider">Custom Action Buttons (Arranging Capable)</label>
+          <div id="custom-buttons-inputs" class="space-y-2"></div>
+          <button type="button" onclick="addCustomButtonInputRow()" class="mt-2 text-xs font-semibold text-[#003366] hover:underline flex items-center gap-1"><i class="fa-solid fa-plus-circle"></i> Add Link Button</button>
+        </div>
+        <div class="flex gap-2.5 pt-1">
+          <button type="button" onclick="closeModal('listing-modal')" class="w-1/2 py-2 rounded-md border border-slate-300 text-slate-600 text-xs font-medium hover:bg-slate-50">Cancel</button>
+          <button type="submit" class="w-1/2 py-2 rounded-md bg-[#003366] hover:bg-[#002244] text-white text-xs font-semibold shadow active:scale-95 transition">Save Listing</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- FAQ modal -->
+  <div id="faq-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-xl p-6 max-w-md w-full shadow-2xl border border-slate-100">
+      <h3 class="text-base font-bold text-slate-800 mb-3">Add FAQ to Project</h3>
+      <input type="hidden" id="faq-listing-id" />
+      <form onsubmit="saveFAQ(event)" class="space-y-3.5">
+        <div><label class="block text-[11px] font-medium text-slate-600 mb-1 uppercase tracking-wider">Question</label><input type="text" id="faq-question" required class="w-full px-3 py-2 border border-slate-300 rounded-md text-xs focus:ring-1 focus:ring-[#003366] focus:outline-none" /></div>
+        <div><label class="block text-[11px] font-medium text-slate-600 mb-1 uppercase tracking-wider">Answer</label><textarea id="faq-answer" rows="3" required class="w-full px-3 py-2 border border-slate-300 rounded-md text-xs focus:ring-1 focus:ring-[#003366] focus:outline-none"></textarea></div>
+        <div class="flex gap-2.5">
+          <button type="button" onclick="closeModal('faq-modal')" class="w-1/2 py-2 rounded-md border border-slate-300 text-slate-600 text-xs font-medium">Cancel</button>
+          <button type="submit" class="w-1/2 py-2 rounded-md bg-[#003366] hover:bg-[#002244] text-white text-xs font-semibold shadow active:scale-95 transition">Submit FAQ</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Reel modal -->
+  <div id="reel-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-xl p-6 max-w-md w-full shadow-2xl border border-slate-100">
+      <h3 id="reel-modal-title" class="text-base font-bold text-slate-800 mb-3">Add Video Reel</h3>
+      <input type="hidden" id="reel-edit-id" />
+      <form onsubmit="saveReel(event)" class="space-y-3.5">
+        <div><label class="block text-[11px] font-medium text-slate-600 mb-1 uppercase tracking-wider">Reel Title</label><input type="text" id="reel-title" required class="w-full px-3 py-2 border border-slate-300 rounded-md text-xs focus:ring-1 focus:ring-[#003366] focus:outline-none" /></div>
+        <div><label class="block text-[11px] font-medium text-slate-600 mb-1 uppercase tracking-wider">Video Source Link (YouTube / YouTube Shorts / MP4)</label><input type="url" id="reel-url" placeholder="https://youtube.com/shorts/... or https://example.com/video.mp4" required class="w-full px-3 py-2 border border-slate-300 rounded-md text-xs focus:ring-1 focus:ring-[#003366] focus:outline-none" /><span class="text-[10px] text-slate-400 mt-0.5 block">YouTube, YouTube Shorts, and direct MP4 video links are supported.</span></div>
+        <div class="flex gap-2.5 pt-1">
+          <button type="button" onclick="closeModal('reel-modal')" class="w-1/2 py-2 rounded-md border border-slate-300 text-slate-600 text-xs font-medium">Cancel</button>
+          <button type="submit" class="w-1/2 py-2 rounded-md bg-[#003366] hover:bg-[#002244] text-white text-xs font-semibold shadow active:scale-95 transition">Save Reel</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Blog modal -->
+  <div id="blog-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-xl p-6 max-w-lg w-full shadow-2xl border border-slate-100">
+      <h3 class="text-base font-bold text-slate-800 mb-3">Create Post Update</h3>
+      <form onsubmit="saveBlog(event)" class="space-y-3.5">
+        <div><label class="block text-[11px] font-medium text-slate-600 mb-1 uppercase tracking-wider">Headline Title</label><input type="text" id="blog-title" placeholder="e.g. New Housing Development Unveiled" required class="w-full px-3 py-2 border border-slate-300 rounded-md text-xs focus:ring-1 focus:ring-[#003366] focus:outline-none" /></div>
+        <div><label class="block text-[11px] font-medium text-slate-600 mb-1 uppercase tracking-wider">Thumbnail & Image URLs (Comma-separated for multiple)</label><textarea id="blog-img" rows="2" placeholder="https://..., https://..." class="w-full px-3 py-2 border border-slate-300 rounded-md text-xs focus:ring-1 focus:ring-[#003366] focus:outline-none"></textarea><span class="text-[10px] text-slate-400 mt-0.5 block">1st Image will be displayed as thumbnail. Multiple images appear as carousel inside post.</span></div>
+        <div>
+          <label class="block text-[11px] font-medium text-slate-600 mb-1 uppercase tracking-wider">Post Caption / Announcement</label>
+          <div class="rich-toolbar flex flex-wrap gap-1.5 p-2 border border-slate-200 border-b-0 rounded-t-md bg-slate-50">
+            <button type="button" onclick="formatBlogText('bold','blog-caption-editor')" title="Bold"><i class="fa-solid fa-bold text-xs"></i></button>
+            <button type="button" onclick="formatBlogText('italic','blog-caption-editor')" title="Italic"><i class="fa-solid fa-italic text-xs"></i></button>
+            <button type="button" onclick="formatBlogText('underline','blog-caption-editor')" title="Underline"><i class="fa-solid fa-underline text-xs"></i></button>
+            <button type="button" onclick="formatBlogText('insertUnorderedList','blog-caption-editor')" title="Bullet list"><i class="fa-solid fa-list-ul text-xs"></i></button>
+            <button type="button" onclick="formatBlogText('insertOrderedList','blog-caption-editor')" title="Numbered list"><i class="fa-solid fa-list-ol text-xs"></i></button>
+            <button type="button" onclick="insertBlogLink('blog-caption-editor')" title="Hyperlink"><i class="fa-solid fa-link text-xs"></i></button>
+            <button type="button" onclick="formatBlogText('justifyLeft','blog-caption-editor')" title="Align left"><i class="fa-solid fa-align-left text-xs"></i></button>
+            <button type="button" onclick="formatBlogText('justifyCenter','blog-caption-editor')" title="Align center"><i class="fa-solid fa-align-center text-xs"></i></button>
+            <button type="button" onclick="formatBlogText('justifyRight','blog-caption-editor')" title="Align right"><i class="fa-solid fa-align-right text-xs"></i></button>
+            <button type="button" onclick="formatBlogText('removeFormat','blog-caption-editor')" title="Clear formatting"><i class="fa-solid fa-eraser text-xs"></i></button>
+          </div>
+          <div id="blog-caption-editor" class="rich-editor w-full px-3 py-2 border border-slate-300 rounded-b-md text-xs focus:ring-1 focus:ring-[#003366] focus:outline-none" contenteditable="true" data-placeholder="Write your update here..."></div>
+          <textarea id="blog-caption" class="hidden"></textarea>
+          <span class="text-[10px] text-slate-400 mt-0.5 block">Supports spacing, bold, italic, underline, lists, alignment, hyperlinks, and rich-text formatting.</span>
+        </div>
+        <div class="flex gap-2.5 pt-1">
+          <button type="button" onclick="closeModal('blog-modal')" class="w-1/2 py-2 rounded-md border border-slate-300 text-slate-600 text-xs font-medium">Cancel</button>
+          <button type="submit" class="w-1/2 py-2 rounded-md bg-[#003366] hover:bg-[#002244] text-white text-xs font-semibold shadow active:scale-95 transition">Publish Post</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Image viewer -->
+  <div id="image-viewer-modal" class="fixed inset-0 bg-slate-950/90 backdrop-blur-md hidden z-50 flex items-center justify-center p-4">
+    <button onclick="closeModal('image-viewer-modal')" class="absolute top-4 right-4 text-white/80 hover:text-white text-xl p-2 z-20"><i class="fa-solid fa-xmark"></i></button>
+    <button id="viewer-prev" onclick="navigateViewer(-1)" class="absolute left-4 text-white/80 hover:text-white text-2xl p-2.5 z-20 bg-slate-900/50 hover:bg-slate-900 rounded-full flex items-center justify-center"><i class="fa-solid fa-chevron-left"></i></button>
+    <button id="viewer-next" onclick="navigateViewer(1)" class="absolute right-4 text-white/80 hover:text-white text-2xl p-2.5 z-20 bg-slate-900/50 hover:bg-slate-900 rounded-full flex items-center justify-center"><i class="fa-solid fa-chevron-right"></i></button>
+    <div class="max-w-5xl max-h-[85vh] overflow-hidden flex items-center justify-center"><img id="viewer-image" src="" alt="Preview" class="max-w-full max-h-[85vh] object-contain rounded-lg shadow-2xl" /></div>
+  </div>
+
+  <!-- Social modal -->
+  <div id="social-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-xl p-6 max-w-md w-full shadow-2xl border border-slate-100">
+      <h3 class="text-base font-bold text-slate-800 mb-3">Add Social Profile</h3>
+      <form onsubmit="saveSocial(event)" class="space-y-3.5">
+        <div><label class="block text-[11px] font-medium text-slate-600 mb-1 uppercase tracking-wider">Platform Name</label><input type="text" id="social-name" placeholder="e.g. Facebook, Instagram" required class="w-full px-3 py-2 border border-slate-300 rounded-md text-xs focus:ring-1 focus:ring-[#003366] focus:outline-none" /></div>
+        <div><label class="block text-[11px] font-medium text-slate-600 mb-1 uppercase tracking-wider">Select Social Icon</label><div id="icon-picker-container" class="grid grid-cols-6 gap-2 p-2.5 border border-slate-200 rounded-md bg-slate-50 max-h-36 overflow-y-auto"></div><input type="hidden" id="social-icon" required /></div>
+        <div><label class="block text-[11px] font-medium text-slate-600 mb-1 uppercase tracking-wider">Profile / Account URL</label><input type="url" id="social-url" placeholder="https://..." required class="w-full px-3 py-2 border border-slate-300 rounded-md text-xs focus:ring-1 focus:ring-[#003366] focus:outline-none" /></div>
+        <div class="flex gap-2.5 pt-1">
+          <button type="button" onclick="closeModal('social-modal')" class="w-1/2 py-2 rounded-md border border-slate-300 text-slate-600 text-xs font-medium">Cancel</button>
+          <button type="submit" class="w-1/2 py-2 rounded-md bg-[#003366] hover:bg-[#002244] text-white text-xs font-semibold shadow active:scale-95 transition">Save Profile</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Footer link modal -->
+  <div id="footer-link-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-xl p-6 max-w-md w-full shadow-2xl border border-slate-100">
+      <h3 class="text-base font-bold text-slate-800 mb-3">Add Related Link</h3>
+      <form onsubmit="saveFooterLink(event)" class="space-y-3.5">
+        <div><label class="block text-[11px] font-medium text-slate-600 mb-1 uppercase tracking-wider">Link Label</label><input type="text" id="footlink-label" required class="w-full px-3 py-2 border border-slate-300 rounded-md text-xs focus:ring-1 focus:ring-[#003366] focus:outline-none" /></div>
+        <div><label class="block text-[11px] font-medium text-slate-600 mb-1 uppercase tracking-wider">URL</label><input type="text" id="footlink-url" required class="w-full px-3 py-2 border border-slate-300 rounded-md text-xs focus:ring-1 focus:ring-[#003366] focus:outline-none" /></div>
+        <div class="flex gap-2.5 pt-1">
+          <button type="button" onclick="closeModal('footer-link-modal')" class="w-1/2 py-2 rounded-md border border-slate-300 text-slate-600 text-xs font-medium">Cancel</button>
+          <button type="submit" class="w-1/2 py-2 rounded-md bg-[#003366] hover:bg-[#002244] text-white text-xs font-semibold shadow active:scale-95 transition">Add Link</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Copy toast (NEW) -->
+  <div id="copy-toast" class="copy-toast">
+    <i class="fa-solid fa-check-circle"></i>
+    <span id="copy-toast-text">Link copied to clipboard!</span>
+  </div>
+
+  <!-- Swiper -->
+  <script src="https://cdn.jsdelivr.net/npm/swiper@10/swiper-bundle.min.js"></script>
+
+  <!-- Firebase -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getDatabase, ref, set, onValue, push, remove } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+    const firebaseConfig = { apiKey: "AIzaSyCq9fPSLPMZ8p6Km4O4SvyB-OZNRMKS79s", authDomain: "dtr-online.firebaseapp.com", databaseURL: "https://dtr-online-default-rtdb.firebaseio.com", projectId: "dtr-online", storageBucket: "dtr-online.firebasestorage.app", messagingSenderId: "660180421531", appId: "1:660180421531:web:931d4e3fb183521bc9ef3e" };
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+    window.db = db; window.ref = ref; window.set = set; window.push = push; window.remove = remove;
+    window.isAdmin = false;
+    window.blogPage = 1; window.blogPostsPerPage = 5; window.allBlogs = []; window.allListings = {}; window.allReels = []; window.allSocials = []; window.allFooterLinks = []; window.profileData = {}; window.globalSearchTerm = '';
+    window.profileKeywordLinks = [ { keyword: "PL", name: "DS Pricelist", url: "https://urbandecahomesbatangas.com/pl" }, { keyword: "EC", name: "E-Calculator", url: "https://urbandecahomesbatangas.com/e-cal" }, { keyword: "SR", name: "Daily Sales Report", url: "https://urbandecahomesbatangas.com/salesreport" }, { keyword: "GC", name: "General Computations", url: "https://docs.google.com/spreadsheets/d/1AD2KlyHsBuOfE8voOaPYwaCQEHt-AIRUy0IOw9qTx2U/edit?gid=0#gid=0" }, { keyword: "TH", name: "Tracker Hub", url: "https://urbandecahomesbatangas.com/tracker-hub" }, { keyword: "IH", name: "Inventory Host", url: "https://docs.google.com/spreadsheets/d/1oc4VaogQ_50WeGWiUd0U9c8pMBT-LyWaC8IboNFPr5k/edit?gid=1669256709#gid=1669256709" }, { keyword: "CD", name: "Comm-Dis", url: "https://urbandecahomesbatangas.com/comdis" }, { keyword: "GD", name: "Google Drive", url: "https://urbandecahomesbatangas.com/members" } ];
+    window.leadSettings = { email: 'agent@example.com', phone: '+1234567890', sheetUrl: '', tgToken: '', tgChatId: '' };
+    let swiperInstance = null;
+    document.getElementById('year').innerText = new Date().getFullYear();
+    document.getElementById('menu-year').innerText = new Date().getFullYear();
+    let loadedSections = { profile: false, listings: false, reels: false, blogs: false, socials: false, footer: false };
+    function checkDataLoaded(section) { loadedSections[section] = true; if (Object.values(loadedSections).every(Boolean)) { const loader = document.getElementById('loading-screen'); if (loader) { loader.classList.add('opacity-0'); setTimeout(() => { loader.style.display = 'none'; }, 500); } } }
+    setTimeout(() => { openPopupModalAnimated('lead-popup-modal'); }, 2000);
+    onValue(ref(db, 'leadSettings'), (snapshot) => { const data = snapshot.val(); if(data) { window.leadSettings = data; document.getElementById('setting-lead-email').value = data.email || ''; document.getElementById('setting-lead-phone').value = data.phone || ''; document.getElementById('setting-sheet-url').value = data.sheetUrl || ''; document.getElementById('setting-tg-token').value = data.tgToken || ''; document.getElementById('setting-tg-chatid').value = data.tgChatId || ''; } });
+    function updatePageMetaTags(name, bio) { const agentName = name || 'Agentech'; const tagline = bio || 'Licensed Real Estate Broker | Helping you find your dream home & high-yield real estate investments'; document.title = agentName; const metaTitle = document.getElementById('meta-doc-title'); if (metaTitle) metaTitle.innerText = agentName; const metaDesc = document.getElementById('meta-doc-desc'); if (metaDesc) metaDesc.setAttribute('content', tagline); const ogTitle = document.getElementById('og-title'); if (ogTitle) ogTitle.setAttribute('content', agentName); const ogDesc = document.getElementById('og-desc'); if (ogDesc) ogDesc.setAttribute('content', tagline); const twTitle = document.getElementById('tw-title'); if (twTitle) twTitle.setAttribute('content', agentName); const twDesc = document.getElementById('tw-desc'); if (twDesc) twDesc.setAttribute('content', tagline); }
+    onValue(ref(db, 'profile'), (snapshot) => { const data = snapshot.val() || {}; window.profileData = data; if(data.cover) { document.getElementById('cover-photo').src = data.cover; document.getElementById('og-image').setAttribute('content', data.cover); document.getElementById('tw-image').setAttribute('content', data.cover); } if(data.avatar) document.getElementById('profile-photo').src = data.avatar; if(data.name) { document.getElementById('profile-name').innerText = data.name; document.getElementById('menu-brand').innerText = data.name; } if(data.bio) document.getElementById('profile-bio').innerText = data.bio; updatePageMetaTags(data.name, data.bio); if(data.email) { document.getElementById('contact-email').href = `mailto:${data.email}`; if(!window.leadSettings.email) window.leadSettings.email = data.email; } if(data.phone) { document.getElementById('contact-phone').href = `tel:${data.phone}`; if(!window.leadSettings.phone) window.leadSettings.phone = data.phone; } checkDataLoaded('profile'); });
+    onValue(ref(db, 'listings'), (snapshot) => { const data = snapshot.val() || {}; window.allListings = data; renderListings(data, window.globalSearchTerm.trim().toLowerCase()); checkDataLoaded('listings'); });
+    onValue(ref(db, 'reels'), (snapshot) => { const data = snapshot.val() || {}; const arr = Array.isArray(data) ? data : Object.entries(data).map(([key, val]) => ({ id: key, ...val })); window.allReels = arr; renderReels(arr, window.globalSearchTerm.trim().toLowerCase()); checkDataLoaded('reels'); });
+    onValue(ref(db, 'blogs'), (snapshot) => { const data = snapshot.val() || {}; const sorted = Object.entries(data).map(([key, val]) => ({ id: key, ...val })).sort((a,b) => (b.timestamp || 0) - (a.timestamp || 0)); window.allBlogs = sorted; renderBlogFeed(); checkDataLoaded('blogs'); });
+    onValue(ref(db, 'socials'), (snapshot) => { const data = snapshot.val() || {}; const arr = Array.isArray(data) ? data : Object.entries(data).map(([key, val]) => ({ id: key, ...val })); window.allSocials = arr; renderSocials(arr); checkDataLoaded('socials'); });
+    onValue(ref(db, 'footer'), (snapshot) => { const data = snapshot.val(); if(data) { if(data.logo) document.getElementById('footer-logo').src = data.logo; if(data.brand) document.getElementById('footer-brand-name').innerText = data.brand; if(data.about) document.getElementById('footer-about').innerText = data.about; if(data.links) { const arr = Array.isArray(data.links) ? data.links : Object.entries(data.links).map(([k, v]) => ({ id: k, ...v })); window.allFooterLinks = arr; renderFooterLinks(arr); } } checkDataLoaded('footer'); });
+    window.initSwiper = function() { if(swiperInstance) swiperInstance.destroy(); swiperInstance = new Swiper('.reelsSwiper', { slidesPerView:1.2, spaceBetween:14, pagination: { el: '.swiper-pagination', clickable: true }, navigation: { nextEl: '#reels-next-btn', prevEl: '#reels-prev-btn' }, speed:400, breakpoints:{480:{slidesPerView:1.8,spaceBetween:16},640:{slidesPerView:2.4,spaceBetween:18},1024:{slidesPerView:3.5,spaceBetween:20}}, touchRatio:1.2, resistance:true, resistanceRatio:.85 }); swiperInstance.on('slideChange', function () { window.stopAllReelVideos(); }); };
+    window.initIconPicker = function() { const icons = [ { name:'Facebook', class:'fa-brands fa-facebook-f' }, { name:'Messenger', class:'fa-brands fa-facebook-messenger' }, { name:'Instagram', class:'fa-brands fa-instagram' }, { name:'WhatsApp', class:'fa-brands fa-whatsapp' }, { name:'TikTok', class:'fa-brands fa-tiktok' }, { name:'YouTube', class:'fa-brands fa-youtube' }, { name:'Telegram', class:'fa-brands fa-telegram' }, { name:'Viber', class:'fa-brands fa-viber' }, { name:'LinkedIn', class:'fa-brands fa-linkedin-in' }, { name:'X / Twitter', class:'fa-brands fa-x-twitter' }, { name:'Globe / Website', class:'fa-solid fa-globe' }, { name:'Envelope Email', class:'fa-solid fa-envelope' } ]; const container = document.getElementById('icon-picker-container'); if(!container) return; container.innerHTML = ''; icons.forEach((icon, idx) => { const btn = document.createElement('button'); btn.type='button'; btn.className=`p-2 rounded-md border flex items-center justify-center text-slate-700 hover:bg-[#003366] hover:text-white transition ${idx===0?'border-[#003366] bg-[#003366]/10 text-[#003366]':'border-slate-200'}`; btn.innerHTML=`<i class="${icon.class} text-xs"></i>`; btn.onclick=()=>{ document.querySelectorAll('#icon-picker-container button').forEach(b=>{ b.classList.remove('border-[#003366]','bg-[#003366]/10','text-[#003366]'); b.classList.add('border-slate-200'); }); btn.classList.add('border-[#003366]','bg-[#003366]/10','text-[#003366]'); document.getElementById('social-icon').value=icon.class; }; container.appendChild(btn); if(idx===0) document.getElementById('social-icon').value=icon.class; }); };
+    window.initIconPicker();
+  </script>
+
+  <script>
+    // ===== HELPER FUNCTIONS =====
+    function formatPeso(val) { if(!val) return '₱0'; const clean = val.toString().replace(/[^0-9.]/g,''); if(!clean) return val; const num = parseFloat(clean); return '₱' + (isNaN(num) ? val : num.toLocaleString('en-PH')); }
+
+    // ===== NEW: SIDE MENU TOGGLE =====
+    function toggleBurgerMenu() {
+      const panel = document.getElementById('menu-panel');
+      const backdrop = document.getElementById('menu-backdrop');
+      const isOpen = panel.classList.contains('open');
+      if (isOpen) {
+        panel.classList.remove('open');
+        backdrop.classList.remove('active');
+        document.body.style.overflow = '';
+      } else {
+        panel.classList.add('open');
+        backdrop.classList.add('active');
+        document.body.style.overflow = 'hidden';
+      }
+    }
+
+    // Close menu on backdrop click (handled by onclick on backdrop)
+
+    // Close menu on Escape key
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') {
+        const panel = document.getElementById('menu-panel');
+        if (panel && panel.classList.contains('open')) {
+          toggleBurgerMenu();
         }
+      }
+    });
 
-        prevButton.addEventListener('click', function() {
-            currentIndex = (currentIndex > 0) ? currentIndex - 1 : carouselItems.length - 1;
-            updateCarousel();
+    // ===== SHARE FUNCTION (NEW) =====
+    function shareBlogPost(id) {
+      const post = window.allBlogs.find(b => b.id === id);
+      if (!post) return;
+
+      // Build a shareable URL that includes the post ID
+      const baseUrl = window.location.origin + window.location.pathname;
+      const shareUrl = baseUrl + '#post-' + id;
+
+      // Get featured image (first image if exists)
+      const featuredImage = (post.images && post.images.length > 0) ? post.images[0] : 'https://images.unsplash.com/photo-1560518883-ce09059eeffa?auto=format&fit=crop&w=1600&q=80';
+
+      // Plain text caption
+      const plainCaption = getBlogPlainText(post.caption || '').substring(0, 150);
+
+      const shareData = {
+        title: post.title || 'Real Estate Update',
+        text: plainCaption + (plainCaption.length >= 150 ? '...' : ''),
+        url: shareUrl
+      };
+
+      // If Web Share API is available, use it
+      if (navigator.share && navigator.canShare && navigator.canShare(shareData)) {
+        navigator.share(shareData).then(() => {
+          showCopyToast('Post shared successfully!');
+        }).catch(() => {
+          // Fallback to copy
+          copyShareLinkToClipboard(shareData, featuredImage);
         });
+      } else {
+        // Fallback: copy rich share text to clipboard
+        copyShareLinkToClipboard(shareData, featuredImage);
+      }
+    }
 
-        nextButton.addEventListener('click', function() {
-            currentIndex = (currentIndex < carouselItems.length - 1) ? currentIndex + 1 : 0;
-            updateCarousel();
+    function copyShareLinkToClipboard(shareData, featuredImage) {
+      // Build a nice share text with URL and image
+      const shareText = `${shareData.title}\n\n${shareData.text}\n\nRead more: ${shareData.url}`;
+
+      // Try using the clipboard API
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(shareText).then(() => {
+          showCopyToast('📋 Post link & preview copied!');
+        }).catch(() => {
+          fallbackCopyText(shareText);
         });
+      } else {
+        fallbackCopyText(shareText);
+      }
+    }
 
-        setInterval(() => {
-            currentIndex = (currentIndex < carouselItems.length - 1) ? currentIndex + 1 : 0;
-            updateCarousel();
-        }, 5000);
+    function fallbackCopyText(text) {
+      const textarea = document.createElement('textarea');
+      textarea.value = text;
+      textarea.style.position = 'fixed';
+      textarea.style.opacity = '0';
+      document.body.appendChild(textarea);
+      textarea.select();
+      try {
+        document.execCommand('copy');
+        showCopyToast('📋 Post link & preview copied!');
+      } catch (err) {
+        showCopyToast('❌ Unable to copy link');
+      }
+      document.body.removeChild(textarea);
+    }
 
-        // Smooth scroll
-        document.querySelectorAll('.nav-menu a[href^="#"]').forEach(anchor => {
-            anchor.addEventListener('click', function(e) {
-                e.preventDefault();
-                const targetId = this.getAttribute('href');
-                if (targetId === '#') return;
-                const targetElement = document.querySelector(targetId);
-                if (targetElement) {
-                    window.scrollTo({ top: targetElement.offsetTop - 70, behavior: 'smooth' });
-                }
-            });
+    function showCopyToast(message) {
+      const toast = document.getElementById('copy-toast');
+      const toastText = document.getElementById('copy-toast-text');
+      if (toast && toastText) {
+        toastText.textContent = message;
+        toast.classList.add('show');
+        setTimeout(() => {
+          toast.classList.remove('show');
+        }, 2500);
+      }
+    }
+
+    // ===== SCROLL REVEAL (NEW) =====
+    function initScrollReveal() {
+      const reveals = document.querySelectorAll('.reveal');
+      if (!reveals.length) return;
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('visible');
+            observer.unobserve(entry.target);
+          }
         });
-    </script>
+      }, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
+      reveals.forEach(el => observer.observe(el));
+    }
+
+    // ===== EXISTING FUNCTIONS (updated where needed) =====
+    function openModal(id) { const modal = document.getElementById(id); if(modal) { modal.classList.remove('hidden'); if (id === 'blog-modal') { const editor = document.getElementById('blog-caption-editor'); if (editor && !document.getElementById('blog-caption').value) editor.innerHTML = ''; } } }
+    function closeModal(id) { const modal = document.getElementById(id); if(modal) modal.classList.add('hidden'); }
+    function openPopupModalAnimated(id) { const modal = document.getElementById(id); const card = document.getElementById('lead-popup-card'); if (modal && card) { modal.classList.remove('hidden'); card.classList.remove('popup-animate-out'); card.classList.add('popup-animate-in'); } }
+    function closePopupModalAnimated(id) { const modal = document.getElementById(id); const card = document.getElementById('lead-popup-card'); if (modal && card) { card.classList.remove('popup-animate-in'); card.classList.add('popup-animate-out'); setTimeout(() => { modal.classList.add('hidden'); card.classList.remove('popup-animate-out'); }, 300); } else { closeModal(id); } }
+    function handleAuthClick() { if(window.isAdmin) { window.isAdmin = false; updateAdminUI(); alert('Logged out from admin mode.'); } else { openModal('login-modal'); } }
+    function submitLogin(e) { e.preventDefault(); const user = document.getElementById('login-user').value.trim(); const pass = document.getElementById('login-pass').value.trim(); const errEl = document.getElementById('login-error'); if(user === "cmbp1613" && pass === "001122") { window.isAdmin = true; errEl.classList.add('hidden'); closeModal('login-modal'); document.getElementById('login-user').value = ''; document.getElementById('login-pass').value = ''; updateAdminUI(); } else { errEl.innerText = "Invalid Admin Credentials."; errEl.classList.remove('hidden'); } }
+    function updateAdminUI() { const adminElements = document.querySelectorAll('.admin-only'); const menuAuthLabel = document.getElementById('menu-auth-label'); const menuAuthBtn = document.getElementById('menu-auth-btn'); if(window.isAdmin) { adminElements.forEach(el => el.classList.remove('hidden')); if (menuAuthLabel) menuAuthLabel.innerText = "Logout"; if (menuAuthBtn) { menuAuthBtn.className = "w-full flex items-center justify-center gap-2.5 px-4 py-3 rounded-xl text-xs font-bold transition text-red-600 bg-red-50 hover:bg-red-100"; } } else { adminElements.forEach(el => el.classList.add('hidden')); if (menuAuthLabel) menuAuthLabel.innerText = "Login"; if (menuAuthBtn) { menuAuthBtn.className = "w-full flex items-center justify-center gap-2.5 px-4 py-3 rounded-xl text-xs font-bold transition text-emerald-600 bg-emerald-50 hover:bg-emerald-100"; } } if(window.allBlogs) renderBlogFeed(); if(window.allListings) renderListings(window.allListings, window.globalSearchTerm.trim().toLowerCase()); if(window.allReels) renderReels(window.allReels, window.globalSearchTerm.trim().toLowerCase()); if(window.allSocials) renderSocials(window.allSocials); if(window.allFooterLinks) renderFooterLinks(window.allFooterLinks); if(window.renderTestimonials) renderTestimonials(); }
+    function editProfileField(type) { if(!window.isAdmin) return; if(type === 'cover') { const url = prompt("Enter Cover Photo URL:"); if(url) window.set(window.ref(window.db, 'profile/cover'), url); } else if(type === 'avatar') { const url = prompt("Enter Profile Photo URL:"); if(url) window.set(window.ref(window.db, 'profile/avatar'), url); } else if(type === 'name') { const name = prompt("Enter Agent Name:"); if(name) window.set(window.ref(window.db, 'profile/name'), name); } else if(type === 'bio') { const bio = prompt("Enter Bio Details:"); if(bio) window.set(window.ref(window.db, 'profile/bio'), bio); } else if(type === 'contact') { const email = prompt("Enter Contact Email:"); const phone = prompt("Enter Contact Phone Number:"); if(email) window.set(window.ref(window.db, 'profile/email'), email); if(phone) window.set(window.ref(window.db, 'profile/phone'), phone); } }
+    function addCustomButtonInputRow(label = '', url = '') { const container = document.getElementById('custom-buttons-inputs'); const row = document.createElement('div'); row.className = 'flex gap-1.5 items-center custom-btn-row p-1 bg-slate-50 border border-slate-200 rounded-md'; row.innerHTML = `<div class="flex flex-col gap-0.5"><button type="button" onclick="moveCustomButtonRow(this, -1)" class="text-slate-400 hover:text-slate-600 text-[10px]" title="Move Up"><i class="fa-solid fa-chevron-up"></i></button><button type="button" onclick="moveCustomButtonRow(this, 1)" class="text-slate-400 hover:text-slate-600 text-[10px]" title="Move Down"><i class="fa-solid fa-chevron-down"></i></button></div><input type="text" placeholder="Button Label" value="${label}" class="w-1/2 px-2.5 py-1.5 border border-slate-300 rounded-md text-xs btn-label focus:outline-none focus:ring-1 focus:ring-[#003366]"><input type="url" placeholder="URL" value="${url}" class="w-1/2 px-2.5 py-1.5 border border-slate-300 rounded-md text-xs btn-url focus:outline-none focus:ring-1 focus:ring-[#003366]"><button type="button" onclick="this.parentElement.remove()" class="text-red-500 hover:text-red-700 p-1.5 text-xs"><i class="fa-solid fa-trash"></i></button>`; container.appendChild(row); }
+    function moveCustomButtonRow(btn, direction) { const row = btn.closest('.custom-btn-row'); if (!row) return; if (direction === -1 && row.previousElementSibling) { row.parentNode.insertBefore(row, row.previousElementSibling); } else if (direction === 1 && row.nextElementSibling) { row.parentNode.insertBefore(row.nextElementSibling, row); } }
+    function openEditListingModal(id) { const item = window.allListings[id]; if (!item) return; document.getElementById('list-edit-id').value = id; document.getElementById('list-name').value = item.name || ''; document.getElementById('list-location').value = item.location || ''; document.getElementById('list-tcp').value = item.tcp || ''; document.getElementById('list-amort').value = item.amort || ''; document.getElementById('list-desc').value = item.desc || ''; document.getElementById('list-photos').value = (item.photos || []).join(', '); const container = document.getElementById('custom-buttons-inputs'); container.innerHTML = ''; if (item.customButtons && Array.isArray(item.customButtons)) { item.customButtons.forEach(b => addCustomButtonInputRow(b.label, b.url)); } document.getElementById('listing-modal-title').innerText = 'Edit Project Listing'; openModal('listing-modal'); }
+    function saveListing(e) { e.preventDefault(); const editId = document.getElementById('list-edit-id').value; const name = document.getElementById('list-name').value; const location = document.getElementById('list-location').value; const tcp = formatPeso(document.getElementById('list-tcp').value); const amort = document.getElementById('list-amort').value.includes('₱') ? document.getElementById('list-amort').value : formatPeso(document.getElementById('list-amort').value); const desc = document.getElementById('list-desc').value; const photosRaw = document.getElementById('list-photos').value; const photos = photosRaw.split(',').map(url => url.trim()).filter(url => url.length > 0); const customButtons = []; document.querySelectorAll('.custom-btn-row').forEach(row => { const bLabel = row.querySelector('.btn-label').value.trim(); const bUrl = row.querySelector('.btn-url').value.trim(); if(bLabel && bUrl) customButtons.push({ label: bLabel, url: bUrl }); }); if (editId) { const existingFaqs = window.allListings[editId] ? (window.allListings[editId].faqs || null) : null; const updatedData = { name, location, tcp, amort, desc, photos, customButtons }; if (existingFaqs) updatedData.faqs = existingFaqs; window.set(window.ref(window.db, `listings/${editId}`), updatedData).then(() => { closeModal('listing-modal'); e.target.reset(); document.getElementById('list-edit-id').value = ''; document.getElementById('custom-buttons-inputs').innerHTML = ''; }); } else { const newRef = window.push(window.ref(window.db, 'listings')); window.set(newRef, { name, location, tcp, amort, desc, photos, customButtons }).then(() => { closeModal('listing-modal'); e.target.reset(); document.getElementById('custom-buttons-inputs').innerHTML = ''; }); } }
+    function renderListings(listings, searchTerm = '') { const container = document.getElementById('listings-container'); container.innerHTML = ''; const keys = Object.keys(listings).filter(id => { if (!searchTerm) return true; const item = listings[id] || {}; return [item.name, item.location, item.desc, item.tcp, item.amort].join(' ').toLowerCase().includes(searchTerm); }); if(keys.length === 0) { container.innerHTML = `<div class="col-span-full text-center py-10 text-slate-400 text-xs border border-dashed border-slate-300 rounded-lg">No project listings added yet.</div>`; return; } keys.forEach(id => { const item = listings[id]; const photos = (item.photos && item.photos.length > 0) ? item.photos : ['https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=600&q=80']; const card = document.createElement('div'); card.className = "glass-panel bg-white/90 rounded-xl border border-slate-200/90 overflow-hidden shadow-sm hover-lift flex flex-col justify-between relative group card-enter"; card.innerHTML = `${window.isAdmin ? `<div class="absolute top-2.5 right-2.5 z-20 flex gap-1"><button onclick="openEditListingModal('${id}')" class="bg-[#003366] hover:bg-[#002244] text-white w-7 h-7 rounded-md text-xs shadow flex items-center justify-center transition active:scale-95" title="Edit Listing"><i class="fa-solid fa-pen"></i></button><button onclick="deleteItem('listings/${id}')" class="bg-red-600 hover:bg-red-700 text-white w-7 h-7 rounded-md text-xs shadow flex items-center justify-center transition active:scale-95" title="Delete Listing"><i class="fa-solid fa-trash"></i></button></div>` : ''}<div><div class="relative h-48 sm:h-52 overflow-hidden bg-slate-900 cursor-pointer" onclick="openListingDetails('${id}')"><img src="${photos[0]}" alt="${item.name}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"><div class="absolute top-2.5 left-2.5 bg-[#003366]/80 text-white text-[10px] font-semibold uppercase tracking-wider px-2.5 py-1 rounded backdrop-blur-md border border-white/10 z-10"><i class="fa-solid fa-location-dot text-[#f1c40f] mr-1"></i> ${item.location}</div></div><div class="p-4 sm:p-5"><h3 onclick="openListingDetails('${id}')" class="text-base sm:text-lg font-bold text-[#003366] hover:text-[#002244] cursor-pointer transition-colors line-clamp-1">${item.name}</h3><div class="text-xs text-slate-500 mt-1.5 line-clamp-2 leading-relaxed">${item.desc}</div><div class="mt-3.5 pt-3 border-t border-slate-100 grid grid-cols-2 gap-2 text-xs"><div><span class="text-slate-400 font-medium block text-[10px]">Total Price</span><span class="font-bold text-[#003366] text-xs sm:text-sm">${item.tcp.startsWith('₱') ? item.tcp : '₱'+item.tcp}</span></div><div><span class="text-slate-400 font-medium block text-[10px]">Monthly starts</span><span class="font-semibold text-emerald-600 text-xs">${item.amort}</span></div></div></div></div><div onclick="openListingDetails('${id}')" class="px-4 py-2.5 bg-slate-50 border-t border-slate-100 text-center text-xs font-semibold text-[#003366] hover:bg-[#003366] hover:text-white cursor-pointer transition flex items-center justify-center gap-1"><span>View Full Details</span> <i class="fa-solid fa-chevron-right text-[10px]"></i></div>`; container.appendChild(card); }); }
+    function openListingDetails(id) { const item = window.allListings[id]; if(!item) return; const modalContent = document.getElementById('listing-details-content'); const photos = item.photos || []; const faqs = item.faqs ? Object.entries(item.faqs) : []; const customBtns = item.customButtons || []; modalContent.innerHTML = `<div class="relative h-60 sm:h-80 w-full bg-slate-900 overflow-hidden"><div id="modal-carousel-slides-${id}" class="w-full h-full relative">${photos.map((p, idx) => `<img src="${p}" alt="${item.name}" class="modal-slide-${id} absolute inset-0 w-full h-full object-cover transition-opacity duration-500 ease-in-out ${idx === 0 ? 'opacity-100' : 'opacity-0'}">`).join('')}</div>${photos.length > 1 ? `<button onclick="navigateModalCarousel('${id}', -1, ${photos.length})" class="absolute left-3 top-1/2 -translate-y-1/2 bg-slate-900/60 text-white w-8 h-8 rounded-full flex items-center justify-center hover:bg-slate-900 transition z-10"><i class="fa-solid fa-chevron-left text-xs"></i></button><button onclick="navigateModalCarousel('${id}', 1, ${photos.length})" class="absolute right-3 top-1/2 -translate-y-1/2 bg-slate-900/60 text-white w-8 h-8 rounded-full flex items-center justify-center hover:bg-slate-900 transition z-10"><i class="fa-solid fa-chevron-right text-xs"></i></button><div class="absolute bottom-3 left-0 right-0 flex justify-center gap-1.5 z-10">${photos.map((_, idx) => `<span class="modal-dot-${id} w-2 h-2 rounded-full bg-white/60 transition-all ${idx === 0 ? '!bg-[#f1c40f] !w-4' : ''}"></span>`).join('')}</div>` : ''}</div><div class="flex gap-2 p-3 overflow-x-auto bg-slate-50 border-b custom-scrollbar items-center">${photos.map((p, idx) => `<div class="relative group flex-shrink-0"><img src="${p}" onclick="setModalCarouselSlide('${id}', ${idx})" class="w-14 h-10 object-cover rounded cursor-pointer border border-transparent hover:border-[#003366] transition">${window.isAdmin && photos.length > 1 ? `<button onclick="deleteListingPhoto('${id}', ${idx})" class="absolute -top-1 -right-1 bg-red-600 text-white w-4 h-4 rounded-full text-[9px] flex items-center justify-center shadow" title="Delete Photo"><i class="fa-solid fa-xmark"></i></button>` : ''}</div>`).join('')}${window.isAdmin ? `<button onclick="addListingPhoto('${id}')" class="px-2.5 py-2 bg-slate-200 hover:bg-slate-300 text-slate-700 rounded text-xs font-semibold flex items-center gap-1 flex-shrink-0"><i class="fa-solid fa-plus text-[10px]"></i> Add Photo</button>` : ''}</div><div class="p-5 sm:p-7 space-y-5">${customBtns.length > 0 ? `<div class="flex flex-wrap gap-2 pb-2 border-b border-slate-100">${customBtns.map(btn => `<button onclick="window.open('${btn.url}', '_blank')" class="px-4 py-2 bg-[#003366] hover:bg-[#002244] text-white font-semibold rounded-md text-xs transition shadow flex items-center gap-1.5"><span>${btn.label}</span><i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i></button>`).join('')}</div>` : ''}<div class="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-3"><div><h2 class="text-xl sm:text-2xl font-bold text-[#003366] tracking-tight">${item.name}</h2><p class="text-xs text-slate-500 mt-0.5"><i class="fa-solid fa-location-dot text-[#f1c40f] mr-1"></i> ${item.location}</p></div><div class="bg-[#003366]/5 p-3 rounded-lg border border-[#003366]/10 inline-block"><span class="block text-[10px] font-semibold text-slate-400 uppercase">Total Price</span><span class="block text-lg font-bold text-[#003366]">${item.tcp.startsWith('₱') ? item.tcp : '₱'+item.tcp}</span><span class="text-xs text-emerald-600 font-medium">Monthly starts ${item.amort}</span></div></div><div class="border-t border-slate-100 pt-4"><h4 class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5">Description</h4><div class="text-slate-600 text-xs sm:text-sm leading-relaxed whitespace-pre-line">${item.desc}</div></div><div class="border-t border-slate-100 pt-4"><div class="flex justify-between items-center mb-3"><h4 class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Frequently Asked Questions</h4>${window.isAdmin ? `<button onclick="openFAQModal('${id}')" class="text-xs text-[#003366] hover:underline font-semibold">+ Add FAQ</button>` : ''}</div>${faqs.length > 0 ? `<div class="space-y-2">${faqs.map(([faqId, faq], index) => `<div class="border border-slate-200 rounded-md overflow-hidden"><div class="flex items-center justify-between bg-slate-50"><button onclick="toggleFaq('${faqId}')" class="w-full text-left p-3 hover:bg-slate-100 font-semibold text-xs text-[#003366] flex justify-between items-center transition"><span>${faq.q}</span><i id="faq-icon-${faqId}" class="fa-solid fa-chevron-down text-slate-400 text-[10px] transition-transform duration-300"></i></button>${window.isAdmin ? `<div class="flex items-center gap-1 pr-2"><button onclick="reorderFaq('${id}', ${index}, -1)" class="text-slate-500 hover:text-[#003366] text-xs p-1" title="Move Up"><i class="fa-solid fa-arrow-up"></i></button><button onclick="reorderFaq('${id}', ${index}, 1)" class="text-slate-500 hover:text-[#003366] text-xs p-1" title="Move Down"><i class="fa-solid fa-arrow-down"></i></button></div>` : ''}</div><div id="faq-ans-${faqId}" class="hidden p-3 bg-white text-xs text-slate-600 border-t border-slate-100 relative">${window.isAdmin ? `<button onclick="deleteItem('listings/${id}/faqs/${faqId}')" class="absolute top-2 right-2 text-red-500 hover:text-red-700 text-xs"><i class="fa-solid fa-trash"></i></button>` : ''}<p>${faq.a}</p></div></div>`).join('')}</div>` : `<p class="text-xs text-slate-400 italic">No FAQs added for this project yet.</p>`}</div></div>`; openModal('listing-details-modal'); }
+    function reorderFaq(listingId, currIdx, direction) { const item = window.allListings[listingId]; if (!item || !item.faqs) return; const faqsArr = Object.entries(item.faqs); const targetIdx = currIdx + direction; if (targetIdx < 0 || targetIdx >= faqsArr.length) return; const temp = faqsArr[currIdx]; faqsArr[currIdx] = faqsArr[targetIdx]; faqsArr[targetIdx] = temp; const newFaqsObj = {}; faqsArr.forEach(([key, val]) => { newFaqsObj[key] = val; }); window.set(window.ref(window.db, `listings/${listingId}/faqs`), newFaqsObj).then(() => { openListingDetails(listingId); }); }
+    function addListingPhoto(id) { const url = prompt("Enter Image URL to add:"); if(url && window.allListings[id]) { const photos = window.allListings[id].photos || []; photos.push(url); window.set(window.ref(window.db, `listings/${id}/photos`), photos).then(() => { openListingDetails(id); }); } }
+    function deleteListingPhoto(id, photoIdx) { if(confirm("Remove this image from project?")) { const photos = window.allListings[id].photos || []; photos.splice(photoIdx, 1); window.set(window.ref(window.db, `listings/${id}/photos`), photos).then(() => { openListingDetails(id); }); } }
+    function toggleFaq(faqId) { const ans = document.getElementById(`faq-ans-${faqId}`); const icon = document.getElementById(`faq-icon-${faqId}`); if(ans) { ans.classList.toggle('hidden'); if(icon) icon.classList.toggle('rotate-180'); } }
+    function openFAQModal(listingId) { document.getElementById('faq-listing-id').value = listingId; openModal('faq-modal'); }
+    function saveFAQ(e) { e.preventDefault(); const listingId = document.getElementById('faq-listing-id').value; const q = document.getElementById('faq-question').value; const a = document.getElementById('faq-answer').value; const newRef = window.push(window.ref(window.db, `listings/${listingId}/faqs`)); window.set(newRef, { q, a }).then(() => { closeModal('faq-modal'); e.target.reset(); openListingDetails(listingId); }); }
+    let activeModalSlideIndex = {};
+    function setModalCarouselSlide(id, idx) { activeModalSlideIndex[id] = idx; const slides = document.querySelectorAll(`.modal-slide-${id}`); const dots = document.querySelectorAll(`.modal-dot-${id}`); slides.forEach((s, i) => s.classList.toggle('opacity-100', i === idx)); slides.forEach((s, i) => s.classList.toggle('opacity-0', i !== idx)); dots.forEach((d, i) => d.classList.toggle('!bg-[#f1c40f]', i === idx)); dots.forEach((d, i) => d.classList.toggle('!w-4', i === idx)); }
+    function navigateModalCarousel(id, direction, max) { let current = activeModalSlideIndex[id] || 0; current = (current + direction + max) % max; setModalCarouselSlide(id, current); }
+    function openReelModal(editId = null, title = '', url = '') { document.getElementById('reel-edit-id').value = editId || ''; document.getElementById('reel-title').value = title || ''; document.getElementById('reel-url').value = url || ''; document.getElementById('reel-modal-title').innerText = editId ? 'Edit Video Reel' : 'Add Video Reel'; openModal('reel-modal'); }
+    function saveReel(e) { e.preventDefault(); const editId = document.getElementById('reel-edit-id').value; const title = document.getElementById('reel-title').value; const url = document.getElementById('reel-url').value; if(editId) { const itemIdx = window.allReels.findIndex(r => r.id === editId); if(itemIdx !== -1) window.allReels[itemIdx] = { ...window.allReels[itemIdx], title, url }; window.set(window.ref(window.db, 'reels'), window.allReels).then(() => { closeModal('reel-modal'); e.target.reset(); }); } else { const newRef = window.push(window.ref(window.db, 'reels')); window.set(newRef, { title, url }).then(() => { closeModal('reel-modal'); e.target.reset(); }); } }
+    function getYouTubeVideoId(url) { try { const parsed = new URL(url); const host = parsed.hostname.toLowerCase().replace(/^www\./, ''); if (host === 'youtu.be') { return parsed.pathname.split('/').filter(Boolean)[0] || null; } if (host === 'youtube.com' || host === 'm.youtube.com') { if (parsed.pathname === '/watch') { return parsed.searchParams.get('v'); } if (parsed.pathname.startsWith('/shorts/')) { return parsed.pathname.split('/').filter(Boolean)[1] || null; } if (parsed.pathname.startsWith('/embed/')) { return parsed.pathname.split('/').filter(Boolean)[1] || null; } } } catch (err) { return null; } return null; }
+    function getReelSource(url) { const youtubeId = getYouTubeVideoId(url); if (youtubeId) { return { type: 'youtube', src: `https://www.youtube.com/embed/${encodeURIComponent(youtubeId)}?enablejsapi=1&rel=0&playsinline=1` }; } return { type: 'video', src: url }; }
+    function escapeReelHtml(value) { return String(value ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;'); }
+    window.stopAllReelVideos = function() { const videos = document.querySelectorAll('.reel-video-el'); videos.forEach(v => { v.pause(); v.currentTime = 0; }); const iframes = document.querySelectorAll('.reel-embed-el'); iframes.forEach(iframe => { iframe.contentWindow.postMessage(JSON.stringify({ event:'command', func:'pauseVideo', args:[] }), '*'); }); };
+    function hoverPlayReel(container) { window.stopAllReelVideos(); const video = container.querySelector('.reel-video-el'); if (video) { video.play().catch(()=>{}); return; } const iframe = container.querySelector('.reel-embed-el'); if (iframe) { iframe.contentWindow.postMessage(JSON.stringify({ event:'command', func:'playVideo', args:[] }), '*'); } }
+    function hoverStopReel(container) { const video = container.querySelector('.reel-video-el'); if (video) { video.pause(); video.currentTime = 0; } const iframe = container.querySelector('.reel-embed-el'); if (iframe) { iframe.contentWindow.postMessage(JSON.stringify({ event:'command', func:'pauseVideo', args:[] }), '*'); } }
+    function toggleReelFullscreen(btn) { const container = btn.closest('.group'); if (!container) return; const media = container.querySelector('.reel-video-el') || container.querySelector('.reel-embed-el'); const target = media || container; if (!document.fullscreenElement) { if (target.requestFullscreen) { target.requestFullscreen(); } else if (target.webkitRequestFullscreen) { target.webkitRequestFullscreen(); } else if (target.msRequestFullscreen) { target.msRequestFullscreen(); } } else { if (document.exitFullscreen) { document.exitFullscreen(); } } }
+    document.addEventListener('DOMContentLoaded', () => { const reelsSec = document.getElementById('reels'); if (reelsSec && 'IntersectionObserver' in window) { const observer = new IntersectionObserver((entries) => { entries.forEach(entry => { if (!entry.isIntersecting) { window.stopAllReelVideos(); } }); }, { threshold: 0.1 }); observer.observe(reelsSec); } initScrollReveal(); });
+    function renderReels(reels, searchTerm = '') { const container = document.getElementById('reels-container'); container.innerHTML = ''; const filteredReels = (reels || []).filter(reel => { if (!searchTerm) return true; return [reel.title, reel.url].join(' ').toLowerCase().includes(searchTerm); }); if(filteredReels.length === 0) { container.innerHTML = `<div class="swiper-slide text-center py-10 text-slate-300 text-xs">No video reels matched your keyword.</div>`; window.initSwiper(); return; } filteredReels.forEach((reel, idx) => { const slide = document.createElement('div'); slide.className = 'swiper-slide draggable-item'; slide.setAttribute('draggable', window.isAdmin ? 'true' : 'false'); slide.dataset.index = idx; const source = getReelSource(reel.url || ''); const safeTitle = escapeReelHtml(reel.title || 'Video Reel'); const safeUrl = escapeReelHtml(reel.url || ''); const safeId = escapeReelHtml(reel.id || ''); const mediaHtml = source.type === 'youtube' ? `<iframe src="${source.src}" title="${safeTitle}" class="w-full h-full object-cover reel-embed-el" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>` : `<video src="${safeUrl}" controls controlsList="nodownload" class="w-full h-full object-cover reel-video-el" preload="metadata" playsinline></video>`; slide.innerHTML = `<div class="relative bg-slate-900 rounded-lg overflow-hidden shadow-lg border border-white/10 group aspect-[9/16]" onmouseenter="hoverPlayReel(this)" onmouseleave="hoverStopReel(this)">${window.isAdmin ? `<div class="absolute top-2 right-2 flex gap-1 z-20"><button onclick="event.stopPropagation(); openReelModal('${safeId.replace(/'/g,"\\'")}', '${safeTitle.replace(/'/g,"\\'")}', '${safeUrl.replace(/'/g,"\\'")}')" class="bg-blue-600 hover:bg-blue-700 text-white w-7 h-7 rounded-md text-xs flex items-center justify-center shadow transition active:scale-95" title="Edit Reel"><i class="fa-solid fa-pen"></i></button><button onclick="event.stopPropagation(); deleteItem('reels/${safeId.replace(/'/g,"\\'")}')" class="bg-red-600 hover:bg-red-700 text-white w-7 h-7 rounded-md text-xs flex items-center justify-center shadow transition active:scale-95" title="Delete Reel"><i class="fa-solid fa-trash"></i></button></div>` : ''}<button onclick="event.stopPropagation(); toggleReelFullscreen(this)" class="sm:hidden absolute top-2 left-2 z-20 bg-slate-900/80 hover:bg-slate-900 text-white w-7 h-7 rounded-md text-xs flex items-center justify-center shadow backdrop-blur-md" title="Full Screen"><i class="fa-solid fa-expand"></i></button>${mediaHtml}<div class="absolute bottom-0 inset-x-0 p-3 bg-gradient-to-t from-slate-950/90 via-slate-950/40 to-transparent pointer-events-none z-10"><h4 class="text-white font-semibold text-xs truncate">${safeTitle}</h4></div></div>`; container.appendChild(slide); }); window.initSwiper(); }
+    function sanitizeBlogHtml(html) { const template = document.createElement('template'); template.innerHTML = String(html || ''); const allowedTags = new Set(['B','STRONG','I','EM','U','S','BR','P','DIV','SPAN','UL','OL','LI','H1','H2','H3','BLOCKQUOTE','A']); template.content.querySelectorAll('*').forEach(el => { if (!allowedTags.has(el.tagName)) { el.replaceWith(...Array.from(el.childNodes)); return; } Array.from(el.attributes).forEach(attr => { if (el.tagName === 'A' && attr.name.toLowerCase() === 'href') return; el.removeAttribute(attr.name); }); if (el.tagName === 'A') { const href = el.getAttribute('href') || ''; if (!/^(https?:|mailto:|tel:)/i.test(href)) { el.removeAttribute('href'); } else { el.setAttribute('target', '_blank'); el.setAttribute('rel', 'noopener noreferrer'); } } }); return template.innerHTML; }
+    function getBlogPlainText(html) { const div = document.createElement('div'); div.innerHTML = String(html || ''); return (div.textContent || div.innerText || '').replace(/\u00a0/g, ' ').replace(/[ \t]+/g, ' ').trim(); }
+    function createBlogExcerpt(html, maxLength = 240) { const plain = getBlogPlainText(html); if (plain.length <= maxLength) return plain; return plain.slice(0, maxLength).trimEnd() + '…'; }
+    function syncBlogEditor(editorId, textareaId) { const editor = document.getElementById(editorId); const textarea = document.getElementById(textareaId); if (editor && textarea) textarea.value = sanitizeBlogHtml(editor.innerHTML); }
+    function formatBlogText(command, editorId = 'blog-caption-editor') { const editor = document.getElementById(editorId); if (!editor) return; editor.focus(); document.execCommand(command, false, null); syncBlogEditor(editorId, editorId === 'blog-caption-editor' ? 'blog-caption' : 'edit-blog-caption'); }
+    function insertBlogLink(editorId = 'blog-caption-editor') { const editor = document.getElementById(editorId); if (!editor) return; editor.focus(); const url = prompt('Enter hyperlink URL:'); if (!url) return; if (!/^(https?:|mailto:|tel:)/i.test(url.trim())) { alert('Please enter a valid http(s), mailto, or tel link.'); return; } const selection = window.getSelection(); const selectedText = selection ? selection.toString() : ''; const label = selectedText.trim() || prompt('Enter link text:') || url; if (selectedText.trim()) { document.execCommand('createLink', false, url.trim()); } else { const safeUrl = url.trim().replace(/&/g,'&amp;').replace(/"/g,'&quot;'); const safeLabel = label.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); document.execCommand('insertHTML', false, `<a href="${safeUrl}" target="_blank" rel="noopener noreferrer">${safeLabel}</a>`); } syncBlogEditor(editorId, editorId === 'blog-caption-editor' ? 'blog-caption' : 'edit-blog-caption'); }
+    function saveBlog(e) { e.preventDefault(); syncBlogEditor('blog-caption-editor', 'blog-caption'); const title = document.getElementById('blog-title').value.trim(); const imgRaw = document.getElementById('blog-img').value; const caption = sanitizeBlogHtml(document.getElementById('blog-caption').value); if (!getBlogPlainText(caption)) { alert('Please enter a post caption.'); return; } const images = imgRaw ? imgRaw.split(',').map(u => u.trim()).filter(u => u.length > 0) : []; const newRef = window.push(window.ref(window.db, 'blogs')); window.set(newRef, { title, images, caption, timestamp: Date.now() }).then(() => { closeModal('blog-modal'); e.target.reset(); const editor = document.getElementById('blog-caption-editor'); if (editor) editor.innerHTML = ''; document.getElementById('blog-caption').value = ''; }); }
+    function openEditBlogModal(id) { const item = window.allBlogs.find(b => b.id === id); if (!item) return; document.getElementById('edit-blog-id').value = id; document.getElementById('edit-blog-title').value = item.title || ''; document.getElementById('edit-blog-img').value = (item.images || []).join(', '); document.getElementById('edit-blog-caption').value = sanitizeBlogHtml(item.caption || ''); const editor = document.getElementById('edit-blog-caption-editor'); if (editor) editor.innerHTML = sanitizeBlogHtml(item.caption || ''); openModal('edit-blog-modal'); }
+    function saveEditedBlog(e) { e.preventDefault(); syncBlogEditor('edit-blog-caption-editor', 'edit-blog-caption'); const id = document.getElementById('edit-blog-id').value; const title = document.getElementById('edit-blog-title').value.trim(); const imgRaw = document.getElementById('edit-blog-img').value; const caption = sanitizeBlogHtml(document.getElementById('edit-blog-caption').value); const images = imgRaw ? imgRaw.split(',').map(u => u.trim()).filter(u => u.length > 0) : []; const existingBlog = window.allBlogs.find(b => b.id === id); const timestamp = existingBlog ? (existingBlog.timestamp || Date.now()) : Date.now(); window.set(window.ref(window.db, `blogs/${id}`), { title, images, caption, timestamp }).then(() => { closeModal('edit-blog-modal'); e.target.reset(); const editor = document.getElementById('edit-blog-caption-editor'); if (editor) editor.innerHTML = ''; document.getElementById('edit-blog-caption').value = ''; }); }
+    function changeBlogPage(dir) { window.blogPage += dir; renderBlogFeed(); document.getElementById('updates')?.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
+    function renderBlogFeed() { const container = document.getElementById('blog-container'); container.innerHTML = ''; const term = (window.globalSearchTerm || '').trim().toLowerCase(); const sourceBlogs = window.allBlogs || []; const filteredBlogs = term ? sourceBlogs.filter(post => [post.title, post.caption, ...(post.images || [])].join(' ').toLowerCase().includes(term)) : sourceBlogs; if (filteredBlogs.length === 0) { container.innerHTML = `<div class="text-center py-10 text-slate-400 text-xs border border-dashed border-slate-300 rounded-lg">${term ? 'No posts matched your keyword.' : 'No post updates available.'}</div>`; document.getElementById('blog-pagination').classList.add('hidden'); return; } document.getElementById('blog-pagination').classList.toggle('hidden', !!term); const totalPages = Math.max(1, Math.ceil(filteredBlogs.length / window.blogPostsPerPage)); if (window.blogPage > totalPages) window.blogPage = totalPages; if (window.blogPage < 1) window.blogPage = 1; document.getElementById('blog-page-info').innerText = `Page ${window.blogPage} of ${totalPages}`; document.getElementById('btn-prev-page').disabled = (window.blogPage === 1); document.getElementById('btn-next-page').disabled = (window.blogPage === totalPages); const start = (window.blogPage - 1) * window.blogPostsPerPage; const pagedItems = term ? filteredBlogs : filteredBlogs.slice(start, start + window.blogPostsPerPage); pagedItems.forEach(post => { const card = document.createElement('article'); card.className = "glass-panel bg-white rounded-xl border border-slate-200/80 overflow-hidden shadow-sm hover-lift relative card-enter"; const thumb = (post.images && post.images.length > 0) ? post.images[0] : null; const formattedDate = new Date(post.timestamp || Date.now()).toLocaleDateString('en-US', { month:'short', day:'numeric', year:'numeric' }); const authorName = window.profileData.name || 'Agent'; const authorAvatar = window.profileData.avatar || 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=200&q=80'; card.innerHTML = `${window.isAdmin ? `<div class="absolute top-3 right-3 flex gap-1.5 z-20"><button onclick="openEditBlogModal('${post.id}')" class="bg-[#003366] hover:bg-[#002244] text-white w-7 h-7 rounded-md text-xs shadow flex items-center justify-center transition active:scale-95" title="Edit Post"><i class="fa-solid fa-pen"></i></button><button onclick="deleteItem('blogs/${post.id}')" class="bg-red-600 hover:bg-red-700 text-white w-7 h-7 rounded-md text-xs shadow flex items-center justify-center transition active:scale-95" title="Delete Post"><i class="fa-solid fa-trash"></i></button></div>` : ''}<div class="p-4 sm:p-5"><div class="flex items-center justify-between gap-2 mb-2"><div class="flex items-center gap-2 text-[11px] text-slate-400 font-medium"><i class="fa-solid fa-calendar-days text-[#003366]"></i><span>${formattedDate}</span></div><button onclick="shareBlogPost('${post.id}')" class="share-btn" title="Share this post"><i class="fa-solid fa-share-nodes"></i> Share</button></div><h3 onclick="openBlogDetails('${post.id}')" class="text-base sm:text-lg font-bold text-[#003366] hover:text-[#002244] cursor-pointer transition line-clamp-2">${post.title}</h3>${thumb ? `<div class="mt-3 rounded-lg overflow-hidden bg-slate-50 border border-slate-100 cursor-pointer" onclick="openBlogDetails('${post.id}')"><img src="${thumb}" alt="${post.title}" class="blog-card-image hover:opacity-95 transition duration-300" loading="lazy"></div>` : ''}<div class="mt-4 text-slate-600 text-xs sm:text-sm leading-relaxed blog-card-excerpt">${createBlogExcerpt(post.caption || '')}</div><div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between gap-3"><div class="flex items-center gap-2 min-w-0"><img src="${authorAvatar}" alt="${authorName}" class="w-8 h-8 rounded-full object-cover border border-white shadow-sm flex-shrink-0"><div class="min-w-0"><div class="text-[10px] text-slate-400 uppercase tracking-wider">Author</div><div class="text-xs font-semibold text-[#003366] truncate">${authorName}</div></div></div><button onclick="openBlogDetails('${post.id}')" class="inline-flex items-center gap-1 text-xs font-semibold text-[#003366] hover:underline flex-shrink-0"><span>More</span> <i class="fa-solid fa-arrow-right text-[10px]"></i></button></div></div>`; container.appendChild(card); }); }
+    function openBlogDetails(id) { const post = window.allBlogs.find(b => b.id === id); if(!post) return; const content = document.getElementById('blog-details-content'); const images = post.images || []; const formattedDate = new Date(post.timestamp || Date.now()).toLocaleDateString('en-US', { month:'long', day:'numeric', year:'numeric' }); const authorName = window.profileData.name || 'Agent'; const authorAvatar = window.profileData.avatar || 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=200&q=80'; content.innerHTML = `<div class="space-y-4"><div class="flex items-center justify-between gap-2"><div class="flex items-center gap-2 text-xs text-slate-400 font-medium"><i class="fa-solid fa-calendar-days text-[#003366]"></i><span>${formattedDate}</span></div><button onclick="shareBlogPost('${id}')" class="share-btn" title="Share this post"><i class="fa-solid fa-share-nodes"></i> Share</button></div><h2 class="text-xl sm:text-2xl font-bold text-[#003366] leading-snug">${post.title}</h2>${images.length > 0 ? `<div class="relative rounded-xl overflow-hidden bg-slate-50 border border-slate-100"><div id="blog-carousel-slides-${id}" class="w-full relative">${images.map((img, idx) => `<img src="${img}" alt="${post.title}" class="blog-slide-${id} blog-detail-image transition-opacity duration-500 ${idx === 0 ? 'opacity-100' : 'opacity-0 absolute inset-0'}">`).join('')}</div>${images.length > 1 ? `<button onclick="navigateBlogCarousel('${id}', -1, ${images.length})" class="absolute left-3 top-1/2 -translate-y-1/2 bg-slate-900/60 text-white w-8 h-8 rounded-full flex items-center justify-center hover:bg-slate-900 transition z-10"><i class="fa-solid fa-chevron-left text-xs"></i></button><button onclick="navigateBlogCarousel('${id}', 1, ${images.length})" class="absolute right-3 top-1/2 -translate-y-1/2 bg-slate-900/60 text-white w-8 h-8 rounded-full flex items-center justify-center hover:bg-slate-900 transition z-10"><i class="fa-solid fa-chevron-right text-xs"></i></button>` : ''}</div>` : ''}<div class="text-slate-700 text-xs sm:text-sm leading-relaxed space-y-3 pt-2 blog-content border-t border-slate-100">${sanitizeBlogHtml(post.caption || '')}</div><div class="pt-4 border-t border-slate-100 flex items-center gap-3"><img src="${authorAvatar}" alt="${authorName}" class="w-10 h-10 rounded-full object-cover border border-white shadow-sm"><div><div class="text-[10px] text-slate-400 uppercase tracking-wider">Posted by</div><div class="text-sm font-bold text-[#003366]">${authorName}</div></div></div></div>`; openModal('blog-details-modal'); }
+    let activeBlogSlideIndex = {};
+    function navigateBlogCarousel(id, dir, max) { let current = activeBlogSlideIndex[id] || 0; current = (current + dir + max) % max; activeBlogSlideIndex[id] = current; const slides = document.querySelectorAll(`.blog-slide-${id}`); slides.forEach((s, i) => { s.classList.toggle('opacity-100', i === current); s.classList.toggle('opacity-0', i !== current); s.classList.toggle('absolute', i !== current); if (i === current) { s.classList.remove('absolute','inset-0'); } else { s.classList.add('absolute','inset-0'); } }); }
+
+    // ===== TESTIMONIALS (NEW) =====
+    function renderTestimonials() {
+      const container = document.getElementById('testimonials-container');
+      if (!container) return;
+      const testimonials = [
+        {
+          name: "Maria Santos",
+          role: "Home Buyer",
+          text: "Location talaga pinaka reason namin ni partner, kung bakit kami kumuha ng unit dito. very accessible sa lahat.",
+          avatar: "https://i.pinimg.com/736x/32/19/70/321970a8f892b486926d2dd204a07ac3.jpg?auto=format&fit=crop&w=200&q=80",
+          rating: 5
+        },
+        {
+          name: "Carlo Rodriguez",
+          role: "Investor",
+          text: "noon pa man nang malaman ko na for sale na ang condo dito ay kaagad nagdecide ako mag-avail via Bank Financing, ngayon di na ako nawawalan ng mga renters.. napakagandang business diba.",
+          avatar: "https://eyecaregroupnc.com/wp-content/uploads/2024/08/Man-Wearing-Trendy-Eyewear-Local-Eyecare-Services-1-2048x2048.jpeg?auto=format&fit=crop&w=200&q=80",
+          rating: 5
+        },
+        {
+          name: "Angela Panganiban",
+          role: "First-time Buyer",
+          text: "As a first-time buyer, I was nervous. But the team guided me through every step with patience and expertise. I felt supported the whole way.",
+          avatar: "https://images.pexels.com/photos/12106735/pexels-photo-12106735.jpeg?auto=format&fit=crop&w=200&q=80",
+          rating: 5
+        }
+      ];
+
+      container.innerHTML = testimonials.map(t => `
+        <div class="testimonial-card glass-panel bg-white/90 rounded-xl p-5 sm:p-6 border border-slate-200/80 shadow-sm">
+          <div class="flex items-center gap-3 mb-3">
+            <img src="${t.avatar}" alt="${t.name}" class="testimonial-avatar" loading="lazy">
+            <div>
+              <div class="text-sm font-bold text-[#003366]">${t.name}</div>
+              <div class="text-[10px] text-slate-400 uppercase tracking-wider">${t.role}</div>
+            </div>
+          </div>
+          <div class="flex gap-0.5 mb-2">
+            ${Array.from({length: 5}, (_, i) => `<i class="fa-solid fa-star ${i < t.rating ? 'star-filled' : 'star-empty'} text-xs"></i>`).join('')}
+          </div>
+          <p class="text-slate-600 text-xs sm:text-sm leading-relaxed">"${t.text}"</p>
+        </div>
+      `).join('');
+    }
+
+    // ===== PROFILE KEYWORD SEARCH (unchanged) =====
+    function getProfileKeywordMatch(value) { const term = String(value || '').trim().toUpperCase(); if (!term) return null; return (window.profileKeywordLinks || []).find(item => item.keyword.toUpperCase() === term) || null; }
+    function renderProfileKeywordResult(value) {
+      const results = document.getElementById('global-search-results');
+      if (!results) return;
+      const match = getProfileKeywordMatch(value);
+      if (!match) {
+        results.innerHTML = '';
+        results.classList.add('hidden');
+        return;
+      }
+      const safeKeyword = escapeReelHtml(match.keyword);
+      const safeName = escapeReelHtml(match.name);
+      results.innerHTML = `
+        <button type="button" class="profile-search-result" onclick="openProfileKeyword('${safeKeyword}')">
+          <span class="keyword-badge">${safeKeyword}</span>
+          <span class="result-label">${safeName}</span>
+          <span class="result-hint"><i class="fa-solid fa-arrow-up-right-from-square"></i></span>
+        </button>
+      `;
+      results.classList.remove('hidden');
+    }
+    function openProfileKeyword(keyword) { const match = getProfileKeywordMatch(keyword); if (!match) return; const results = document.getElementById('global-search-results'); if (results) results.classList.add('hidden'); window.open(match.url, '_blank', 'noopener,noreferrer'); }
+    function handleGlobalSearch(value) {
+      window.globalSearchTerm = value || '';
+      window.blogPage = 1;
+      renderProfileKeywordResult(value);
+      if (getProfileKeywordMatch(value)) return;
+      renderBlogFeed();
+      const term = window.globalSearchTerm.trim().toLowerCase();
+      if (window.allListings) renderListings(window.allListings, term);
+      if (window.allReels) renderReels(window.allReels, term);
+    }
+    function clearGlobalSearch() { const input = document.getElementById('global-search'); if (input) input.value = ''; const results = document.getElementById('global-search-results'); if (results) { results.innerHTML = ''; results.classList.add('hidden'); } handleGlobalSearch(''); }
+    document.addEventListener('keydown', function(event) { const input = document.getElementById('global-search'); if (event.key === 'Enter' && document.activeElement === input) { const match = getProfileKeywordMatch(input.value); if (match) { event.preventDefault(); openProfileKeyword(match.keyword); } } });
+    function saveSocial(e) { e.preventDefault(); const name = document.getElementById('social-name').value; const icon = document.getElementById('social-icon').value; const url = document.getElementById('social-url').value; const newRef = window.push(window.ref(window.db, 'socials')); window.set(newRef, { name, icon, url }).then(() => { closeModal('social-modal'); e.target.reset(); }); }
+    function renderSocials(socials) { const container = document.getElementById('socials-container'); container.innerHTML = ''; if(!socials || socials.length === 0) { container.innerHTML = `<div class="col-span-full text-center py-6 text-slate-400 text-xs">No social links configured.</div>`; return; } socials.forEach(s => { const item = document.createElement('div'); item.className = "relative group"; item.innerHTML = `${window.isAdmin ? `<button onclick="deleteItem('socials/${s.id}')" class="absolute -top-1.5 -right-1.5 bg-red-600 text-white w-5 h-5 rounded-full text-[10px] flex items-center justify-center shadow z-20 opacity-0 group-hover:opacity-100 transition"><i class="fa-solid fa-xmark"></i></button>` : ''}<a href="${s.url}" target="_blank" class="flex items-center gap-3 p-3 rounded-lg border border-slate-200 bg-white hover:border-[#003366] hover:bg-slate-50 transition shadow-sm hover-lift"><div class="w-8 h-8 rounded-md bg-[#003366]/10 text-[#003366] flex items-center justify-center flex-shrink-0"><i class="${s.icon || 'fa-solid fa-link'} text-sm"></i></div><span class="text-xs font-semibold text-slate-700 truncate">${s.name}</span></a>`; container.appendChild(item); }); }
+    function submitLeadForm(e, isPopup = false) { e.preventDefault(); const name = isPopup ? document.getElementById('popup-lead-name').value : document.getElementById('lead-name').value; const phone = isPopup ? document.getElementById('popup-lead-phone').value : document.getElementById('lead-phone').value; const email = isPopup ? document.getElementById('popup-lead-email').value : document.getElementById('lead-email').value; const message = isPopup ? 'Submitted via popup window' : (document.getElementById('lead-message').value || 'No message provided.'); const payload = { name, phone, email, message, timestamp: new Date().toISOString() }; const leadRef = window.push(window.ref(window.db, 'leads')); window.set(leadRef, payload); if(window.leadSettings.sheetUrl) { fetch(window.leadSettings.sheetUrl, { method:'POST', mode:'no-cors', headers:{'Content-Type':'application/json'}, body:JSON.stringify(payload) }).catch(err => console.log('Sheet integration error:', err)); } if(window.leadSettings.tgToken && window.leadSettings.tgChatId) { const tgMsg = `<b>New Inquiry Received!</b>\n\n<b>Name:</b> ${name}\n<b>Phone:</b> ${phone}\n<b>Email:</b> ${email}\n<b>Message:</b> ${message}`; fetch(`https://api.telegram.org/bot${window.leadSettings.tgToken}/sendMessage`, { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ chat_id: window.leadSettings.tgChatId, text: tgMsg, parse_mode:'HTML' }) }).catch(err => console.log('Telegram integration error:', err)); } alert('Thank you! Your request has been sent successfully.'); e.target.reset(); if(isPopup) closePopupModalAnimated('lead-popup-modal'); }
+    function saveLeadSettings(e) { e.preventDefault(); const email = document.getElementById('setting-lead-email').value; const phone = document.getElementById('setting-lead-phone').value; const sheetUrl = document.getElementById('setting-sheet-url').value; const tgToken = document.getElementById('setting-tg-token').value; const tgChatId = document.getElementById('setting-tg-chatid').value; window.set(window.ref(window.db, 'leadSettings'), { email, phone, sheetUrl, tgToken, tgChatId }).then(() => { closeModal('lead-settings-modal'); alert('Lead & Integration settings updated!'); }); }
+    function editFooterDetails() { if(!window.isAdmin) return; const logo = prompt("Enter Footer Logo URL:"); const brand = prompt("Enter Brand / Realty Name:"); const about = prompt("Enter Short Footer Bio/About:"); if(logo) window.set(window.ref(window.db, 'footer/logo'), logo); if(brand) window.set(window.ref(window.db, 'footer/brand'), brand); if(about) window.set(window.ref(window.db, 'footer/about'), about); }
+    function saveFooterLink(e) { e.preventDefault(); const label = document.getElementById('footlink-label').value; const url = document.getElementById('footlink-url').value; const newRef = window.push(window.ref(window.db, 'footer/links')); window.set(newRef, { label, url }).then(() => { closeModal('footer-link-modal'); e.target.reset(); }); }
+    function renderFooterLinks(links) { const container = document.getElementById('footer-links-container'); container.innerHTML = ''; if(!links || links.length === 0) { container.innerHTML = `<li class="text-slate-500 italic">No links added</li>`; return; } links.forEach(l => { const li = document.createElement('li'); li.className = "flex items-center justify-between group"; li.innerHTML = `<a href="${l.url}" target="_blank" class="hover:text-[#f1c40f] transition flex items-center gap-1"><i class="fa-solid fa-chevron-right text-[9px] text-[#f1c40f]"></i><span>${l.label}</span></a>${window.isAdmin ? `<button onclick="deleteItem('footer/links/${l.id}')" class="text-red-400 hover:text-red-600 text-[10px] opacity-0 group-hover:opacity-100 transition"><i class="fa-solid fa-trash"></i></button>` : ''}`; container.appendChild(li); }); }
+    function deleteItem(path) { if(confirm("Are you sure you want to delete this item?")) { window.remove(window.ref(window.db, path)); } }
+
+    // ===== INIT TESTIMONIALS =====
+    document.addEventListener('DOMContentLoaded', function() {
+      renderTestimonials();
+    });
+  </script>
 </body>
 </html>
