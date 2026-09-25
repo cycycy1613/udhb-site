@@ -5,7 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Urban Deca Homes Batangas — Visitor Log</title>
 <style>
-:root{--bg:#f4f7fb;--card:#fff;--text:#172033;--muted:#667085;--line:#e4e7ec;--primary:#1d4ed8;--danger:#dc2626;--ok:#15803d;--shadow:0 10px 30px rgba(16,24,40,.08)}
+:root{--bg:#f3f6fb;--card:#fff;--text:#172033;--muted:#667085;--line:#e4e7ec;--primary:#1d4ed8;--primary2:#2563eb;--danger:#dc2626;--ok:#15803d;--shadow:0 14px 40px rgba(16,24,40,.08);--shadow2:0 25px 70px rgba(16,24,40,.12)}
+*{scrollbar-width:thin;scrollbar-color:#cbd5e1 transparent}
 *{box-sizing:border-box}
 body{margin:0;font-family:Inter,Arial,sans-serif;background:var(--bg);color:var(--text)}
 button,input,select{font:inherit}
@@ -14,9 +15,27 @@ button,input,select{font:inherit}
 .brand h1{font-size:20px;margin:0}.brand p{font-size:12px;color:var(--muted);margin:4px 0 0}
 .wrap{max-width:1100px;margin:30px auto;padding:0 18px}
 .card{background:var(--card);border:1px solid var(--line);border-radius:18px;box-shadow:var(--shadow);padding:25px}
-.hero{text-align:center;max-width:700px;margin:25px auto 18px}
-.hero h2{font-size:30px;margin:0 0 8px}.hero p{color:var(--muted);line-height:1.5}
+.hero{text-align:center;max-width:780px;margin:38px auto 22px}
+.hero .eyebrow{display:inline-flex;align-items:center;gap:7px;padding:7px 12px;border-radius:999px;background:#eaf1ff;color:#1e40af;font-size:12px;font-weight:750;margin-bottom:12px}
+.hero .dot{width:7px;height:7px;border-radius:50%;background:#16a34a;box-shadow:0 0 0 4px rgba(22,163,74,.12)}
+.hero h2{font-size:clamp(28px,5vw,42px);letter-spacing:-1.2px;margin:0 0 10px}.hero p{color:var(--muted);line-height:1.6;margin:0}
 .form-card{max-width:650px;margin:0 auto}
+.public-logs{margin:28px auto 0;max-width:950px}
+.logs-head{display:flex;justify-content:space-between;align-items:end;gap:15px;margin-bottom:13px}
+.logs-head h3{margin:0;font-size:21px}.logs-head p{margin:5px 0 0;color:var(--muted);font-size:13px}
+.live-pill{display:inline-flex;align-items:center;gap:7px;background:#ecfdf3;color:#166534;border:1px solid #bbf7d0;padding:7px 10px;border-radius:999px;font-size:11px;font-weight:750;white-space:nowrap}
+.live-dot{width:7px;height:7px;background:#22c55e;border-radius:50%;animation:pulse 1.7s infinite}
+@keyframes pulse{50%{opacity:.4;transform:scale(.8)}}
+.public-log-card{background:rgba(255,255,255,.9);border:1px solid var(--line);border-radius:18px;box-shadow:var(--shadow);overflow:hidden}
+.public-log-scroll{max-height:430px;overflow:auto}
+.public-log-row{display:grid;grid-template-columns:1.15fr 1fr 1fr .7fr;gap:15px;padding:15px 18px;border-bottom:1px solid #eef0f3;align-items:center}
+.public-log-row:last-child{border-bottom:0}
+.public-log-row.head{background:#f8fafc;color:#667085;font-size:11px;font-weight:750;text-transform:uppercase;letter-spacing:.05em;position:sticky;top:0;z-index:2}
+.public-log-row .name{font-weight:700}.public-log-row .muted{color:var(--muted);font-size:13px}
+.purpose-chip{display:inline-flex;padding:6px 9px;border-radius:8px;background:#eff6ff;color:#1d4ed8;font-size:11px;font-weight:700}
+.time-cell{text-align:right;font-weight:650;font-size:13px}
+.empty-logs{text-align:center;padding:42px 20px;color:var(--muted)}
+.privacy-note{max-width:950px;margin:12px auto 0;color:#98a2b3;font-size:11px;text-align:center;line-height:1.5}
 label{display:block;font-weight:650;font-size:14px;margin:16px 0 7px}
 input,select{width:100%;padding:13px 14px;border:1px solid #d0d5dd;border-radius:11px;background:#fff;outline:none}
 input:focus,select:focus{border-color:var(--primary);box-shadow:0 0 0 3px rgba(29,78,216,.10)}
@@ -39,7 +58,11 @@ th{background:#f8fafc;font-size:12px;text-transform:uppercase;color:#475467}
 .modal-head{display:flex;justify-content:space-between;align-items:center}
 .notice{padding:12px;border-radius:10px;background:#fffaeb;color:#92400e;font-size:13px;margin-top:12px}
 footer{text-align:center;color:var(--muted);font-size:12px;padding:35px 15px}
-@media(max-width:750px){.admin-grid{grid-template-columns:repeat(2,1fr)}.hero h2{font-size:24px}.top-inner{align-items:flex-start}.brand h1{font-size:17px}}
+@media(max-width:750px){
+.admin-grid{grid-template-columns:repeat(2,1fr)}.hero h2{font-size:24px}.top-inner{align-items:flex-start}.brand h1{font-size:17px}
+.public-log-row{grid-template-columns:1.2fr 1fr .9fr}.public-log-row.head div:nth-child(2),.public-log-row.head div:nth-child(3),.public-log-row div:nth-child(2),.public-log-row div:nth-child(3){display:none}
+.time-cell{text-align:right}
+}
 @media(max-width:480px){.wrap{margin-top:18px}.card{padding:18px}.admin-grid{grid-template-columns:1fr 1fr}.toolbar>*{max-width:none!important;width:100%}}
 </style>
 </head>
@@ -48,8 +71,9 @@ footer{text-align:center;color:var(--muted);font-size:12px;padding:35px 15px}
 <header class="top">
   <div class="top-inner">
     <div class="brand">
-      <h1>Urban Deca Homes Batangas</h1>
-      <p>Office Visitor Log</p>
+      <div class="brand-mark">UD</div>
+      <div><h1>Urban Deca Homes Batangas</h1>
+      <p>Office Visitor Log</p></div>
     </div>
     <button class="ghost" id="adminBtn">Admin</button>
   </div>
@@ -58,8 +82,9 @@ footer{text-align:center;color:var(--muted);font-size:12px;padding:35px 15px}
 <main class="wrap">
   <section id="visitorPage">
     <div class="hero">
-      <h2>Welcome to Our Office</h2>
-      <p>Please register your visit. Location verification is required before a visitor log can be submitted.</p>
+      <div class="eyebrow"><span class="dot"></span> Office Visitor Registration</div>
+      <h2>Welcome to Urban Deca Homes Batangas</h2>
+      <p>Please register your visit below. Your device location is verified to make sure the registration is made within the office premises.</p>
     </div>
 
     <div class="card form-card">
@@ -94,6 +119,36 @@ footer{text-align:center;color:var(--muted);font-size:12px;padding:35px 15px}
         <div class="small" style="margin-top:10px">By submitting, you acknowledge that your visit information and location verification data will be recorded for office visitor-management purposes.</div>
       </form>
     </div>
+
+    <section class="public-logs">
+      <div class="logs-head">
+        <div>
+          <h3>Today's Visitor Log</h3>
+          <p>Visitors recorded at Urban Deca Homes Batangas today</p>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:flex-end">
+          <select id="publicPurposeFilter" aria-label="Filter visitor log by purpose" style="width:auto;min-width:155px;padding:9px 12px">
+            <option value="all">All Purposes</option>
+            <option value="Attendance">Attendance</option>
+            <option value="Manning Schedule">Manning Schedule</option>
+            <option value="Site-Tripping">Site-Tripping</option>
+            <option value="Others">Others</option>
+          </select>
+          <div class="live-pill"><span class="live-dot"></span> LIVE</div>
+        </div>
+      </div>
+      <div class="public-log-card">
+        <div class="public-log-scroll">
+          <div class="public-log-row head">
+            <div>Visitor</div><div>Realty / Group</div><div>Purpose</div><div>Time</div>
+          </div>
+          <div id="publicLogsBody">
+            <div class="empty-logs">Loading today's visitor log...</div>
+          </div>
+        </div>
+      </div>
+      <div class="privacy-note">Today's visitor log is publicly displayed for office transparency. Only the information configured for public display is shown here.</div>
+    </section>
   </section>
 
   <section id="adminPage" class="hidden">
@@ -268,6 +323,52 @@ $("visitorForm").onsubmit=async e=>{
   }
 };
 
+
+function publicRecordDate(r){
+  if(r.timeIn?.toDate) return r.timeIn.toDate();
+  if(r.timeIn) return new Date(r.timeIn);
+  if(r.createdAt?.toDate) return r.createdAt.toDate();
+  return null;
+}
+function renderPublicLogs(){
+  const body=$("publicLogsBody");
+  if(!body) return;
+  const start=new Date(); start.setHours(0,0,0,0);
+  const end=new Date(start); end.setDate(end.getDate()+1);
+  const selectedPurpose = $("publicPurposeFilter")?.value || "all";
+  const todays=records.filter(r=>{
+    const d=publicRecordDate(r);
+    const purposeMatch = selectedPurpose === "all" || r.purpose === selectedPurpose;
+    return d && d>=start && d<end && purposeMatch;
+  }).sort((a,b)=>publicRecordDate(a)-publicRecordDate(b));
+
+  if(!todays.length){
+    body.innerHTML=selectedPurpose==="all"
+      ? '<div class="empty-logs">No visitor records have been registered today yet.</div>'
+      : `<div class="empty-logs">No ${escapeHTML(selectedPurpose)} records have been registered today.</div>`;
+    return;
+  }
+  body.innerHTML=todays.map(r=>{
+    const d=publicRecordDate(r);
+    const purpose=r.purpose==="Others" && r.otherPurpose ? r.otherPurpose : r.purpose;
+    return `<div class="public-log-row">
+      <div class="name">${escapeHTML(r.fullName)}</div>
+      <div class="muted">${escapeHTML(r.realty)}</div>
+      <div><span class="purpose-chip">${escapeHTML(purpose)}</span></div>
+      <div class="time-cell">${escapeHTML(d.toLocaleTimeString("en-PH",{hour:"2-digit",minute:"2-digit"}))}</div>
+    </div>`;
+  }).join("");
+}
+async function loadPublicLogs(){
+  try{
+    const snap=await getDocs(query(collection(db,COLLECTION),orderBy("timeIn","desc")));
+    records=snap.docs.map(d=>({id:d.id,...d.data()}));
+    renderPublicLogs();
+  }catch(err){
+    console.error(err);
+    $("publicLogsBody").innerHTML='<div class="empty-logs">Visitor logs are temporarily unavailable.</div>';
+  }
+}
 $("adminBtn").onclick=()=>{$("loginModal").classList.remove("hidden");$("loginError").textContent=""};
 $("closeLogin").onclick=()=>$("loginModal").classList.add("hidden");
 
@@ -289,6 +390,7 @@ async function loadRecords(){
     const snap=await getDocs(query(collection(db,COLLECTION),orderBy("timeIn","desc")));
     records=snap.docs.map(d=>({id:d.id,...d.data()}));
     renderRecords();
+    renderPublicLogs();
   }catch(err){
     console.error(err);
     $("recordsBody").innerHTML="<tr><td colspan='6'>Unable to load records. Check Firestore rules/indexes.</td></tr>";
@@ -332,6 +434,7 @@ function renderRecords(){
 }
 
 $("searchBox").oninput=renderRecords; $("dateFilter").onchange=renderRecords;
+$("publicPurposeFilter").onchange=renderPublicLogs;
 
 function openRecord(r=null){
   $("recordModal").classList.remove("hidden");
@@ -399,7 +502,11 @@ $("exportBtn").onclick=()=>{
   pdf.save(`urban-deca-homes-batangas-visitor-log-${new Date().toISOString().slice(0,10)}.pdf`);
 };
 
-window.addEventListener("load",()=>verifyLocation());
+window.addEventListener("load",()=>{
+  verifyLocation();
+  loadPublicLogs();
+  setInterval(loadPublicLogs,30000);
+});
 </script>
 </body>
 </html>
