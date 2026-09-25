@@ -1,331 +1,663 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>UDHB —  Log Records</title>
-<style>
-:root{
-  --bg:#eef2f9;
-  --card:rgba(255,255,255,0.75);
-  --glass:rgba(255,255,255,0.55);
-  --glass-border:rgba(255,255,255,0.7);
-  --text:#172033;
-  --muted:#667085;
-  --line:rgba(228,231,236,0.7);
-  --primary:#1d4ed8;
-  --primary2:#2563eb;
-  --danger:#dc2626;
-  --ok:#15803d;
-  --shadow:0 14px 40px rgba(16,24,40,.08);
-  --shadow2:0 25px 70px rgba(16,24,40,.12);
-  --shadow-glass:0 8px 32px rgba(31,38,135,0.15);
-  --radius:18px;
-}
-*{scrollbar-width:thin;scrollbar-color:#cbd5e1 transparent}
-*{box-sizing:border-box}
-body{
-  margin:0;
-  font-family:Inter,Arial,sans-serif;
-  background:linear-gradient(135deg,#e8edf8 0%,#f0f4fe 40%,#e2e9f5 100%);
-  color:var(--text);
-  min-height:100vh;
-  perspective:1200px;
-  overflow-x:hidden;
-}
-/* floating 3d background elements */
-.bg-shape{
-  position:fixed;
-  border-radius:50%;
-  pointer-events:none;
-  z-index:0;
-  filter:blur(60px);
-  opacity:0.45;
-  animation:floatShape 18s ease-in-out infinite alternate;
-}
-.bg-shape:nth-child(1){width:400px;height:400px;background:radial-gradient(circle,#a5b4fc,#6366f1);top:-120px;left:-100px;animation-duration:22s;}
-.bg-shape:nth-child(2){width:300px;height:300px;background:radial-gradient(circle,#93c5fd,#3b82f6);bottom:-80px;right:-60px;animation-duration:19s;animation-delay:-5s;}
-.bg-shape:nth-child(3){width:250px;height:250px;background:radial-gradient(circle,#c4b5fd,#8b5cf6);top:45%;left:60%;animation-duration:25s;animation-delay:-10s;}
-@keyframes floatShape{
-  0%{transform:translate(0,0) scale(1) rotate(0deg);}
-  50%{transform:translate(30px,-40px) scale(1.1) rotate(10deg);}
-  100%{transform:translate(-20px,20px) scale(0.95) rotate(-5deg);}
-}
-button,input,select{font:inherit}
-.top{
-  background:rgba(255,255,255,0.55);
-  backdrop-filter:blur(18px) saturate(180%);
-  -webkit-backdrop-filter:blur(18px) saturate(180%);
-  border-bottom:1px solid rgba(255,255,255,0.6);
-  padding:18px 22px;
-  position:sticky;top:0;z-index:20;
-  box-shadow:0 4px 30px rgba(0,0,0,0.03);
-  transition:box-shadow 0.3s ease, background 0.3s ease;
-}
-.top:hover{box-shadow:0 8px 40px rgba(29,78,216,0.08);}
-.top-inner{max-width:1100px;margin:auto;display:flex;justify-content:space-between;align-items:center;gap:15px}
-.brand h1{font-size:20px;margin:0}
-.brand p{font-size:12px;color:var(--muted);margin:4px 0 0}
-.brand-mark{
-  display:inline-flex;align-items:center;justify-content:center;
-  width:38px;height:38px;border-radius:12px;
-  background:linear-gradient(145deg,#1d4ed8,#3b82f6);
-  color:#fff;font-weight:800;font-size:15px;
-  box-shadow:0 8px 20px rgba(29,78,216,0.3), inset 0 -2px 4px rgba(0,0,0,0.1), inset 0 2px 4px rgba(255,255,255,0.25);
-  transform:rotate(-4deg) scale(1);
-  transition:transform 0.3s ease, box-shadow 0.3s ease;
-}
-.brand-mark:hover{transform:rotate(4deg) scale(1.1);box-shadow:0 12px 28px rgba(29,78,216,0.4);}
-.brand > div{display:flex;align-items:center;gap:12px;}
-.wrap{max-width:1100px;margin:30px auto;padding:0 18px;position:relative;z-index:1}
-.card{
-  background:rgba(255,255,255,0.6);
-  backdrop-filter:blur(16px) saturate(150%);
-  -webkit-backdrop-filter:blur(16px) saturate(150%);
-  border:1px solid rgba(255,255,255,0.8);
-  border-radius:var(--radius);
-  box-shadow:var(--shadow-glass), 0 4px 16px rgba(0,0,0,0.02);
-  padding:25px;
-  transition:transform 0.4s ease, box-shadow 0.4s ease, border-color 0.3s ease;
-  transform-style:preserve-3d;
-}
-.card:hover{
-  transform:translateY(-4px) rotateX(1deg) rotateY(-1deg);
-  box-shadow:0 25px 60px rgba(31,38,135,0.18), 0 8px 20px rgba(0,0,0,0.04);
-  border-color:rgba(255,255,255,0.95);
-}
-.hero{text-align:center;max-width:780px;margin:38px auto 22px}
-.hero .eyebrow{
-  display:inline-flex;align-items:center;gap:7px;
-  padding:7px 12px;border-radius:999px;
-  background:rgba(234,241,255,0.7);
-  backdrop-filter:blur(8px);
-  border:1px solid rgba(255,255,255,0.7);
-  color:#1e40af;font-size:12px;font-weight:750;margin-bottom:12px;
-  box-shadow:0 4px 12px rgba(29,78,216,0.08);
-  animation:fadeSlideDown 0.6s ease both;
-}
-.hero .dot{width:7px;height:7px;border-radius:50%;background:#16a34a;box-shadow:0 0 0 4px rgba(22,163,74,.12);animation:pulseDot 1.8s infinite;}
-@keyframes pulseDot{50%{box-shadow:0 0 0 8px rgba(22,163,74,0);}}
-.hero h2{font-size:clamp(28px,5vw,42px);letter-spacing:-1.2px;margin:0 0 10px;animation:fadeSlideDown 0.7s 0.1s ease both;}
-.hero p{color:var(--muted);line-height:1.6;margin:0;animation:fadeSlideDown 0.7s 0.2s ease both;}
-@keyframes fadeSlideDown{
-  from{opacity:0;transform:translateY(-12px);}
-  to{opacity:1;transform:translateY(0);}
-}
-.form-card{max-width:650px;margin:0 auto;animation:cardEnter 0.8s 0.2s cubic-bezier(.21,.98,.6,1) both;}
-@keyframes cardEnter{
-  from{opacity:0;transform:translateY(30px) scale(0.97);}
-  to{opacity:1;transform:translateY(0) scale(1);}
-}
-.public-logs{margin:28px auto 0;max-width:950px;animation:fadeSlideDown 0.8s 0.4s ease both;}
-.logs-head{display:flex;justify-content:space-between;align-items:end;gap:15px;margin-bottom:13px}
-.logs-head h3{margin:0;font-size:21px}
-.logs-head p{margin:5px 0 0;color:var(--muted);font-size:13px}
-.live-pill{
-  display:inline-flex;align-items:center;gap:7px;
-  background:rgba(236,253,243,0.7);
-  backdrop-filter:blur(8px);
-  border:1px solid #bbf7d0;padding:7px 10px;border-radius:999px;
-  font-size:11px;font-weight:750;white-space:nowrap;
-  box-shadow:0 4px 12px rgba(22,163,74,0.1);
-}
-.live-dot{width:7px;height:7px;background:#22c55e;border-radius:50%;animation:pulse 1.7s infinite}
-@keyframes pulse{50%{opacity:.4;transform:scale(.8)}}
-.public-log-card{
-  background:rgba(255,255,255,0.55);
-  backdrop-filter:blur(14px) saturate(150%);
-  -webkit-backdrop-filter:blur(14px) saturate(150%);
-  border:1px solid rgba(255,255,255,0.8);
-  border-radius:var(--radius);
-  box-shadow:var(--shadow-glass);
-  overflow:hidden;
-  transition:box-shadow 0.3s ease;
-}
-.public-log-card:hover{box-shadow:0 15px 45px rgba(31,38,135,0.16);}
-.public-log-scroll{max-height:430px;overflow:auto}
-.public-log-row{display:grid;grid-template-columns:1.15fr 1fr 1fr .7fr;gap:15px;padding:15px 18px;border-bottom:1px solid rgba(238,240,243,0.6);align-items:center;transition:background 0.25s ease;}
-.public-log-row:last-child{border-bottom:0}
-.public-log-row:hover:not(.head){background:rgba(255,255,255,0.4);}
-.public-log-row.head{background:rgba(248,250,252,0.6);backdrop-filter:blur(8px);color:#667085;font-size:11px;font-weight:750;text-transform:uppercase;letter-spacing:.05em;position:sticky;top:0;z-index:2;}
-/* visitor name now same font weight as realty — no bold, no enlarge */
-.public-log-row .name{font-weight:400;font-size:13px;color:var(--text);}
-.public-log-row .muted{color:var(--muted);font-size:13px}
-.purpose-chip{display:inline-flex;padding:6px 9px;border-radius:8px;background:rgba(239,246,255,0.8);color:#1d4ed8;font-size:11px;font-weight:700;border:1px solid rgba(29,78,216,0.1);box-shadow:0 2px 6px rgba(29,78,216,0.05);transition:transform 0.2s ease;}
-.purpose-chip:hover{transform:scale(1.04);}
-.time-cell{text-align:right;font-weight:650;font-size:13px}
-.empty-logs{text-align:center;padding:42px 20px;color:var(--muted)}
-.privacy-note{max-width:950px;margin:12px auto 0;color:#98a2b3;font-size:11px;text-align:center;line-height:1.5}
-label{display:block;font-weight:650;font-size:14px;margin:16px 0 7px}
-input,select{
-  width:100%;padding:13px 14px;border:1px solid rgba(208,213,221,0.7);
-  border-radius:11px;background:rgba(255,255,255,0.7);
-  backdrop-filter:blur(4px);
-  outline:none;
-  transition:border-color 0.25s ease, box-shadow 0.25s ease, background 0.25s ease, transform 0.2s ease;
-}
-input:hover,select:hover{background:rgba(255,255,255,0.85);}
-input:focus,select:focus{
-  border-color:var(--primary);
-  box-shadow:0 0 0 3px rgba(29,78,216,.12), 0 4px 12px rgba(29,78,216,0.08);
-  background:rgba(255,255,255,0.95);
-  transform:translateY(-1px);
-}
-button{
-  border:0;border-radius:11px;padding:12px 17px;cursor:pointer;font-weight:650;
-  transition:transform 0.2s ease, box-shadow 0.25s ease, background 0.25s ease, filter 0.2s ease;
-  position:relative;overflow:hidden;
-}
-button::after{
-  content:'';position:absolute;inset:0;background:radial-gradient(circle at center, rgba(255,255,255,0.4) 0%, transparent 70%);
-  opacity:0;transition:opacity 0.3s ease;pointer-events:none;
-}
-button:hover::after{opacity:1;}
-button:active{transform:scale(0.97);}
-.primary{
-  background:linear-gradient(145deg,#1d4ed8,#2563eb);
-  color:#fff;
-  box-shadow:0 6px 20px rgba(29,78,216,0.3), inset 0 -2px 4px rgba(0,0,0,0.1), inset 0 2px 4px rgba(255,255,255,0.2);
-  transform:translateZ(0);
-}
-.primary:hover{
-  box-shadow:0 12px 30px rgba(29,78,216,0.4);
-  transform:translateY(-2px) scale(1.01);
-}
-.secondary{
-  background:rgba(238,242,255,0.8);
-  backdrop-filter:blur(4px);
-  color:#1e3a8a;
-  box-shadow:0 4px 12px rgba(29,78,216,0.08);
-  border:1px solid rgba(255,255,255,0.6);
-}
-.secondary:hover{background:rgba(238,242,255,1);transform:translateY(-2px);box-shadow:0 8px 20px rgba(29,78,216,0.12);}
-.danger{background:rgba(254,226,226,0.85);color:#991b1b;border:1px solid rgba(255,255,255,0.5);}
-.danger:hover{background:#fee2e2;transform:translateY(-2px);box-shadow:0 6px 16px rgba(220,38,38,0.15);}
-.ghost{background:rgba(242,244,247,0.7);backdrop-filter:blur(4px);color:#344054;border:1px solid rgba(255,255,255,0.5);}
-.ghost:hover{background:rgba(242,244,247,1);transform:translateY(-2px);}
-.full{width:100%;margin-top:20px}
-.location{
-  padding:14px;border-radius:12px;
-  background:rgba(248,250,252,0.7);
-  backdrop-filter:blur(8px);
-  border:1px solid rgba(228,231,236,0.8);
-  margin-top:17px;font-size:14px;
-  transition:box-shadow 0.3s ease, border-color 0.3s ease;
-}
-.location:hover{border-color:rgba(29,78,216,0.2);box-shadow:0 4px 16px rgba(29,78,216,0.05);}
-.ok{color:var(--ok);font-weight:700}
-.bad{color:var(--danger);font-weight:700}
-.small{font-size:12px;color:var(--muted)}
-.hidden{display:none!important}
-.admin-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:20px}
-.stat{
-  background:rgba(255,255,255,0.6);
-  backdrop-filter:blur(12px) saturate(150%);
-  border:1px solid rgba(255,255,255,0.8);
-  border-radius:15px;padding:18px;
-  box-shadow:0 4px 20px rgba(31,38,135,0.06);
-  transition:transform 0.3s ease, box-shadow 0.3s ease;
-}
-.stat:hover{transform:translateY(-6px) rotateX(2deg);box-shadow:0 16px 40px rgba(31,38,135,0.12);}
-.stat b{display:block;font-size:25px;margin-top:7px}
-.toolbar{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:15px}
-.toolbar input,.toolbar select{max-width:240px}
-.table-wrap{
-  overflow:auto;border:1px solid rgba(255,255,255,0.7);
-  border-radius:14px;
-  background:rgba(255,255,255,0.4);
-  backdrop-filter:blur(8px);
-  box-shadow:0 4px 20px rgba(0,0,0,0.03);
-}
-table{border-collapse:collapse;width:100%;min-width:900px;background:transparent}
-th,td{padding:12px 13px;border-bottom:1px solid rgba(228,231,236,0.6);text-align:left;font-size:13px;vertical-align:top}
-th{background:rgba(248,250,252,0.7);font-size:12px;text-transform:uppercase;color:#475467;backdrop-filter:blur(8px);}
-tr{transition:background 0.2s ease;}
-tbody tr:hover{background:rgba(255,255,255,0.3);}
-.modal{
-  position:fixed;inset:0;
-  background:rgba(16,24,40,0.4);
-  backdrop-filter:blur(8px);
-  display:flex;align-items:center;justify-content:center;padding:18px;z-index:50;
-  animation:fadeIn 0.3s ease;
-}
-@keyframes fadeIn{from{opacity:0}to{opacity:1}}
-.modal-box{
-  background:rgba(255,255,255,0.85);
-  backdrop-filter:blur(20px) saturate(160%);
-  border:1px solid rgba(255,255,255,0.9);
-  border-radius:18px;width:min(620px,100%);max-height:90vh;overflow:auto;padding:23px;
-  box-shadow:0 30px 70px rgba(16,24,40,0.25);
-  animation:modalPop 0.35s cubic-bezier(.21,.98,.6,1) both;
-}
-@keyframes modalPop{from{opacity:0;transform:scale(0.94) translateY(10px);}to{opacity:1;transform:scale(1) translateY(0);}}
-.modal-head{display:flex;justify-content:space-between;align-items:center}
-.notice{padding:12px;border-radius:10px;background:rgba(255,250,235,0.8);backdrop-filter:blur(4px);color:#92400e;font-size:13px;margin-top:12px;border:1px solid rgba(255,237,213,0.8);}
-footer{
-  text-align:center;color:var(--muted);font-size:12px;padding:35px 15px;
-  position:relative;z-index:1;
-}
-/* admin footer link */
-.footer-admin-link{
-  display:inline-block;margin-top:6px;
-  color:#667085;font-size:12px;font-weight:600;cursor:pointer;
-  text-decoration:underline;text-underline-offset:3px;
-  transition:color 0.25s ease, transform 0.2s ease;
-  border:0;background:none;padding:2px 4px;
-}
-.footer-admin-link:hover{color:#1d4ed8;transform:translateY(-1px);}
-.footer-admin-link:active{transform:scale(0.97);}
-/* extra 3d tilt for admin cards */
-@media(max-width:750px){
-  .admin-grid{grid-template-columns:repeat(2,1fr)}
-  .hero h2{font-size:24px}
-  .top-inner{align-items:flex-start}
-  .brand h1{font-size:17px}
-  .public-log-row{grid-template-columns:1.2fr 1fr .9fr}
-  .public-log-row.head div:nth-child(2),.public-log-row.head div:nth-child(3),.public-log-row div:nth-child(2),.public-log-row div:nth-child(3){display:none}
-  .time-cell{text-align:right}
-}
-@media(max-width:480px){
-  .wrap{margin-top:18px}
-  .card{padding:18px}
-  .admin-grid{grid-template-columns:1fr 1fr}
-  .toolbar>*{max-width:none!important;width:100%}
-}
-/* subtle rotating rings on background */
-.bg-ring{
-  position:fixed;border-radius:50%;border:1px solid rgba(29,78,216,0.06);pointer-events:none;z-index:0;
-  animation:ringSpin 40s linear infinite;
-}
-.bg-ring:nth-child(4){width:600px;height:600px;top:-200px;right:-200px;}
-.bg-ring:nth-child(5){width:400px;height:400px;bottom:-100px;left:-100px;animation-duration:30s;animation-direction:reverse;}
-@keyframes ringSpin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>UDHB — Log Records</title>
+  <style>
+    /* ---------- SIMPLIFIED, FASTER, RESPONSIVE DESIGN ---------- */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    :root {
+      --bg: #f5f7fc;
+      --card: #ffffff;
+      --text: #172033;
+      --muted: #5b6b7c;
+      --line: #dee3eb;
+      --primary: #1d4ed8;
+      --primary-soft: #e8edf9;
+      --danger: #b91c1c;
+      --ok: #15803d;
+      --shadow-sm: 0 2px 8px rgba(0,0,0,0.04);
+      --radius: 16px;
+    }
+
+    body {
+      font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.5;
+      padding: 0 0 32px;
+      min-height: 100vh;
+    }
+
+    /* Remove all 3D/floating/backdrop effects for speed */
+    .top {
+      background: #ffffff;
+      border-bottom: 1px solid var(--line);
+      padding: 14px 16px;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    .top-inner {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .brand-mark {
+      width: 40px;
+      height: 40px;
+      background: var(--primary);
+      color: white;
+      font-weight: 700;
+      font-size: 15px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .brand h1 {
+      font-size: 1.1rem;
+      font-weight: 600;
+      letter-spacing: -0.3px;
+      line-height: 1.2;
+    }
+
+    .brand p {
+      font-size: 0.75rem;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+
+    .wrap {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 16px 14px;
+    }
+
+    /* HERO – minimal */
+    .hero {
+      text-align: center;
+      max-width: 700px;
+      margin: 8px auto 22px;
+      padding: 0 4px;
+    }
+
+    .hero .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--primary-soft);
+      padding: 5px 12px;
+      border-radius: 30px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--primary);
+      margin-bottom: 12px;
+    }
+
+    .hero h2 {
+      font-size: 1.8rem;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+      margin-bottom: 8px;
+      line-height: 1.25;
+    }
+
+    .hero p {
+      color: var(--muted);
+      font-size: 0.95rem;
+    }
+
+    /* CARDS */
+    .card {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow-sm);
+      padding: 20px 18px;
+      transition: none;
+    }
+
+    .form-card {
+      max-width: 620px;
+      margin: 0 auto;
+    }
+
+    /* form elements */
+    label {
+      display: block;
+      font-weight: 600;
+      font-size: 0.85rem;
+      margin: 16px 0 6px;
+    }
+
+    input, select, button {
+      font: inherit;
+      width: 100%;
+      padding: 12px 14px;
+      border-radius: 12px;
+      border: 1px solid var(--line);
+      background: #ffffff;
+      outline: none;
+      transition: border-color 0.1s, box-shadow 0.1s;
+      font-size: 0.95rem;
+    }
+
+    input:focus, select:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(29, 78, 216, 0.1);
+    }
+
+    button {
+      cursor: pointer;
+      font-weight: 600;
+      border: none;
+      background: #f1f4f9;
+      color: var(--text);
+      width: auto;
+      transition: background 0.15s, transform 0.1s;
+    }
+
+    button:active {
+      transform: scale(0.97);
+    }
+
+    .primary {
+      background: var(--primary);
+      color: white;
+    }
+
+    .primary:hover {
+      background: #1a44c2;
+    }
+
+    .secondary {
+      background: #edf2fc;
+      color: #1e3a8a;
+    }
+
+    .secondary:hover {
+      background: #dfe8fa;
+    }
+
+    .danger {
+      background: #fee2e2;
+      color: #991b1b;
+    }
+
+    .danger:hover {
+      background: #fecaca;
+    }
+
+    .ghost {
+      background: #f2f5f9;
+      color: #344054;
+    }
+
+    .ghost:hover {
+      background: #e6ecf3;
+    }
+
+    .full {
+      width: 100%;
+      margin-top: 18px;
+    }
+
+    .location {
+      background: #f9fbfe;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 14px 16px;
+      margin-bottom: 8px;
+    }
+
+    .small {
+      font-size: 0.78rem;
+      color: var(--muted);
+      line-height: 1.4;
+    }
+
+    .ok { color: var(--ok); font-weight: 600; }
+    .bad { color: var(--danger); font-weight: 600; }
+
+    /* PUBLIC LOGS – responsive table with horizontal scroll */
+    .public-logs {
+      margin: 32px auto 0;
+      max-width: 1000px;
+    }
+
+    .logs-head {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+
+    .logs-head h3 {
+      font-size: 1.25rem;
+      font-weight: 700;
+    }
+
+    .logs-head p {
+      font-size: 0.8rem;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+
+    .filter-group {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .filter-group select {
+      width: auto;
+      min-width: 140px;
+      padding: 8px 12px;
+      font-size: 0.85rem;
+    }
+
+    .live-pill {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: #e6f7ec;
+      padding: 6px 12px;
+      border-radius: 30px;
+      font-size: 0.7rem;
+      font-weight: 700;
+      color: #0b5e2e;
+    }
+
+    .live-dot {
+      width: 8px;
+      height: 8px;
+      background: #22c55e;
+      border-radius: 50%;
+    }
+
+    /* Horizontal scroll wrapper */
+    .public-log-card {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .public-log-scroll {
+      min-width: 600px; /* ensures table doesn't squish */
+      width: 100%;
+    }
+
+    .public-log-row {
+      display: grid;
+      grid-template-columns: 1.2fr 1.1fr 1.1fr 0.8fr;
+      gap: 12px;
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--line);
+      align-items: center;
+      font-size: 0.9rem;
+      background: white;
+    }
+
+    .public-log-row:last-child {
+      border-bottom: none;
+    }
+
+    .public-log-row.head {
+      background: #f8fafd;
+      font-size: 0.7rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+      color: #4b5b6b;
+      border-bottom: 1px solid var(--line);
+      position: sticky;
+      top: 0;
+      z-index: 2;
+    }
+
+    .public-log-row .name {
+      font-weight: 400;
+      font-size: 0.9rem;
+      word-break: break-word;
+    }
+
+    .public-log-row .muted {
+      color: var(--muted);
+      font-size: 0.9rem;
+      word-break: break-word;
+    }
+
+    .purpose-chip {
+      display: inline-block;
+      background: #eef4ff;
+      padding: 4px 10px;
+      border-radius: 30px;
+      font-size: 0.7rem;
+      font-weight: 600;
+      color: var(--primary);
+      white-space: nowrap;
+    }
+
+    .time-cell {
+      text-align: right;
+      font-weight: 500;
+      font-size: 0.85rem;
+      white-space: nowrap;
+    }
+
+    .empty-logs {
+      text-align: center;
+      padding: 40px 20px;
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+
+    .privacy-note {
+      max-width: 1000px;
+      margin: 10px auto 0;
+      font-size: 0.7rem;
+      color: #8493a6;
+      text-align: center;
+    }
+
+    /* ADMIN dashboard */
+    .admin-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 14px;
+      margin: 18px 0 24px;
+    }
+
+    .stat {
+      background: white;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 16px;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .stat span {
+      font-size: 0.75rem;
+      color: var(--muted);
+    }
+
+    .stat b {
+      display: block;
+      font-size: 1.6rem;
+      margin-top: 4px;
+      font-weight: 700;
+      line-height: 1.2;
+    }
+
+    .toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 18px;
+      align-items: center;
+    }
+
+    .toolbar input,
+    .toolbar select {
+      max-width: 200px;
+      flex: 1 1 150px;
+      padding: 10px 12px;
+      font-size: 0.9rem;
+    }
+
+    .toolbar button {
+      width: auto;
+      flex: 0 1 auto;
+      padding: 10px 18px;
+      white-space: nowrap;
+    }
+
+    /* admin table horizontal scroll */
+    .table-wrap {
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: white;
+    }
+
+    table {
+      width: 100%;
+      min-width: 800px;
+      border-collapse: collapse;
+      font-size: 0.85rem;
+    }
+
+    th, td {
+      padding: 12px 12px;
+      text-align: left;
+      border-bottom: 1px solid var(--line);
+      vertical-align: middle;
+    }
+
+    th {
+      background: #f8fafd;
+      font-weight: 700;
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      color: #4b5b6b;
+      letter-spacing: 0.03em;
+    }
+
+    tbody tr:hover {
+      background: #f9fcff;
+    }
+
+    td button {
+      width: auto;
+      padding: 6px 12px;
+      font-size: 0.75rem;
+      border-radius: 8px;
+      margin-right: 6px;
+    }
+
+    /* MODALS */
+    .modal {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.35);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      z-index: 100;
+    }
+
+    .modal-box {
+      background: white;
+      border-radius: 24px;
+      width: 100%;
+      max-width: 550px;
+      max-height: 90vh;
+      overflow-y: auto;
+      padding: 22px 20px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+    }
+
+    .modal-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 6px;
+    }
+
+    .modal-head h3 {
+      font-size: 1.25rem;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    footer {
+      text-align: center;
+      padding: 28px 16px 16px;
+      font-size: 0.75rem;
+      color: var(--muted);
+      border-top: 1px solid var(--line);
+      margin-top: 30px;
+    }
+
+    .footer-admin-link {
+      background: none;
+      border: none;
+      color: var(--muted);
+      text-decoration: underline;
+      font-size: 0.75rem;
+      cursor: pointer;
+      padding: 4px;
+      width: auto;
+      margin-top: 6px;
+    }
+
+    .footer-admin-link:hover {
+      color: var(--primary);
+    }
+
+    /* ----- RESPONSIVE ADJUSTMENTS ----- */
+    @media (max-width: 900px) {
+      .admin-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (max-width: 700px) {
+      .hero h2 {
+        font-size: 1.5rem;
+      }
+      .brand h1 {
+        font-size: 1rem;
+      }
+      .brand p {
+        font-size: 0.7rem;
+      }
+    }
+
+    @media (max-width: 600px) {
+      .wrap {
+        padding: 12px 10px;
+      }
+      .card {
+        padding: 16px 14px;
+      }
+      .public-log-row {
+        grid-template-columns: 1.3fr 1fr 0.9fr 0.7fr;
+        gap: 8px;
+        padding: 12px 12px;
+        font-size: 0.8rem;
+      }
+      .public-log-row .name,
+      .public-log-row .muted,
+      .purpose-chip,
+      .time-cell {
+        font-size: 0.75rem;
+      }
+      .logs-head {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+      .filter-group {
+        width: 100%;
+        justify-content: space-between;
+      }
+      .filter-group select {
+        flex: 1;
+      }
+      .admin-grid {
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+      }
+      .stat b {
+        font-size: 1.3rem;
+      }
+      .toolbar input,
+      .toolbar select {
+        max-width: 100%;
+        flex: 1 1 100%;
+      }
+      .toolbar button {
+        flex: 1 1 auto;
+        padding: 10px 12px;
+      }
+    }
+
+    @media (max-width: 400px) {
+      .hero h2 {
+        font-size: 1.3rem;
+      }
+      .brand-mark {
+        width: 34px;
+        height: 34px;
+        font-size: 13px;
+      }
+      .public-log-row {
+        grid-template-columns: 1.2fr 1fr 0.8fr 0.6fr;
+        gap: 6px;
+        padding: 10px 10px;
+      }
+    }
+
+    /* Ensure that on very small screens the public log still scrolls horizontally 
+       if needed, but min-width of 600px inside scroll container handles it. */
+    .public-log-card {
+      overflow-x: auto;
+    }
+
+    /* quick utility */
+    .mt-2 { margin-top: 8px; }
+    .text-center { text-align: center; }
+  </style>
 </head>
 <body>
-
-<!-- floating 3d background shapes -->
-<div class="bg-shape"></div>
-<div class="bg-shape"></div>
-<div class="bg-shape"></div>
-<div class="bg-ring"></div>
-<div class="bg-ring"></div>
 
 <header class="top">
   <div class="top-inner">
     <div class="brand">
       <div class="brand-mark">UD</div>
-      <div><h1>Urban Deca Homes Batangas</h1>
-      <p>Office Visitor Log</p></div>
+      <div>
+        <h1>Urban Deca Homes Batangas</h1>
+        <p>Office Visitor Log</p>
+      </div>
     </div>
-    <!-- admin button removed from header -->
   </div>
 </header>
 
 <main class="wrap">
+  <!-- VISITOR PAGE -->
   <section id="visitorPage">
     <div class="hero">
-      <div class="eyebrow"><span class="dot"></span> UDHB — Log Records</div>
+      <div class="eyebrow">📋 UDHB — Log Records</div>
       <h2>Welcome to Urban Deca Homes Batangas</h2>
       <p>Please register your visit below. Your device location is verified to make sure the registration is made within the office premises.</p>
     </div>
@@ -334,7 +666,7 @@ footer{
       <div class="location" id="locationBox">
         <b>Location verification</b>
         <div id="locationText" class="small" style="margin-top:6px">Checking your device location...</div>
-        <button class="secondary" id="locateBtn" style="margin-top:10px">Verify My Location</button>
+        <button class="secondary" id="locateBtn" style="margin-top:12px; width:auto; padding:10px 18px;">Verify My Location</button>
       </div>
 
       <form id="visitorForm">
@@ -359,18 +691,19 @@ footer{
         </div>
 
         <button class="primary full" id="submitBtn" type="submit" disabled>Submit</button>
-        <div class="small" style="margin-top:10px">By submitting, you acknowledge that your visit information and location verification data will be recorded for office logs-management purposes.</div>
+        <div class="small" style="margin-top:12px">By submitting, you acknowledge that your visit information and location verification data will be recorded for office logs-management purposes.</div>
       </form>
     </div>
 
+    <!-- PUBLIC LOGS - horizontal scroll enabled -->
     <section class="public-logs">
       <div class="logs-head">
         <div>
           <h3>Today's Recorded Logs</h3>
           <p>Urban Deca Homes Batangas</p>
         </div>
-        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:flex-end">
-          <select id="publicPurposeFilter" aria-label="Filter visitor log by purpose" style="width:auto;min-width:155px;padding:9px 12px">
+        <div class="filter-group">
+          <select id="publicPurposeFilter" aria-label="Filter visitor log by purpose">
             <option value="all">All Purposes</option>
             <option value="Attendance">Attendance</option>
             <option value="Manning Schedule">Manning Schedule</option>
@@ -383,7 +716,10 @@ footer{
       <div class="public-log-card">
         <div class="public-log-scroll">
           <div class="public-log-row head">
-            <div>Visitor</div><div>Realty / Group</div><div>Purpose</div><div>Time</div>
+            <div>Visitor</div>
+            <div>Realty / Group</div>
+            <div>Purpose</div>
+            <div>Time</div>
           </div>
           <div id="publicLogsBody">
             <div class="empty-logs">Loading today's entry log...</div>
@@ -394,16 +730,17 @@ footer{
     </section>
   </section>
 
+  <!-- ADMIN PAGE -->
   <section id="adminPage" class="hidden">
-    <div class="hero" style="text-align:left;max-width:none">
+    <div class="hero" style="text-align:left; max-width:100%; margin-bottom:8px;">
       <h2>Log Dashboard</h2>
       <p>Urban Deca Homes Batangas · Balagtas, Batangas City</p>
     </div>
     <div class="admin-grid">
-      <div class="stat"><span class="small">Today's Records</span><b id="statToday">0</b></div>
-      <div class="stat"><span class="small">Attendance</span><b id="statAttendance">0</b></div>
-      <div class="stat"><span class="small">Manning Schedule</span><b id="statManning">0</b></div>
-      <div class="stat"><span class="small">Site-Tripping</span><b id="statSite">0</b></div>
+      <div class="stat"><span>Today's Records</span><b id="statToday">0</b></div>
+      <div class="stat"><span>Attendance</span><b id="statAttendance">0</b></div>
+      <div class="stat"><span>Manning Schedule</span><b id="statManning">0</b></div>
+      <div class="stat"><span>Site-Tripping</span><b id="statSite">0</b></div>
     </div>
     <div class="card">
       <div class="toolbar">
@@ -431,19 +768,21 @@ footer{
   <button class="footer-admin-link" id="adminBtn">Admin Login</button>
 </footer>
 
+<!-- LOGIN MODAL -->
 <div class="modal hidden" id="loginModal">
   <div class="modal-box">
-    <div class="modal-head"><h3>Login</h3><button class="ghost" id="closeLogin">Close</button></div>
+    <div class="modal-head"><h3>Login</h3><button class="ghost" id="closeLogin" style="width:auto; padding:6px 14px;">Close</button></div>
     <label>Username</label><input id="adminUser" autocomplete="username">
     <label>Password</label><input id="adminPass" type="password" autocomplete="current-password">
     <button class="primary full" id="loginBtn">Login</button>
-    <div id="loginError" class="bad" style="margin-top:10px"></div>
+    <div id="loginError" class="bad" style="margin-top:12px;"></div>
   </div>
 </div>
 
+<!-- RECORD MODAL -->
 <div class="modal hidden" id="recordModal">
   <div class="modal-box">
-    <div class="modal-head"><h3 id="recordModalTitle">Add Record</h3><button class="ghost" id="closeRecord">Close</button></div>
+    <div class="modal-head"><h3 id="recordModalTitle">Add Record</h3><button class="ghost" id="closeRecord" style="width:auto; padding:6px 14px;">Close</button></div>
     <input id="editId" type="hidden">
     <label>Full Name *</label><input id="editName" required>
     <label>Realty / Group *</label><input id="editRealty" required>
@@ -454,304 +793,318 @@ footer{
     <label>Other Purpose</label><input id="editOther" placeholder="Optional">
     <label>Date & Time</label><input id="editDate" type="datetime-local">
     <button class="primary full" id="saveRecord">Save Record</button>
-    <button class="danger full" id="deleteRecord" style="display:none">Delete Record</button>
+    <button class="danger full" id="deleteRecord" style="display:none;">Delete Record</button>
   </div>
 </div>
 
 <script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-app.js";
-import {
-  getFirestore, collection, addDoc, getDocs, doc, updateDoc, deleteDoc,
-  serverTimestamp, query, orderBy
-} from "https://www.gstatic.com/firebasejs/12.2.1/firebase-firestore.js";
-import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-analytics.js";
-import { jsPDF } from "https://cdn.jsdelivr.net/npm/jspdf@2.5.2/+esm";
-import autoTable from "https://cdn.jsdelivr.net/npm/jspdf-autotable@3.8.4/+esm";
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-app.js";
+  import {
+    getFirestore, collection, addDoc, getDocs, doc, updateDoc, deleteDoc,
+    serverTimestamp, query, orderBy
+  } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-firestore.js";
+  import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-analytics.js";
+  import { jsPDF } from "https://cdn.jsdelivr.net/npm/jspdf@2.5.2/+esm";
+  import autoTable from "https://cdn.jsdelivr.net/npm/jspdf-autotable@3.8.4/+esm";
 
-const firebaseConfig = {
-  apiKey: "AIzaSyBOm4XyjvLoe2MR0_bWT_zHS4CkdYXt5M4",
-  authDomain: "btb-inventory.firebaseapp.com",
-  projectId: "btb-inventory",
-  storageBucket: "btb-inventory.firebasestorage.app",
-  messagingSenderId: "635532868561",
-  appId: "1:635532868561:web:b7bee31c83f6f4ceb63ef0",
-  measurementId: "G-C8DV3NBLCP"
-};
-
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
-try { getAnalytics(app); } catch(e) {}
-
-const OFFICE = { lat:13.7925383, lng:121.0736218, radius:100 };
-const ADMIN_USER = "cmbp";
-const ADMIN_PASS = "161316";
-const COLLECTION = "officeVisitorLogs";
-
-let verifiedLocation = null;
-let records = [];
-let isAdmin = false;
-
-const $ = id => document.getElementById(id);
-const escapeHTML = s => String(s ?? "").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[c]));
-const distanceMeters = (lat1,lon1,lat2,lon2) => {
-  const R=6371000, p1=lat1*Math.PI/180, p2=lat2*Math.PI/180;
-  const dp=(lat2-lat1)*Math.PI/180, dl=(lon2-lon1)*Math.PI/180;
-  const a=Math.sin(dp/2)**2+Math.cos(p1)*Math.cos(p2)*Math.sin(dl/2)**2;
-  return 2*R*Math.atan2(Math.sqrt(a),Math.sqrt(1-a));
-};
-const formatDate = d => d ? new Date(d).toLocaleString("en-PH",{year:"numeric",month:"short",day:"2-digit",hour:"2-digit",minute:"2-digit"}) : "";
-const localDateInput = d => {
-  const x=new Date(d); const pad=n=>String(n).padStart(2,"0");
-  return `${x.getFullYear()}-${pad(x.getMonth()+1)}-${pad(x.getDate())}T${pad(x.getHours())}:${pad(x.getMinutes())}`;
-};
-
-async function verifyLocation(){
-  $("locationText").textContent="Requesting device location...";
-  $("submitBtn").disabled=true;
-  if(!navigator.geolocation){
-    $("locationText").innerHTML='<span class="bad">Location is not supported by this browser.</span>';
-    return;
-  }
-  navigator.geolocation.getCurrentPosition(pos=>{
-    const {latitude,longitude,accuracy}=pos.coords;
-    const distance=distanceMeters(latitude,longitude,OFFICE.lat,OFFICE.lng);
-    const ok=distance <= OFFICE.radius;
-    verifiedLocation={latitude,longitude,accuracy,distance,verified:ok};
-    if(ok){
-      $("locationText").innerHTML=`<span class="ok">✓ Location verified.</span> You are approximately ${Math.round(distance)}m from the office. GPS accuracy: ±${Math.round(accuracy)}m.`;
-      $("submitBtn").disabled=false;
-    }else{
-      $("locationText").innerHTML=`<span class="bad">✕ Outside the allowed area.</span> You are approximately ${Math.round(distance)}m from the office. You must be within ${OFFICE.radius}m.`;
-    }
-  },err=>{
-    let msg="Unable to verify your location.";
-    if(err.code===1) msg="Location permission was denied. Please allow location access and try again.";
-    if(err.code===2) msg="Your location could not be determined. Try again outdoors or with GPS enabled.";
-    if(err.code===3) msg="Location request timed out. Please try again.";
-    $("locationText").innerHTML=`<span class="bad">${msg}</span>`;
-  },{enableHighAccuracy:true,timeout:15000,maximumAge:0});
-}
-$("locateBtn").onclick=verifyLocation;
-
-$("purpose").onchange=()=> $("otherWrap").classList.toggle("hidden",$("purpose").value!=="Others");
-
-$("visitorForm").onsubmit=async e=>{
-  e.preventDefault();
-  if(!verifiedLocation?.verified) return alert("Please verify that you are within the office premises.");
-  $("submitBtn").disabled=true; $("submitBtn").textContent="Saving...";
-  const purpose=$("purpose").value;
-  const other=$("otherPurpose").value.trim();
-  try{
-    await addDoc(collection(db,COLLECTION),{
-      fullName:$("fullName").value.trim(),
-      realty:$("realty").value.trim(),
-      purpose,
-      otherPurpose:purpose==="Others"?other:"",
-      timeIn:serverTimestamp(),
-      location:{
-        latitude:verifiedLocation.latitude,
-        longitude:verifiedLocation.longitude,
-        accuracy:verifiedLocation.accuracy,
-        distanceMeters:verifiedLocation.distance,
-        verified:true
-      },
-      createdAt:serverTimestamp()
-    });
-    $("visitorForm").reset(); $("otherWrap").classList.add("hidden");
-    verifiedLocation=null;
-    $("submitBtn").disabled=true; $("submitBtn").textContent="Register Visit";
-    $("locationText").innerHTML='<span class="ok">✓ Visit recorded successfully.</span>';
-    alert("Your visit has been successfully recorded.");
-  }catch(err){
-    console.error(err); alert("Could not save the visitor record. Check your Firebase Firestore setup/rules.");
-    $("submitBtn").disabled=false; $("submitBtn").textContent="Register Visit";
-  }
-};
-
-
-function publicRecordDate(r){
-  if(r.timeIn?.toDate) return r.timeIn.toDate();
-  if(r.timeIn) return new Date(r.timeIn);
-  if(r.createdAt?.toDate) return r.createdAt.toDate();
-  return null;
-}
-function renderPublicLogs(){
-  const body=$("publicLogsBody");
-  if(!body) return;
-  const start=new Date(); start.setHours(0,0,0,0);
-  const end=new Date(start); end.setDate(end.getDate()+1);
-  const selectedPurpose = $("publicPurposeFilter")?.value || "all";
-  const todays=records.filter(r=>{
-    const d=publicRecordDate(r);
-    const purposeMatch = selectedPurpose === "all" || r.purpose === selectedPurpose;
-    return d && d>=start && d<end && purposeMatch;
-  }).sort((a,b)=>publicRecordDate(a)-publicRecordDate(b));
-
-  if(!todays.length){
-    body.innerHTML=selectedPurpose==="all"
-      ? '<div class="empty-logs">No visitor records have been registered today yet.</div>'
-      : `<div class="empty-logs">No ${escapeHTML(selectedPurpose)} records have been registered today.</div>`;
-    return;
-  }
-  body.innerHTML=todays.map(r=>{
-    const d=publicRecordDate(r);
-    const purpose=r.purpose==="Others" && r.otherPurpose ? r.otherPurpose : r.purpose;
-    return `<div class="public-log-row">
-      <div class="name">${escapeHTML(r.fullName)}</div>
-      <div class="muted">${escapeHTML(r.realty)}</div>
-      <div><span class="purpose-chip">${escapeHTML(purpose)}</span></div>
-      <div class="time-cell">${escapeHTML(d.toLocaleTimeString("en-PH",{hour:"2-digit",minute:"2-digit"}))}</div>
-    </div>`;
-  }).join("");
-}
-async function loadPublicLogs(){
-  try{
-    const snap=await getDocs(query(collection(db,COLLECTION),orderBy("timeIn","desc")));
-    records=snap.docs.map(d=>({id:d.id,...d.data()}));
-    renderPublicLogs();
-  }catch(err){
-    console.error(err);
-    $("publicLogsBody").innerHTML='<div class="empty-logs">Visitor logs are temporarily unavailable.</div>';
-  }
-}
-$("adminBtn").onclick=()=>{$("loginModal").classList.remove("hidden");$("loginError").textContent=""};
-$("closeLogin").onclick=()=>$("loginModal").classList.add("hidden");
-
-$("loginBtn").onclick=async ()=>{
-  const u=$("adminUser").value.trim(), p=$("adminPass").value;
-  if(u===ADMIN_USER && p===ADMIN_PASS){
-    isAdmin=true; $("loginModal").classList.add("hidden"); $("visitorPage").classList.add("hidden"); $("adminPage").classList.remove("hidden"); await loadRecords();
-  }else $("loginError").textContent="Invalid username or password.";
-};
-
-$("logoutBtn").onclick=()=>{
-  isAdmin=false; $("adminPage").classList.add("hidden"); $("visitorPage").classList.remove("hidden");
-  $("adminUser").value="";$("adminPass").value="";
-};
-
-async function loadRecords(){
-  $("recordsBody").innerHTML="<tr><td colspan='6'>Loading...</td></tr>";
-  try{
-    const snap=await getDocs(query(collection(db,COLLECTION),orderBy("timeIn","desc")));
-    records=snap.docs.map(d=>({id:d.id,...d.data()}));
-    renderRecords();
-    renderPublicLogs();
-  }catch(err){
-    console.error(err);
-    $("recordsBody").innerHTML="<tr><td colspan='6'>Unable to load records. Check Firestore rules/indexes.</td></tr>";
-  }
-}
-
-function recordDate(r){
-  if(r.timeIn?.toDate) return r.timeIn.toDate();
-  if(r.timeIn) return new Date(r.timeIn);
-  if(r.createdAt?.toDate) return r.createdAt.toDate();
-  return null;
-}
-function renderRecords(){
-  const term=$("searchBox").value.trim().toLowerCase(), date=$("dateFilter").value;
-  const today=new Date(); today.setHours(0,0,0,0);
-  const filtered=records.filter(r=>{
-    const d=recordDate(r);
-    const hay=[r.fullName,r.realty,r.purpose,r.otherPurpose].join(" ").toLowerCase();
-    const matches=!term||hay.includes(term);
-    const matchesDate=date==="all"|| (d && d>=today);
-    return matches&&matchesDate;
-  });
-  $("recordsBody").innerHTML=filtered.length?filtered.map(r=>{
-    const d=recordDate(r), loc=r.location;
-    return `<tr>
-      <td>${escapeHTML(formatDate(d))}</td>
-      <td><b>${escapeHTML(r.fullName)}</b></td>
-      <td>${escapeHTML(r.realty)}</td>
-      <td>${escapeHTML(r.purpose)}${r.otherPurpose?`<br><span class="small">${escapeHTML(r.otherPurpose)}</span>`:""}</td>
-      <td>${loc?.verified?"✓ Verified":""}${loc?.distanceMeters!=null?`<br><span class="small">${Math.round(loc.distanceMeters)}m from office</span>`:""}</td>
-      <td><button class="secondary" onclick="window.editRecord('${r.id}')">Edit</button> <button class="danger" onclick="window.removeRecord('${r.id}')">Delete</button></td>
-    </tr>`;
-  }).join(""):"<tr><td colspan='6'>No records found.</td></tr>";
-
-  const td=new Date(); td.setHours(0,0,0,0);
-  const todayRecords=records.filter(r=>{const d=recordDate(r);return d&&d>=td});
-  $("statToday").textContent=todayRecords.length;
-  $("statAttendance").textContent=todayRecords.filter(r=>r.purpose==="Attendance").length;
-  $("statManning").textContent=todayRecords.filter(r=>r.purpose==="Manning Schedule").length;
-  $("statSite").textContent=todayRecords.filter(r=>r.purpose==="Site-Tripping").length;
-}
-
-$("searchBox").oninput=renderRecords; $("dateFilter").onchange=renderRecords;
-$("publicPurposeFilter").onchange=renderPublicLogs;
-
-function openRecord(r=null){
-  $("recordModal").classList.remove("hidden");
-  $("recordModalTitle").textContent=r?"Edit Record":"Add Record";
-  $("editId").value=r?.id||"";
-  $("editName").value=r?.fullName||"";
-  $("editRealty").value=r?.realty||"";
-  $("editPurpose").value=r?.purpose||"Attendance";
-  $("editOther").value=r?.otherPurpose||"";
-  $("editDate").value=localDateInput(recordDate(r)||new Date());
-  $("deleteRecord").style.display=r?"block":"none";
-}
-$("addRecordBtn").onclick=()=>openRecord();
-$("closeRecord").onclick=()=>$("recordModal").classList.add("hidden");
-
-$("saveRecord").onclick=async()=>{
-  const id=$("editId").value;
-  const data={
-    fullName:$("editName").value.trim(),
-    realty:$("editRealty").value.trim(),
-    purpose:$("editPurpose").value,
-    otherPurpose:$("editPurpose").value==="Others"?$("editOther").value.trim():"",
+  const firebaseConfig = {
+    apiKey: "AIzaSyBOm4XyjvLoe2MR0_bWT_zHS4CkdYXt5M4",
+    authDomain: "btb-inventory.firebaseapp.com",
+    projectId: "btb-inventory",
+    storageBucket: "btb-inventory.firebasestorage.app",
+    messagingSenderId: "635532868561",
+    appId: "1:635532868561:web:b7bee31c83f6f4ceb63ef0",
+    measurementId: "G-C8DV3NBLCP"
   };
-  if(!data.fullName||!data.realty) return alert("Full Name and Realty / Group are required.");
-  const dateVal=$("editDate").value;
-  if(dateVal) data.timeIn=new Date(dateVal);
-  try{
-    if(id) await updateDoc(doc(db,COLLECTION,id),data);
-    else await addDoc(collection(db,COLLECTION),{...data,timeIn:data.timeIn||serverTimestamp(),createdAt:serverTimestamp(),location:{verified:false,manuallyAdded:true}});
-    $("recordModal").classList.add("hidden"); await loadRecords();
-  }catch(err){console.error(err);alert("Could not save record.");}
-};
 
-window.editRecord=id=>{const r=records.find(x=>x.id===id);if(r)openRecord(r)};
-window.removeRecord=async id=>{
-  if(!confirm("Delete this visitor record? This cannot be undone.")) return;
-  try{await deleteDoc(doc(db,COLLECTION,id));await loadRecords()}catch(err){console.error(err);alert("Could not delete record.")};
-};
-$("deleteRecord").onclick=async()=>{
-  const id=$("editId").value;
-  if(id) window.removeRecord(id).then(()=>$("recordModal").classList.add("hidden"));
-};
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+  try { getAnalytics(app); } catch(e) {}
 
-$("exportBtn").onclick=()=>{
-  const term=$("searchBox").value.trim().toLowerCase(), date=$("dateFilter").value;
-  const today=new Date();today.setHours(0,0,0,0);
-  const filtered=records.filter(r=>{
-    const d=recordDate(r),hay=[r.fullName,r.realty,r.purpose,r.otherPurpose].join(" ").toLowerCase();
-    return (!term||hay.includes(term))&&(date==="all"||(d&&d>=today));
+  const OFFICE = { lat:13.7925383, lng:121.0736218, radius:100 };
+  const ADMIN_USER = "cmbp";
+  const ADMIN_PASS = "161316";
+  const COLLECTION = "officeVisitorLogs";
+
+  let verifiedLocation = null;
+  let records = [];
+  let isAdmin = false;
+
+  const $ = id => document.getElementById(id);
+  const escapeHTML = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[c]));
+  const distanceMeters = (lat1,lon1,lat2,lon2) => {
+    const R=6371000, p1=lat1*Math.PI/180, p2=lat2*Math.PI/180;
+    const dp=(lat2-lat1)*Math.PI/180, dl=(lon2-lon1)*Math.PI/180;
+    const a=Math.sin(dp/2)**2+Math.cos(p1)*Math.cos(p2)*Math.sin(dl/2)**2;
+    return 2*R*Math.atan2(Math.sqrt(a),Math.sqrt(1-a));
+  };
+  const formatDate = d => d ? new Date(d).toLocaleString("en-PH",{year:"numeric",month:"short",day:"2-digit",hour:"2-digit",minute:"2-digit"}) : "";
+  const localDateInput = d => {
+    const x=new Date(d); const pad=n=>String(n).padStart(2,"0");
+    return `${x.getFullYear()}-${pad(x.getMonth()+1)}-${pad(x.getDate())}T${pad(x.getHours())}:${pad(x.getMinutes())}`;
+  };
+
+  async function verifyLocation(){
+    $("locationText").textContent="Requesting device location...";
+    $("submitBtn").disabled=true;
+    if(!navigator.geolocation){
+      $("locationText").innerHTML='<span class="bad">Location is not supported by this browser.</span>';
+      return;
+    }
+    navigator.geolocation.getCurrentPosition(pos=>{
+      const {latitude,longitude,accuracy}=pos.coords;
+      const distance=distanceMeters(latitude,longitude,OFFICE.lat,OFFICE.lng);
+      const ok=distance <= OFFICE.radius;
+      verifiedLocation={latitude,longitude,accuracy,distance,verified:ok};
+      if(ok){
+        $("locationText").innerHTML=`<span class="ok">✓ Location verified.</span> You are approximately ${Math.round(distance)}m from the office. GPS accuracy: ±${Math.round(accuracy)}m.`;
+        $("submitBtn").disabled=false;
+      }else{
+        $("locationText").innerHTML=`<span class="bad">✕ Outside the allowed area.</span> You are approximately ${Math.round(distance)}m from the office. You must be within ${OFFICE.radius}m.`;
+      }
+    },err=>{
+      let msg="Unable to verify your location.";
+      if(err.code===1) msg="Location permission was denied. Please allow location access and try again.";
+      if(err.code===2) msg="Your location could not be determined. Try again outdoors or with GPS enabled.";
+      if(err.code===3) msg="Location request timed out. Please try again.";
+      $("locationText").innerHTML=`<span class="bad">${msg}</span>`;
+    },{enableHighAccuracy:true,timeout:15000,maximumAge:0});
+  }
+
+  // event listeners
+  document.addEventListener('DOMContentLoaded', () => {
+    // re-bind after elements exist (module defers)
+    $("locateBtn").onclick = verifyLocation;
+    $("purpose").onchange = () => $("otherWrap").classList.toggle("hidden", $("purpose").value !== "Others");
+
+    $("visitorForm").onsubmit = async e => {
+      e.preventDefault();
+      if(!verifiedLocation?.verified) return alert("Please verify that you are within the office premises.");
+      $("submitBtn").disabled = true; $("submitBtn").textContent = "Saving...";
+      const purpose = $("purpose").value;
+      const other = $("otherPurpose").value.trim();
+      try {
+        await addDoc(collection(db, COLLECTION), {
+          fullName: $("fullName").value.trim(),
+          realty: $("realty").value.trim(),
+          purpose,
+          otherPurpose: purpose === "Others" ? other : "",
+          timeIn: serverTimestamp(),
+          location: {
+            latitude: verifiedLocation.latitude,
+            longitude: verifiedLocation.longitude,
+            accuracy: verifiedLocation.accuracy,
+            distanceMeters: verifiedLocation.distance,
+            verified: true
+          },
+          createdAt: serverTimestamp()
+        });
+        $("visitorForm").reset(); $("otherWrap").classList.add("hidden");
+        verifiedLocation = null;
+        $("submitBtn").disabled = true; $("submitBtn").textContent = "Register Visit";
+        $("locationText").innerHTML = '<span class="ok">✓ Visit recorded successfully.</span>';
+        alert("Your visit has been successfully recorded.");
+      } catch(err) {
+        console.error(err); alert("Could not save the visitor record. Check your Firebase Firestore setup/rules.");
+        $("submitBtn").disabled = false; $("submitBtn").textContent = "Register Visit";
+      }
+    };
+
+    // admin & modal bindings
+    $("adminBtn").onclick = () => { $("loginModal").classList.remove("hidden"); $("loginError").textContent = ""; };
+    $("closeLogin").onclick = () => $("loginModal").classList.add("hidden");
+
+    $("loginBtn").onclick = async () => {
+      const u = $("adminUser").value.trim(), p = $("adminPass").value;
+      if(u === ADMIN_USER && p === ADMIN_PASS) {
+        isAdmin = true; $("loginModal").classList.add("hidden"); $("visitorPage").classList.add("hidden"); $("adminPage").classList.remove("hidden"); await loadRecords();
+      } else $("loginError").textContent = "Invalid username or password.";
+    };
+
+    $("logoutBtn").onclick = () => {
+      isAdmin = false; $("adminPage").classList.add("hidden"); $("visitorPage").classList.remove("hidden");
+      $("adminUser").value = ""; $("adminPass").value = "";
+    };
+
+    $("searchBox").oninput = renderRecords;
+    $("dateFilter").onchange = renderRecords;
+    $("publicPurposeFilter").onchange = renderPublicLogs;
+
+    $("addRecordBtn").onclick = () => openRecord();
+    $("closeRecord").onclick = () => $("recordModal").classList.add("hidden");
+
+    $("saveRecord").onclick = async () => {
+      const id = $("editId").value;
+      const data = {
+        fullName: $("editName").value.trim(),
+        realty: $("editRealty").value.trim(),
+        purpose: $("editPurpose").value,
+        otherPurpose: $("editPurpose").value === "Others" ? $("editOther").value.trim() : "",
+      };
+      if(!data.fullName || !data.realty) return alert("Full Name and Realty / Group are required.");
+      const dateVal = $("editDate").value;
+      if(dateVal) data.timeIn = new Date(dateVal);
+      try {
+        if(id) await updateDoc(doc(db, COLLECTION, id), data);
+        else await addDoc(collection(db, COLLECTION), { ...data, timeIn: data.timeIn || serverTimestamp(), createdAt: serverTimestamp(), location: { verified: false, manuallyAdded: true } });
+        $("recordModal").classList.add("hidden"); await loadRecords();
+      } catch(err) { console.error(err); alert("Could not save record."); }
+    };
+
+    $("deleteRecord").onclick = async () => {
+      const id = $("editId").value;
+      if(id) window.removeRecord(id).then(() => $("recordModal").classList.add("hidden"));
+    };
+
+    $("exportBtn").onclick = () => {
+      const term = $("searchBox").value.trim().toLowerCase(), date = $("dateFilter").value;
+      const today = new Date(); today.setHours(0,0,0,0);
+      const filtered = records.filter(r => {
+        const d = recordDate(r), hay = [r.fullName, r.realty, r.purpose, r.otherPurpose].join(" ").toLowerCase();
+        return (!term || hay.includes(term)) && (date === "all" || (d && d >= today));
+      });
+      const pdf = new jsPDF({ orientation: "landscape" });
+      pdf.setFontSize(16); pdf.text("Urban Deca Homes Batangas — Visitor Log", 14, 16);
+      pdf.setFontSize(9); pdf.text(`Generated: ${new Date().toLocaleString("en-PH")}`, 14, 23);
+      autoTable(pdf, {
+        startY: 29,
+        head: [["Date & Time","Full Name","Realty / Group","Purpose","Location"]],
+        body: filtered.map(r => [
+          formatDate(recordDate(r)), r.fullName, r.realty,
+          r.purpose + (r.otherPurpose ? ` - ${r.otherPurpose}` : ""),
+          r.location?.verified ? `Verified (${Math.round(r.location.distanceMeters || 0)}m)` : "Manual/Admin"
+        ]),
+        styles: { fontSize: 8 },
+        headStyles: { fillColor: [29,78,216] }
+      });
+      pdf.save(`urban-deca-homes-batangas-visitor-log-${new Date().toISOString().slice(0,10)}.pdf`);
+    };
+
+    // initial data load and timer
+    window.addEventListener("load", () => {
+      verifyLocation();
+      loadPublicLogs();
+      setInterval(loadPublicLogs, 30000);
+    });
   });
-  const pdf=new jsPDF({orientation:"landscape"});
-  pdf.setFontSize(16);pdf.text("Urban Deca Homes Batangas — Visitor Log",14,16);
-  pdf.setFontSize(9);pdf.text(`Generated: ${new Date().toLocaleString("en-PH")}`,14,23);
-  autoTable(pdf,{
-    startY:29,
-    head:[["Date & Time","Full Name","Realty / Group","Purpose","Location"]],
-    body:filtered.map(r=>[
-      formatDate(recordDate(r)),r.fullName,r.realty,
-      r.purpose+(r.otherPurpose?` - ${r.otherPurpose}`:""),
-      r.location?.verified?`Verified (${Math.round(r.location.distanceMeters||0)}m)`:"Manual/Admin"
-    ]),
-    styles:{fontSize:8},
-    headStyles:{fillColor:[29,78,216]}
-  });
-  pdf.save(`urban-deca-homes-batangas-visitor-log-${new Date().toISOString().slice(0,10)}.pdf`);
-};
 
-window.addEventListener("load",()=>{
-  verifyLocation();
-  loadPublicLogs();
-  setInterval(loadPublicLogs,30000);
-});
+  // ----- Data functions (identical to original) -----
+  function publicRecordDate(r){
+    if(r.timeIn?.toDate) return r.timeIn.toDate();
+    if(r.timeIn) return new Date(r.timeIn);
+    if(r.createdAt?.toDate) return r.createdAt.toDate();
+    return null;
+  }
+
+  function renderPublicLogs(){
+    const body = $("publicLogsBody");
+    if(!body) return;
+    const start = new Date(); start.setHours(0,0,0,0);
+    const end = new Date(start); end.setDate(end.getDate()+1);
+    const selectedPurpose = $("publicPurposeFilter")?.value || "all";
+    const todays = records.filter(r => {
+      const d = publicRecordDate(r);
+      const purposeMatch = selectedPurpose === "all" || r.purpose === selectedPurpose;
+      return d && d >= start && d < end && purposeMatch;
+    }).sort((a,b) => publicRecordDate(a) - publicRecordDate(b));
+
+    if(!todays.length){
+      body.innerHTML = selectedPurpose === "all"
+        ? '<div class="empty-logs">No visitor records have been registered today yet.</div>'
+        : `<div class="empty-logs">No ${escapeHTML(selectedPurpose)} records have been registered today.</div>`;
+      return;
+    }
+    body.innerHTML = todays.map(r => {
+      const d = publicRecordDate(r);
+      const purpose = r.purpose === "Others" && r.otherPurpose ? r.otherPurpose : r.purpose;
+      return `<div class="public-log-row">
+        <div class="name">${escapeHTML(r.fullName)}</div>
+        <div class="muted">${escapeHTML(r.realty)}</div>
+        <div><span class="purpose-chip">${escapeHTML(purpose)}</span></div>
+        <div class="time-cell">${escapeHTML(d.toLocaleTimeString("en-PH",{hour:"2-digit",minute:"2-digit"}))}</div>
+      </div>`;
+    }).join("");
+  }
+
+  async function loadPublicLogs(){
+    try {
+      const snap = await getDocs(query(collection(db, COLLECTION), orderBy("timeIn", "desc")));
+      records = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+      renderPublicLogs();
+    } catch(err) {
+      console.error(err);
+      $("publicLogsBody").innerHTML = '<div class="empty-logs">Visitor logs are temporarily unavailable.</div>';
+    }
+  }
+
+  async function loadRecords(){
+    $("recordsBody").innerHTML = "<tr><td colspan='6'>Loading...</td></tr>";
+    try {
+      const snap = await getDocs(query(collection(db, COLLECTION), orderBy("timeIn", "desc")));
+      records = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+      renderRecords();
+      renderPublicLogs();
+    } catch(err) {
+      console.error(err);
+      $("recordsBody").innerHTML = "<tr><td colspan='6'>Unable to load records. Check Firestore rules/indexes.</td></tr>";
+    }
+  }
+
+  function recordDate(r){
+    if(r.timeIn?.toDate) return r.timeIn.toDate();
+    if(r.timeIn) return new Date(r.timeIn);
+    if(r.createdAt?.toDate) return r.createdAt.toDate();
+    return null;
+  }
+
+  function renderRecords(){
+    const term = $("searchBox").value.trim().toLowerCase(), date = $("dateFilter").value;
+    const today = new Date(); today.setHours(0,0,0,0);
+    const filtered = records.filter(r => {
+      const d = recordDate(r);
+      const hay = [r.fullName, r.realty, r.purpose, r.otherPurpose].join(" ").toLowerCase();
+      const matches = !term || hay.includes(term);
+      const matchesDate = date === "all" || (d && d >= today);
+      return matches && matchesDate;
+    });
+    $("recordsBody").innerHTML = filtered.length ? filtered.map(r => {
+      const d = recordDate(r), loc = r.location;
+      return `<tr>
+        <td>${escapeHTML(formatDate(d))}</td>
+        <td><b>${escapeHTML(r.fullName)}</b></td>
+        <td>${escapeHTML(r.realty)}</td>
+        <td>${escapeHTML(r.purpose)}${r.otherPurpose ? `<br><span class="small">${escapeHTML(r.otherPurpose)}</span>` : ""}</td>
+        <td>${loc?.verified ? "✓ Verified" : ""}${loc?.distanceMeters != null ? `<br><span class="small">${Math.round(loc.distanceMeters)}m from office</span>` : ""}</td>
+        <td><button class="secondary" onclick="window.editRecord('${r.id}')">Edit</button> <button class="danger" onclick="window.removeRecord('${r.id}')">Delete</button></td>
+      </tr>`;
+    }).join("") : "<tr><td colspan='6'>No records found.</td></tr>";
+
+    const td = new Date(); td.setHours(0,0,0,0);
+    const todayRecords = records.filter(r => { const d = recordDate(r); return d && d >= td; });
+    $("statToday").textContent = todayRecords.length;
+    $("statAttendance").textContent = todayRecords.filter(r => r.purpose === "Attendance").length;
+    $("statManning").textContent = todayRecords.filter(r => r.purpose === "Manning Schedule").length;
+    $("statSite").textContent = todayRecords.filter(r => r.purpose === "Site-Tripping").length;
+  }
+
+  function openRecord(r = null){
+    $("recordModal").classList.remove("hidden");
+    $("recordModalTitle").textContent = r ? "Edit Record" : "Add Record";
+    $("editId").value = r?.id || "";
+    $("editName").value = r?.fullName || "";
+    $("editRealty").value = r?.realty || "";
+    $("editPurpose").value = r?.purpose || "Attendance";
+    $("editOther").value = r?.otherPurpose || "";
+    $("editDate").value = localDateInput(recordDate(r) || new Date());
+    $("deleteRecord").style.display = r ? "block" : "none";
+  }
+
+  // global functions for inline onclick
+  window.editRecord = id => { const r = records.find(x => x.id === id); if(r) openRecord(r); };
+  window.removeRecord = async id => {
+    if(!confirm("Delete this visitor record? This cannot be undone.")) return;
+    try { await deleteDoc(doc(db, COLLECTION, id)); await loadRecords(); } catch(err) { console.error(err); alert("Could not delete record."); }
+  };
 </script>
 </body>
 </html>
