@@ -637,6 +637,86 @@
     /* quick utility */
     .mt-2 { margin-top: 8px; }
     .text-center { text-align: center; }
+
+    /* --- NEW: model unit keys borrower list --- */
+    .borrower-list {
+      margin-top: 10px;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: #f9fbfe;
+      max-height: 220px;
+      overflow-y: auto;
+    }
+    .borrower-item {
+      padding: 12px 14px;
+      border-bottom: 1px solid var(--line);
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      transition: background 0.1s;
+      font-size: 0.9rem;
+    }
+    .borrower-item:last-child {
+      border-bottom: none;
+    }
+    .borrower-item:hover {
+      background: #eef4ff;
+    }
+    .borrower-item.selected {
+      background: #dbeafe;
+      border-left: 4px solid var(--primary);
+    }
+    .borrower-item .borrower-name {
+      font-weight: 600;
+    }
+    .borrower-item .borrower-meta {
+      font-size: 0.75rem;
+      color: var(--muted);
+      text-align: right;
+    }
+    .borrower-item .badge-borrow {
+      background: #fef3c7;
+      color: #92400e;
+      padding: 2px 10px;
+      border-radius: 30px;
+      font-size: 0.65rem;
+      font-weight: 700;
+    }
+    .borrower-item .badge-return {
+      background: #d1fae5;
+      color: #065f46;
+      padding: 2px 10px;
+      border-radius: 30px;
+      font-size: 0.65rem;
+      font-weight: 700;
+    }
+    .no-borrowers {
+      padding: 20px;
+      text-align: center;
+      color: var(--muted);
+      font-size: 0.85rem;
+    }
+
+    /* action-specific row in public logs */
+    .action-chip {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 30px;
+      font-size: 0.6rem;
+      font-weight: 700;
+      margin-left: 6px;
+      vertical-align: middle;
+    }
+    .action-chip.borrow {
+      background: #fef3c7;
+      color: #92400e;
+    }
+    .action-chip.return {
+      background: #d1fae5;
+      color: #065f46;
+    }
   </style>
 </head>
 <body>
@@ -675,11 +755,31 @@
         <label for="purpose">Purpose *</label>
         <select id="purpose" required>
           <option value="">Select purpose</option>
-          <option>Attendance</option>
+          <option>Core Sellers</option>
           <option>Manning Schedule</option>
           <option>Site-Tripping</option>
+          <option>Model Unit Keys</option>
           <option>Others</option>
         </select>
+
+        <!-- Model Unit Keys: Borrow / Return -->
+        <div id="modelUnitWrap" class="hidden">
+          <label for="modelUnitAction">Key Action *</label>
+          <select id="modelUnitAction">
+            <option value="">Select action</option>
+            <option value="Borrow">Borrow</option>
+            <option value="Return">Return</option>
+          </select>
+
+          <!-- Borrower list (shown only when Return is selected) -->
+          <div id="borrowerListWrap" class="hidden">
+            <label style="margin-top:16px;">Select borrower to return key</label>
+            <div id="borrowerList" class="borrower-list">
+              <div class="no-borrowers">Loading borrowers...</div>
+            </div>
+            <div id="selectedBorrowerInfo" class="small" style="margin-top:8px; color: var(--primary); font-weight:600;"></div>
+          </div>
+        </div>
 
         <div id="otherWrap" class="hidden">
           <label for="otherPurpose">Specify Other Purpose</label>
@@ -701,9 +801,10 @@
         <div class="filter-group">
           <select id="publicPurposeFilter" aria-label="Filter visitor log by purpose">
             <option value="all">All Purposes</option>
-            <option value="Attendance">Attendance</option>
+            <option value="Core Sellers">Core Sellers</option>
             <option value="Manning Schedule">Manning Schedule</option>
             <option value="Site-Tripping">Site-Tripping</option>
+            <option value="Model Unit Keys">Model Unit Keys</option>
             <option value="Others">Others</option>
           </select>
           <div class="live-pill"><span class="live-dot"></span> LIVE</div>
@@ -734,7 +835,7 @@
     </div>
     <div class="admin-grid">
       <div class="stat"><span>Today's Records</span><b id="statToday">0</b></div>
-      <div class="stat"><span>Attendance</span><b id="statAttendance">0</b></div>
+      <div class="stat"><span>Core Sellers</span><b id="statCore Sellers">0</b></div>
       <div class="stat"><span>Manning Schedule</span><b id="statManning">0</b></div>
       <div class="stat"><span>Site-Tripping</span><b id="statSite">0</b></div>
     </div>
@@ -784,7 +885,7 @@
     <label>Realty / Group *</label><input id="editRealty" required>
     <label>Purpose *</label>
     <select id="editPurpose">
-      <option>Attendance</option><option>Manning Schedule</option><option>Site-Tripping</option><option>Others</option>
+      <option>Core Sellers</option><option>Manning Schedule</option><option>Site-Tripping</option><option>Model Unit Keys</option><option>Others</option>
     </select>
     <label>Other Purpose</label><input id="editOther" placeholder="Optional">
     <label>Date & Time</label><input id="editDate" type="datetime-local">
@@ -825,6 +926,7 @@
   let verifiedLocation = null;
   let records = [];
   let isAdmin = false;
+  let selectedBorrowerId = null; // for Model Unit Keys return
 
   const $ = id => document.getElementById(id);
   const escapeHTML = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[c]));
@@ -867,42 +969,226 @@
     },{enableHighAccuracy:true,timeout:15000,maximumAge:0});
   }
 
+  // ----- NEW: Model Unit Keys logic -----
+
+  // Returns array of records that are "Model Unit Keys" / "Borrow" and not yet returned
+  function getActiveBorrowers() {
+    // A borrower is someone with purpose "Model Unit Keys", action "Borrow",
+    // and no later "Return" record that references them (or no return at all).
+    const borrowRecords = records.filter(r =>
+      r.purpose === "Model Unit Keys" &&
+      r.modelUnitAction === "Borrow"
+    );
+
+    // Sort by time descending (most recent first)
+    borrowRecords.sort((a, b) => {
+      const da = recordDate(a) || 0;
+      const db = recordDate(b) || 0;
+      return db - da;
+    });
+
+    // For each borrow, check if a return exists that references it
+    const activeBorrowers = [];
+    for (const borrow of borrowRecords) {
+      const hasReturn = records.some(r =>
+        r.purpose === "Model Unit Keys" &&
+        r.modelUnitAction === "Return" &&
+        r.borrowerRecordId === borrow.id
+      );
+      if (!hasReturn) {
+        activeBorrowers.push(borrow);
+      }
+    }
+    return activeBorrowers;
+  }
+
+  function renderBorrowerList() {
+    const list = $("borrowerList");
+    if (!list) return;
+    const active = getActiveBorrowers();
+    if (!active.length) {
+      list.innerHTML = '<div class="no-borrowers">No active borrowers for Model Unit Keys.</div>';
+      selectedBorrowerId = null;
+      $("selectedBorrowerInfo").textContent = "";
+      return;
+    }
+    // Preserve selection if still valid
+    if (selectedBorrowerId && !active.some(b => b.id === selectedBorrowerId)) {
+      selectedBorrowerId = null;
+      $("selectedBorrowerInfo").textContent = "";
+    }
+    list.innerHTML = active.map(b => {
+      const d = recordDate(b);
+      const timeStr = d ? d.toLocaleString("en-PH", { month: "short", day: "2-digit", hour: "2-digit", minute: "2-digit" }) : "—";
+      const selectedClass = selectedBorrowerId === b.id ? " selected" : "";
+      return `<div class="borrower-item${selectedClass}" data-id="${escapeHTML(b.id)}" onclick="window.selectBorrower('${escapeHTML(b.id)}')">
+        <div>
+          <div class="borrower-name">${escapeHTML(b.fullName)}</div>
+          <div style="font-size:0.75rem; color:var(--muted);">${escapeHTML(b.realty)}</div>
+        </div>
+        <div class="borrower-meta">
+          <span class="badge-borrow">BORROWED</span>
+          <div style="margin-top:4px;">${escapeHTML(timeStr)}</div>
+        </div>
+      </div>`;
+    }).join("");
+
+    // Update selected info
+    if (selectedBorrowerId) {
+      const sel = active.find(b => b.id === selectedBorrowerId);
+      if (sel) {
+        $("selectedBorrowerInfo").textContent = `Selected: ${sel.fullName} (${sel.realty}) — borrowed ${formatDate(recordDate(sel))}`;
+      } else {
+        $("selectedBorrowerInfo").textContent = "";
+      }
+    } else {
+      $("selectedBorrowerInfo").textContent = "";
+    }
+  }
+
+  window.selectBorrower = (id) => {
+    selectedBorrowerId = id;
+    // Refresh list UI
+    document.querySelectorAll(".borrower-item").forEach(el => {
+      el.classList.toggle("selected", el.dataset.id === id);
+    });
+    const active = getActiveBorrowers();
+    const sel = active.find(b => b.id === id);
+    if (sel) {
+      $("selectedBorrowerInfo").textContent = `Selected: ${sel.fullName} (${sel.realty}) — borrowed ${formatDate(recordDate(sel))}`;
+    }
+  };
+
+  // Show/hide borrower list based on purpose and action
+  function toggleModelUnitFields() {
+    const purpose = $("purpose").value;
+    const action = $("modelUnitAction").value;
+    const isModelUnit = purpose === "Model Unit Keys";
+    $("modelUnitWrap").classList.toggle("hidden", !isModelUnit);
+    if (isModelUnit && action === "Return") {
+      $("borrowerListWrap").classList.remove("hidden");
+      renderBorrowerList();
+    } else {
+      $("borrowerListWrap").classList.add("hidden");
+      // Don't clear selection here; but if we hide, maybe keep for later
+    }
+    // Update submit disabled state
+    updateSubmitState();
+  }
+
+  function updateSubmitState() {
+    const purpose = $("purpose").value;
+    const isModelUnit = purpose === "Model Unit Keys";
+    const action = $("modelUnitAction").value;
+
+    // Basic required fields
+    const baseOk = verifiedLocation?.verified &&
+                   $("fullName").value.trim() &&
+                   $("realty").value.trim() &&
+                   purpose;
+
+    let extraOk = true;
+    if (isModelUnit) {
+      if (!action) extraOk = false;
+      if (action === "Return" && !selectedBorrowerId) extraOk = false;
+    }
+
+    $("submitBtn").disabled = !(baseOk && extraOk);
+  }
+
+  // ----- end new functions -----
+
   // event listeners
   document.addEventListener('DOMContentLoaded', () => {
     // re-bind after elements exist (module defers)
     $("locateBtn").onclick = verifyLocation;
-    $("purpose").onchange = () => $("otherWrap").classList.toggle("hidden", $("purpose").value !== "Others");
+
+    $("purpose").onchange = () => {
+      const isOther = $("purpose").value === "Others";
+      $("otherWrap").classList.toggle("hidden", !isOther);
+      // Model unit logic
+      $("modelUnitAction").value = ""; // reset
+      selectedBorrowerId = null;
+      $("selectedBorrowerInfo").textContent = "";
+      toggleModelUnitFields();
+      updateSubmitState();
+    };
+
+    // Model Unit action change
+    $("modelUnitAction").onchange = () => {
+      if ($("modelUnitAction").value !== "Return") {
+        selectedBorrowerId = null;
+        $("selectedBorrowerInfo").textContent = "";
+      }
+      toggleModelUnitFields();
+      updateSubmitState();
+    };
+
+    // Also monitor input fields to enable/disable submit
+    $("fullName").addEventListener("input", updateSubmitState);
+    $("realty").addEventListener("input", updateSubmitState);
 
     $("visitorForm").onsubmit = async e => {
       e.preventDefault();
+
+      // Validate
       if(!verifiedLocation?.verified) return alert("Please verify that you are within the office premises.");
-      $("submitBtn").disabled = true; $("submitBtn").textContent = "Saving...";
       const purpose = $("purpose").value;
+      const isModelUnit = purpose === "Model Unit Keys";
+      const action = $("modelUnitAction").value;
+
+      if (isModelUnit && !action) return alert("Please select a Key Action (Borrow or Return).");
+      if (isModelUnit && action === "Return" && !selectedBorrowerId) {
+        return alert("Please select the borrower whose key you are returning.");
+      }
+
+      $("submitBtn").disabled = true; $("submitBtn").textContent = "Saving...";
       const other = $("otherPurpose").value.trim();
+
+      // Prepare record data
+      const recordData = {
+        fullName: $("fullName").value.trim(),
+        realty: $("realty").value.trim(),
+        purpose,
+        otherPurpose: purpose === "Others" ? other : "",
+        timeIn: serverTimestamp(),
+        location: {
+          latitude: verifiedLocation.latitude,
+          longitude: verifiedLocation.longitude,
+          accuracy: verifiedLocation.accuracy,
+          distanceMeters: verifiedLocation.distance,
+          verified: true
+        },
+        createdAt: serverTimestamp()
+      };
+
+      // Model Unit specific fields
+      if (isModelUnit) {
+        recordData.modelUnitAction = action; // "Borrow" or "Return"
+        if (action === "Return" && selectedBorrowerId) {
+          recordData.borrowerRecordId = selectedBorrowerId;
+        }
+      }
+
       try {
-        await addDoc(collection(db, COLLECTION), {
-          fullName: $("fullName").value.trim(),
-          realty: $("realty").value.trim(),
-          purpose,
-          otherPurpose: purpose === "Others" ? other : "",
-          timeIn: serverTimestamp(),
-          location: {
-            latitude: verifiedLocation.latitude,
-            longitude: verifiedLocation.longitude,
-            accuracy: verifiedLocation.accuracy,
-            distanceMeters: verifiedLocation.distance,
-            verified: true
-          },
-          createdAt: serverTimestamp()
-        });
-        $("visitorForm").reset(); $("otherWrap").classList.add("hidden");
+        await addDoc(collection(db, COLLECTION), recordData);
+        $("visitorForm").reset();
+        $("otherWrap").classList.add("hidden");
+        $("modelUnitWrap").classList.add("hidden");
+        $("borrowerListWrap").classList.add("hidden");
+        $("modelUnitAction").value = "";
+        selectedBorrowerId = null;
+        $("selectedBorrowerInfo").textContent = "";
         verifiedLocation = null;
-        $("submitBtn").disabled = true; $("submitBtn").textContent = "Register Visit";
+        $("submitBtn").disabled = true; $("submitBtn").textContent = "Submit";
         $("locationText").innerHTML = '<span class="ok">✓ Visit recorded successfully.</span>';
         alert("Your visit has been successfully recorded.");
+        // Refresh public logs and records
+        await loadPublicLogs();
+        if (isAdmin) await loadRecords();
       } catch(err) {
         console.error(err); alert("Could not save the visitor record. Check your Firebase Firestore setup/rules.");
-        $("submitBtn").disabled = false; $("submitBtn").textContent = "Register Visit";
+        $("submitBtn").disabled = false; $("submitBtn").textContent = "Submit";
       }
     };
 
@@ -967,7 +1253,7 @@
         head: [["Date & Time","Full Name","Realty / Group","Purpose","Location"]],
         body: filtered.map(r => [
           formatDate(recordDate(r)), r.fullName, r.realty,
-          r.purpose + (r.otherPurpose ? ` - ${r.otherPurpose}` : ""),
+          r.purpose + (r.otherPurpose ? ` - ${r.otherPurpose}` : "") + (r.modelUnitAction ? ` (${r.modelUnitAction})` : ""),
           r.location?.verified ? `Verified (${Math.round(r.location.distanceMeters || 0)}m)` : "Manual/Admin"
         ]),
         styles: { fontSize: 8 },
@@ -981,10 +1267,12 @@
       verifyLocation();
       loadPublicLogs();
       setInterval(loadPublicLogs, 30000);
+      // ensure model unit fields are hidden initially
+      toggleModelUnitFields();
     });
   });
 
-  // ----- Data functions (identical to original) -----
+  // ----- Data functions -----
   function publicRecordDate(r){
     if(r.timeIn?.toDate) return r.timeIn.toDate();
     if(r.timeIn) return new Date(r.timeIn);
@@ -1012,11 +1300,26 @@
     }
     body.innerHTML = todays.map(r => {
       const d = publicRecordDate(r);
-      const purpose = r.purpose === "Others" && r.otherPurpose ? r.otherPurpose : r.purpose;
+      let purposeDisplay = r.purpose;
+      if (r.purpose === "Others" && r.otherPurpose) purposeDisplay = r.otherPurpose;
+
+      // Build action chip for Model Unit Keys
+      let actionHtml = "";
+      if (r.purpose === "Model Unit Keys" && r.modelUnitAction) {
+        actionHtml = `<span class="action-chip ${r.modelUnitAction === "Borrow" ? "borrow" : "return"}">${escapeHTML(r.modelUnitAction)}</span>`;
+        // If return, try to show who borrowed (optional but nice)
+        if (r.modelUnitAction === "Return" && r.borrowerRecordId) {
+          const borrower = records.find(x => x.id === r.borrowerRecordId);
+          if (borrower) {
+            actionHtml += ` <span style="font-size:0.65rem; color:var(--muted);">(from ${escapeHTML(borrower.fullName)})</span>`;
+          }
+        }
+      }
+
       return `<div class="public-log-row">
         <div class="name">${escapeHTML(r.fullName)}</div>
         <div class="muted">${escapeHTML(r.realty)}</div>
-        <div><span class="purpose-chip">${escapeHTML(purpose)}</span></div>
+        <div><span class="purpose-chip">${escapeHTML(purposeDisplay)}</span>${actionHtml}</div>
         <div class="time-cell">${escapeHTML(d.toLocaleTimeString("en-PH",{hour:"2-digit",minute:"2-digit"}))}</div>
       </div>`;
     }).join("");
@@ -1027,6 +1330,10 @@
       const snap = await getDocs(query(collection(db, COLLECTION), orderBy("timeIn", "desc")));
       records = snap.docs.map(d => ({ id: d.id, ...d.data() }));
       renderPublicLogs();
+      // Also update borrower list if the return section is visible
+      if (!$("borrowerListWrap").classList.contains("hidden")) {
+        renderBorrowerList();
+      }
     } catch(err) {
       console.error(err);
       $("publicLogsBody").innerHTML = '<div class="empty-logs">Visitor logs are temporarily unavailable.</div>';
@@ -1040,6 +1347,9 @@
       records = snap.docs.map(d => ({ id: d.id, ...d.data() }));
       renderRecords();
       renderPublicLogs();
+      if (!$("borrowerListWrap").classList.contains("hidden")) {
+        renderBorrowerList();
+      }
     } catch(err) {
       console.error(err);
       $("recordsBody").innerHTML = "<tr><td colspan='6'>Unable to load records. Check Firestore rules/indexes.</td></tr>";
@@ -1065,11 +1375,20 @@
     });
     $("recordsBody").innerHTML = filtered.length ? filtered.map(r => {
       const d = recordDate(r), loc = r.location;
+      let purposeCell = escapeHTML(r.purpose);
+      if (r.otherPurpose) purposeCell += `<br><span class="small">${escapeHTML(r.otherPurpose)}</span>`;
+      if (r.purpose === "Model Unit Keys" && r.modelUnitAction) {
+        purposeCell += `<br><span class="action-chip ${r.modelUnitAction === "Borrow" ? "borrow" : "return"}" style="margin-left:0; margin-top:4px;">${escapeHTML(r.modelUnitAction)}</span>`;
+        if (r.modelUnitAction === "Return" && r.borrowerRecordId) {
+          const borrower = records.find(x => x.id === r.borrowerRecordId);
+          if (borrower) purposeCell += ` <span class="small">(from ${escapeHTML(borrower.fullName)})</span>`;
+        }
+      }
       return `<tr>
         <td>${escapeHTML(formatDate(d))}</td>
         <td><b>${escapeHTML(r.fullName)}</b></td>
         <td>${escapeHTML(r.realty)}</td>
-        <td>${escapeHTML(r.purpose)}${r.otherPurpose ? `<br><span class="small">${escapeHTML(r.otherPurpose)}</span>` : ""}</td>
+        <td>${purposeCell}</td>
         <td>${loc?.verified ? "✓ Verified" : ""}${loc?.distanceMeters != null ? `<br><span class="small">${Math.round(loc.distanceMeters)}m from office</span>` : ""}</td>
         <td><button class="secondary" onclick="window.editRecord('${r.id}')">Edit</button> <button class="danger" onclick="window.removeRecord('${r.id}')">Delete</button></td>
       </tr>`;
@@ -1078,7 +1397,7 @@
     const td = new Date(); td.setHours(0,0,0,0);
     const todayRecords = records.filter(r => { const d = recordDate(r); return d && d >= td; });
     $("statToday").textContent = todayRecords.length;
-    $("statAttendance").textContent = todayRecords.filter(r => r.purpose === "Attendance").length;
+    $("statCore Sellers").textContent = todayRecords.filter(r => r.purpose === "Core Sellers").length;
     $("statManning").textContent = todayRecords.filter(r => r.purpose === "Manning Schedule").length;
     $("statSite").textContent = todayRecords.filter(r => r.purpose === "Site-Tripping").length;
   }
@@ -1089,7 +1408,7 @@
     $("editId").value = r?.id || "";
     $("editName").value = r?.fullName || "";
     $("editRealty").value = r?.realty || "";
-    $("editPurpose").value = r?.purpose || "Attendance";
+    $("editPurpose").value = r?.purpose || "Core Sellers";
     $("editOther").value = r?.otherPurpose || "";
     $("editDate").value = localDateInput(recordDate(r) || new Date());
     $("deleteRecord").style.display = r ? "block" : "none";
