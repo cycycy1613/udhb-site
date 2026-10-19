@@ -14,6 +14,16 @@
   <meta name="twitter:description" id="tw-desc" content="a residential community located in Barangay Balagtas, Batangas City. It is designed to offer affordable, comfortable, and modern living spaces for families, professionals, and first-time homebuyers." />
   <meta name="twitter:image" id="tw-image" content="https://proudtobeinc.wordpress.com/wp-content/uploads/2026/09/screenshot-2025-09-02-091838.png?auto=format&fit=crop&w=1600&q=80" />
 
+  <!-- SEO Tags -->
+  <meta name="keywords" content="Urban Deca Homes Batangas, affordable housing Batangas, residential community Balagtas, modern living spaces, house and lot Batangas, condo Batangas, real estate Philippines, first-time homebuyers" />
+  <meta name="robots" content="index, follow" />
+  <meta name="author" content="Urban Deca Homes Batangas" />
+  <link rel="canonical" href="https://urbandecahomesbatangas.com/" />
+  <meta property="og:site_name" content="Urban Deca Homes Batangas" />
+  <meta property="og:locale" content="en_PH" />
+  <meta name="geo.region" content="PH-BTG" />
+  <meta name="geo.placename" content="Batangas City" />
+
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@10/swiper-bundle.min.css" />
@@ -65,19 +75,20 @@
       animation: floatLabel 2s ease-in-out infinite;
     }
 
-    /* ===== GLASS PANELS ===== */
-    .glass-panel { 
-      background: rgba(255,255,255,.85); 
-      backdrop-filter: blur(16px); 
-      -webkit-backdrop-filter: blur(16px); 
-      border: 1px solid rgba(255,255,255,.8); 
-      box-shadow: 0 8px 32px 0 rgba(0,51,102,.06);
+    /* ===== REPLACED GLASS PANELS WITH SOLID / GRADIENT ===== */
+    .panel-light {
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      box-shadow: 0 4px 12px rgba(0, 51, 102, 0.05);
     }
-    .glass-panel-dark { 
-      background: rgba(0,51,102,.88); 
-      backdrop-filter: blur(20px); 
-      -webkit-backdrop-filter: blur(20px); 
-      border: 1px solid rgba(255,255,255,.2);
+    .panel-dark {
+      background: linear-gradient(145deg, #002b4d 0%, #001f3f 100%);
+      border: 1px solid rgba(255,255,255,0.1);
+      box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+    }
+    .panel-gradient-accent {
+      background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+      border: 1px solid #cbd5e1;
     }
 
     /* ===== HOVER LIFT ===== */
@@ -86,7 +97,7 @@
     }
     .hover-lift:hover { 
       transform: translateY(-6px) scale(1.01); 
-      box-shadow: 0 20px 40px -12px rgba(0,51,102,.12);
+      box-shadow: 0 20px 40px -12px rgba(0,51,102,.15);
     }
 
     /* ===== CUSTOM SCROLLBAR ===== */
@@ -135,16 +146,14 @@
     .popup-animate-in { animation:popupScaleIn .4s cubic-bezier(.16,1,.3,1) forwards; }
     .popup-animate-out { animation:popupScaleOut .3s cubic-bezier(.16,1,.3,1) forwards; }
 
-    /* ===== NEW: SEARCH BAR ===== */
+    /* ===== REDESIGNED SEARCH BAR (SOLID, NO BLUR) ===== */
     .profile-search-wrap {
       width: min(280px, calc(100vw - 120px));
     }
     .profile-search {
-      background: rgba(255,255,255,.2);
-      border: 1px solid rgba(255,255,255,.5);
-      backdrop-filter: blur(20px);
-      -webkit-backdrop-filter: blur(20px);
-      box-shadow: 0 8px 24px rgba(15,23,42,.15);
+      background: #ffffff;
+      border: 2px solid #e2e8f0;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
       border-radius: 40px;
       padding: 4px 12px 4px 14px;
       display: flex;
@@ -153,21 +162,21 @@
       transition: box-shadow .3s ease, border-color .3s ease;
     }
     .profile-search:focus-within {
-      border-color: rgba(241,196,15,.8);
-      box-shadow: 0 8px 32px rgba(241,196,15,.2);
+      border-color: #003366;
+      box-shadow: 0 4px 16px rgba(0,51,102,0.15);
     }
     .profile-search input {
       background: transparent;
       border: 0;
       outline: none;
       font-size: 0.75rem;
-      color: white;
+      color: #1e293b;
       width: 100%;
       padding: 6px 0;
     }
-    .profile-search input::placeholder { color: rgba(255,255,255,.85); }
+    .profile-search input::placeholder { color: #94a3b8; }
     .profile-search .search-icon {
-      color: rgba(255,255,255,.85);
+      color: #64748b;
       font-size: 0.75rem;
     }
     #global-search-clear { display: none !important; }
@@ -175,11 +184,9 @@
     .profile-search-results {
       margin-top: 6px;
       border-radius: 14px;
-      background: rgba(255,255,255,.96);
-      border: 1px solid rgba(255,255,255,.6);
-      box-shadow: 0 12px 28px rgba(15,23,42,.18);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      box-shadow: 0 12px 28px rgba(15,23,42,.12);
       overflow: hidden;
       max-height: 240px;
       overflow-y: auto;
@@ -205,8 +212,8 @@
       align-items: center;
       justify-content: center;
       border-radius: 30px;
-      background: rgba(0,51,102,.08);
-      color: #003366;
+      background: linear-gradient(135deg, #003366, #004080);
+      color: #ffffff;
       font-size: 10px;
       font-weight: 800;
       letter-spacing: .04em;
@@ -245,13 +252,11 @@
     }
     @keyframes spin { to { transform:rotate(360deg); } }
 
-    /* ===== NEW: ENHANCED MENU ===== */
+    /* ===== ENHANCED MENU (SOLID BACKGROUND) ===== */
     .menu-backdrop {
       position: fixed;
       inset: 0;
-      background: rgba(0,0,0,.3);
-      backdrop-filter: blur(4px);
-      -webkit-backdrop-filter: blur(4px);
+      background: rgba(0,0,0,.4);
       z-index: 40;
       opacity: 0;
       pointer-events: none;
@@ -267,9 +272,7 @@
       right: 0;
       height: 100vh;
       width: min(360px, 85vw);
-      background: rgba(255,255,255,.98);
-      backdrop-filter: blur(24px);
-      -webkit-backdrop-filter: blur(24px);
+      background: #ffffff;
       z-index: 50;
       transform: translateX(100%);
       transition: transform .4s cubic-bezier(.16,1,.3,1);
@@ -277,6 +280,7 @@
       display: flex;
       flex-direction: column;
       overflow-y: auto;
+      border-left: 1px solid #e2e8f0;
     }
     .menu-panel.open {
       transform: translateX(0);
@@ -301,7 +305,7 @@
       top: 0;
       height: 100%;
       width: 3px;
-      background: #f1c40f;
+      background: linear-gradient(to bottom, #f1c40f, #d4ac0d);
       transform: scaleY(0);
       transition: transform .3s ease;
       transform-origin: bottom;
@@ -320,18 +324,18 @@
       font-size: 0.9rem;
     }
 
-    /* ===== NEW: SHARE BUTTON ===== */
+    /* ===== SHARE BUTTON ===== */
     .share-btn {
       display: inline-flex;
       align-items: center;
       gap: 6px;
       padding: 6px 14px;
       border-radius: 30px;
-      background: rgba(0,51,102,.06);
+      background: #f1f5f9;
       color: #003366;
       font-size: 0.7rem;
       font-weight: 600;
-      border: 1px solid rgba(0,51,102,.1);
+      border: 1px solid #e2e8f0;
       transition: all .25s ease;
       cursor: pointer;
     }
@@ -373,13 +377,13 @@
       color: #f1c40f;
     }
 
-    /* ===== NEW: TESTIMONIALS ===== */
+    /* ===== TESTIMONIALS ===== */
     .testimonial-card {
       transition: all .4s cubic-bezier(.16,1,.3,1);
     }
     .testimonial-card:hover {
       transform: translateY(-4px);
-      box-shadow: 0 20px 40px -12px rgba(0,51,102,.12);
+      box-shadow: 0 20px 40px -12px rgba(0,51,102,.15);
     }
     .testimonial-avatar {
       width: 44px;
@@ -392,7 +396,7 @@
     .star-filled { color: #f1c40f; }
     .star-empty { color: #e2e8f0; }
 
-    /* ===== NEW: STATS BADGES ===== */
+    /* ===== STATS BADGES ===== */
     .stat-badge {
       display: inline-flex;
       align-items: center;
@@ -401,7 +405,6 @@
       border-radius: 30px;
       background: rgba(255,255,255,.15);
       border: 1px solid rgba(255,255,255,.25);
-      backdrop-filter: blur(8px);
       font-size: 0.7rem;
       color: white;
       font-weight: 500;
@@ -410,7 +413,7 @@
       color: #f1c40f;
     }
 
-    /* ===== NEW: SCROLL REVEAL ===== */
+    /* ===== SCROLL REVEAL ===== */
     .reveal {
       opacity: 0;
       transform: translateY(30px);
@@ -515,7 +518,7 @@
 
     <!-- Profile info block -->
     <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div class="glass-panel rounded-xl p-5 sm:p-6 -mt-16 sm:-mt-20 relative z-10 shadow-lg flex flex-col md:flex-row items-center md:items-start justify-between gap-6 card-enter">
+      <div class="panel-light rounded-xl p-5 sm:p-6 -mt-16 sm:-mt-20 relative z-10 shadow-lg flex flex-col md:flex-row items-center md:items-start justify-between gap-6 card-enter">
         <div class="flex flex-col sm:flex-row items-center sm:items-start gap-5 text-center sm:text-left w-full md:w-auto">
           <div class="relative group flex-shrink-0">
             <img id="profile-photo" src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=400&q=80" alt="Profile" class="w-28 h-28 sm:w-32 sm:h-32 md:w-36 md:h-36 rounded-lg border-2 border-white shadow-md object-cover bg-white" />
@@ -557,7 +560,7 @@
     </section>
 
     <!-- Reels -->
-    <section id="reels" class="glass-panel-dark text-white rounded-xl p-5 sm:p-7 shadow-xl relative overflow-hidden reveal">
+    <section id="reels" class="panel-dark text-white rounded-xl p-5 sm:p-7 shadow-xl relative overflow-hidden reveal">
       <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6 relative z-10">
         <div>
           <h2 class="text-2xl font-bold tracking-tight">Reels Carousel</h2>
@@ -600,7 +603,7 @@
     </section>
 
     <!-- Connect -->
-    <section id="connect" class="glass-panel rounded-xl p-6 sm:p-8 text-center max-w-4xl mx-auto w-full reveal">
+    <section id="connect" class="panel-light rounded-xl p-6 sm:p-8 text-center max-w-4xl mx-auto w-full reveal">
       <div class="flex items-center justify-center gap-2 mb-1">
         <h2 class="text-2xl font-bold text-[#003366] tracking-tight">Connect With Us</h2>
         <button onclick="openModal('social-modal')" class="admin-only hidden text-[#003366] hover:text-[#002244] text-xs font-semibold transition"><i class="fa-solid fa-plus-circle mr-1"></i> Add Link</button>
@@ -610,7 +613,7 @@
     </section>
 
     <!-- Lead -->
-    <section id="lead-capture" class="glass-panel-dark text-white rounded-xl p-6 sm:p-8 shadow-xl relative overflow-hidden reveal">
+    <section id="lead-capture" class="panel-dark text-white rounded-xl p-6 sm:p-8 shadow-xl relative overflow-hidden reveal">
       <div class="max-w-3xl mx-auto relative z-10">
         <div class="flex justify-between items-start gap-4 mb-5">
           <div>
@@ -665,7 +668,7 @@
   <!-- ========== MODALS ========== -->
   <!-- Lead popup -->
   <div id="lead-popup-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4 transition-opacity duration-300">
-    <div id="lead-popup-card" class="glass-panel bg-white/95 rounded-xl p-6 max-w-md w-full shadow-2xl relative border border-slate-200">
+    <div id="lead-popup-card" class="bg-white rounded-xl p-6 max-w-md w-full shadow-2xl relative border border-slate-200">
       <button onclick="closePopupModalAnimated('lead-popup-modal')" class="absolute top-3 right-3 text-slate-400 hover:text-slate-600 text-base p-1"><i class="fa-solid fa-xmark"></i></button>
       <div class="text-center mb-5">
         <div class="w-12 h-12 bg-sky-50 text-[#003366] rounded-md flex items-center justify-center mx-auto mb-2 text-xl shadow-inner"><i class="fa-solid fa-house-user"></i></div>
@@ -980,46 +983,48 @@
       }
     });
 
-    // ===== SHARE FUNCTION (NEW) =====
+    // ===== SHARE FUNCTION (UPDATED WITH SLUG & FEATURED IMAGE) =====
+    function slugify(text) {
+      return String(text || '').toLowerCase()
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/^-+|-+$/g, '')
+        .substring(0, 60);
+    }
+
+    function getBlogShareUrl(post) {
+      const slug = slugify(post.title || 'post');
+      const baseUrl = window.location.origin + window.location.pathname;
+      return baseUrl + '?post=' + encodeURIComponent(post.id) + '&slug=' + encodeURIComponent(slug);
+    }
+
     function shareBlogPost(id) {
       const post = window.allBlogs.find(b => b.id === id);
       if (!post) return;
 
-      // Build a shareable URL that includes the post ID
-      const baseUrl = window.location.origin + window.location.pathname;
-      const shareUrl = baseUrl + '#post-' + id;
-
-      // Get featured image (first image if exists)
+      const shareUrl = getBlogShareUrl(post);
       const featuredImage = (post.images && post.images.length > 0) ? post.images[0] : 'https://images.unsplash.com/photo-1560518883-ce09059eeffa?auto=format&fit=crop&w=1600&q=80';
-
-      // Plain text caption
       const plainCaption = getBlogPlainText(post.caption || '').substring(0, 150);
 
       const shareData = {
         title: post.title || 'Real Estate Update',
         text: plainCaption + (plainCaption.length >= 150 ? '...' : ''),
-        url: shareUrl
+        url: shareUrl,
+        image: featuredImage
       };
 
-      // If Web Share API is available, use it
       if (navigator.share && navigator.canShare && navigator.canShare(shareData)) {
         navigator.share(shareData).then(() => {
           showCopyToast('Post shared successfully!');
         }).catch(() => {
-          // Fallback to copy
           copyShareLinkToClipboard(shareData, featuredImage);
         });
       } else {
-        // Fallback: copy rich share text to clipboard
         copyShareLinkToClipboard(shareData, featuredImage);
       }
     }
 
     function copyShareLinkToClipboard(shareData, featuredImage) {
-      // Build a nice share text with URL and image
       const shareText = `${shareData.title}\n\n${shareData.text}\n\nRead more: ${shareData.url}`;
-
-      // Try using the clipboard API
       if (navigator.clipboard && navigator.clipboard.writeText) {
         navigator.clipboard.writeText(shareText).then(() => {
           showCopyToast('📋 Post link & preview copied!');
@@ -1087,7 +1092,7 @@
     function moveCustomButtonRow(btn, direction) { const row = btn.closest('.custom-btn-row'); if (!row) return; if (direction === -1 && row.previousElementSibling) { row.parentNode.insertBefore(row, row.previousElementSibling); } else if (direction === 1 && row.nextElementSibling) { row.parentNode.insertBefore(row.nextElementSibling, row); } }
     function openEditListingModal(id) { const item = window.allListings[id]; if (!item) return; document.getElementById('list-edit-id').value = id; document.getElementById('list-name').value = item.name || ''; document.getElementById('list-location').value = item.location || ''; document.getElementById('list-tcp').value = item.tcp || ''; document.getElementById('list-amort').value = item.amort || ''; document.getElementById('list-desc').value = item.desc || ''; document.getElementById('list-photos').value = (item.photos || []).join(', '); const container = document.getElementById('custom-buttons-inputs'); container.innerHTML = ''; if (item.customButtons && Array.isArray(item.customButtons)) { item.customButtons.forEach(b => addCustomButtonInputRow(b.label, b.url)); } document.getElementById('listing-modal-title').innerText = 'Edit Project Listing'; openModal('listing-modal'); }
     function saveListing(e) { e.preventDefault(); const editId = document.getElementById('list-edit-id').value; const name = document.getElementById('list-name').value; const location = document.getElementById('list-location').value; const tcp = formatPeso(document.getElementById('list-tcp').value); const amort = document.getElementById('list-amort').value.includes('₱') ? document.getElementById('list-amort').value : formatPeso(document.getElementById('list-amort').value); const desc = document.getElementById('list-desc').value; const photosRaw = document.getElementById('list-photos').value; const photos = photosRaw.split(',').map(url => url.trim()).filter(url => url.length > 0); const customButtons = []; document.querySelectorAll('.custom-btn-row').forEach(row => { const bLabel = row.querySelector('.btn-label').value.trim(); const bUrl = row.querySelector('.btn-url').value.trim(); if(bLabel && bUrl) customButtons.push({ label: bLabel, url: bUrl }); }); if (editId) { const existingFaqs = window.allListings[editId] ? (window.allListings[editId].faqs || null) : null; const updatedData = { name, location, tcp, amort, desc, photos, customButtons }; if (existingFaqs) updatedData.faqs = existingFaqs; window.set(window.ref(window.db, `listings/${editId}`), updatedData).then(() => { closeModal('listing-modal'); e.target.reset(); document.getElementById('list-edit-id').value = ''; document.getElementById('custom-buttons-inputs').innerHTML = ''; }); } else { const newRef = window.push(window.ref(window.db, 'listings')); window.set(newRef, { name, location, tcp, amort, desc, photos, customButtons }).then(() => { closeModal('listing-modal'); e.target.reset(); document.getElementById('custom-buttons-inputs').innerHTML = ''; }); } }
-    function renderListings(listings, searchTerm = '') { const container = document.getElementById('listings-container'); container.innerHTML = ''; const keys = Object.keys(listings).filter(id => { if (!searchTerm) return true; const item = listings[id] || {}; return [item.name, item.location, item.desc, item.tcp, item.amort].join(' ').toLowerCase().includes(searchTerm); }); if(keys.length === 0) { container.innerHTML = `<div class="col-span-full text-center py-10 text-slate-400 text-xs border border-dashed border-slate-300 rounded-lg">No project listings added yet.</div>`; return; } keys.forEach(id => { const item = listings[id]; const photos = (item.photos && item.photos.length > 0) ? item.photos : ['https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=600&q=80']; const card = document.createElement('div'); card.className = "glass-panel bg-white/90 rounded-xl border border-slate-200/90 overflow-hidden shadow-sm hover-lift flex flex-col justify-between relative group card-enter"; card.innerHTML = `${window.isAdmin ? `<div class="absolute top-2.5 right-2.5 z-20 flex gap-1"><button onclick="openEditListingModal('${id}')" class="bg-[#003366] hover:bg-[#002244] text-white w-7 h-7 rounded-md text-xs shadow flex items-center justify-center transition active:scale-95" title="Edit Listing"><i class="fa-solid fa-pen"></i></button><button onclick="deleteItem('listings/${id}')" class="bg-red-600 hover:bg-red-700 text-white w-7 h-7 rounded-md text-xs shadow flex items-center justify-center transition active:scale-95" title="Delete Listing"><i class="fa-solid fa-trash"></i></button></div>` : ''}<div><div class="relative h-48 sm:h-52 overflow-hidden bg-slate-900 cursor-pointer" onclick="openListingDetails('${id}')"><img src="${photos[0]}" alt="${item.name}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"><div class="absolute top-2.5 left-2.5 bg-[#003366]/80 text-white text-[10px] font-semibold uppercase tracking-wider px-2.5 py-1 rounded backdrop-blur-md border border-white/10 z-10"><i class="fa-solid fa-location-dot text-[#f1c40f] mr-1"></i> ${item.location}</div></div><div class="p-4 sm:p-5"><h3 onclick="openListingDetails('${id}')" class="text-base sm:text-lg font-bold text-[#003366] hover:text-[#002244] cursor-pointer transition-colors line-clamp-1">${item.name}</h3><div class="text-xs text-slate-500 mt-1.5 line-clamp-2 leading-relaxed">${item.desc}</div><div class="mt-3.5 pt-3 border-t border-slate-100 grid grid-cols-2 gap-2 text-xs"><div><span class="text-slate-400 font-medium block text-[10px]">Total Price</span><span class="font-bold text-[#003366] text-xs sm:text-sm">${item.tcp.startsWith('₱') ? item.tcp : '₱'+item.tcp}</span></div><div><span class="text-slate-400 font-medium block text-[10px]">Monthly starts</span><span class="font-semibold text-emerald-600 text-xs">${item.amort}</span></div></div></div></div><div onclick="openListingDetails('${id}')" class="px-4 py-2.5 bg-slate-50 border-t border-slate-100 text-center text-xs font-semibold text-[#003366] hover:bg-[#003366] hover:text-white cursor-pointer transition flex items-center justify-center gap-1"><span>View Full Details</span> <i class="fa-solid fa-chevron-right text-[10px]"></i></div>`; container.appendChild(card); }); }
+    function renderListings(listings, searchTerm = '') { const container = document.getElementById('listings-container'); container.innerHTML = ''; const keys = Object.keys(listings).filter(id => { if (!searchTerm) return true; const item = listings[id] || {}; return [item.name, item.location, item.desc, item.tcp, item.amort].join(' ').toLowerCase().includes(searchTerm); }); if(keys.length === 0) { container.innerHTML = `<div class="col-span-full text-center py-10 text-slate-400 text-xs border border-dashed border-slate-300 rounded-lg">No project listings added yet.</div>`; return; } keys.forEach(id => { const item = listings[id]; const photos = (item.photos && item.photos.length > 0) ? item.photos : ['https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=600&q=80']; const card = document.createElement('div'); card.className = "panel-light bg-white rounded-xl border border-slate-200/90 overflow-hidden shadow-sm hover-lift flex flex-col justify-between relative group card-enter"; card.innerHTML = `${window.isAdmin ? `<div class="absolute top-2.5 right-2.5 z-20 flex gap-1"><button onclick="openEditListingModal('${id}')" class="bg-[#003366] hover:bg-[#002244] text-white w-7 h-7 rounded-md text-xs shadow flex items-center justify-center transition active:scale-95" title="Edit Listing"><i class="fa-solid fa-pen"></i></button><button onclick="deleteItem('listings/${id}')" class="bg-red-600 hover:bg-red-700 text-white w-7 h-7 rounded-md text-xs shadow flex items-center justify-center transition active:scale-95" title="Delete Listing"><i class="fa-solid fa-trash"></i></button></div>` : ''}<div><div class="relative h-48 sm:h-52 overflow-hidden bg-slate-900 cursor-pointer" onclick="openListingDetails('${id}')"><img src="${photos[0]}" alt="${item.name}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"><div class="absolute top-2.5 left-2.5 bg-[#003366]/80 text-white text-[10px] font-semibold uppercase tracking-wider px-2.5 py-1 rounded backdrop-blur-md border border-white/10 z-10"><i class="fa-solid fa-location-dot text-[#f1c40f] mr-1"></i> ${item.location}</div></div><div class="p-4 sm:p-5"><h3 onclick="openListingDetails('${id}')" class="text-base sm:text-lg font-bold text-[#003366] hover:text-[#002244] cursor-pointer transition-colors line-clamp-1">${item.name}</h3><div class="text-xs text-slate-500 mt-1.5 line-clamp-2 leading-relaxed">${item.desc}</div><div class="mt-3.5 pt-3 border-t border-slate-100 grid grid-cols-2 gap-2 text-xs"><div><span class="text-slate-400 font-medium block text-[10px]">Total Price</span><span class="font-bold text-[#003366] text-xs sm:text-sm">${item.tcp.startsWith('₱') ? item.tcp : '₱'+item.tcp}</span></div><div><span class="text-slate-400 font-medium block text-[10px]">Monthly starts</span><span class="font-semibold text-emerald-600 text-xs">${item.amort}</span></div></div></div></div><div onclick="openListingDetails('${id}')" class="px-4 py-2.5 bg-slate-50 border-t border-slate-100 text-center text-xs font-semibold text-[#003366] hover:bg-[#003366] hover:text-white cursor-pointer transition flex items-center justify-center gap-1"><span>View Full Details</span> <i class="fa-solid fa-chevron-right text-[10px]"></i></div>`; container.appendChild(card); }); }
     function openListingDetails(id) { const item = window.allListings[id]; if(!item) return; const modalContent = document.getElementById('listing-details-content'); const photos = item.photos || []; const faqs = item.faqs ? Object.entries(item.faqs) : []; const customBtns = item.customButtons || []; modalContent.innerHTML = `<div class="relative h-60 sm:h-80 w-full bg-slate-900 overflow-hidden"><div id="modal-carousel-slides-${id}" class="w-full h-full relative">${photos.map((p, idx) => `<img src="${p}" alt="${item.name}" class="modal-slide-${id} absolute inset-0 w-full h-full object-cover transition-opacity duration-500 ease-in-out ${idx === 0 ? 'opacity-100' : 'opacity-0'}">`).join('')}</div>${photos.length > 1 ? `<button onclick="navigateModalCarousel('${id}', -1, ${photos.length})" class="absolute left-3 top-1/2 -translate-y-1/2 bg-slate-900/60 text-white w-8 h-8 rounded-full flex items-center justify-center hover:bg-slate-900 transition z-10"><i class="fa-solid fa-chevron-left text-xs"></i></button><button onclick="navigateModalCarousel('${id}', 1, ${photos.length})" class="absolute right-3 top-1/2 -translate-y-1/2 bg-slate-900/60 text-white w-8 h-8 rounded-full flex items-center justify-center hover:bg-slate-900 transition z-10"><i class="fa-solid fa-chevron-right text-xs"></i></button><div class="absolute bottom-3 left-0 right-0 flex justify-center gap-1.5 z-10">${photos.map((_, idx) => `<span class="modal-dot-${id} w-2 h-2 rounded-full bg-white/60 transition-all ${idx === 0 ? '!bg-[#f1c40f] !w-4' : ''}"></span>`).join('')}</div>` : ''}</div><div class="flex gap-2 p-3 overflow-x-auto bg-slate-50 border-b custom-scrollbar items-center">${photos.map((p, idx) => `<div class="relative group flex-shrink-0"><img src="${p}" onclick="setModalCarouselSlide('${id}', ${idx})" class="w-14 h-10 object-cover rounded cursor-pointer border border-transparent hover:border-[#003366] transition">${window.isAdmin && photos.length > 1 ? `<button onclick="deleteListingPhoto('${id}', ${idx})" class="absolute -top-1 -right-1 bg-red-600 text-white w-4 h-4 rounded-full text-[9px] flex items-center justify-center shadow" title="Delete Photo"><i class="fa-solid fa-xmark"></i></button>` : ''}</div>`).join('')}${window.isAdmin ? `<button onclick="addListingPhoto('${id}')" class="px-2.5 py-2 bg-slate-200 hover:bg-slate-300 text-slate-700 rounded text-xs font-semibold flex items-center gap-1 flex-shrink-0"><i class="fa-solid fa-plus text-[10px]"></i> Add Photo</button>` : ''}</div><div class="p-5 sm:p-7 space-y-5">${customBtns.length > 0 ? `<div class="flex flex-wrap gap-2 pb-2 border-b border-slate-100">${customBtns.map(btn => `<button onclick="window.open('${btn.url}', '_blank')" class="px-4 py-2 bg-[#003366] hover:bg-[#002244] text-white font-semibold rounded-md text-xs transition shadow flex items-center gap-1.5"><span>${btn.label}</span><i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i></button>`).join('')}</div>` : ''}<div class="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-3"><div><h2 class="text-xl sm:text-2xl font-bold text-[#003366] tracking-tight">${item.name}</h2><p class="text-xs text-slate-500 mt-0.5"><i class="fa-solid fa-location-dot text-[#f1c40f] mr-1"></i> ${item.location}</p></div><div class="bg-[#003366]/5 p-3 rounded-lg border border-[#003366]/10 inline-block"><span class="block text-[10px] font-semibold text-slate-400 uppercase">Total Price</span><span class="block text-lg font-bold text-[#003366]">${item.tcp.startsWith('₱') ? item.tcp : '₱'+item.tcp}</span><span class="text-xs text-emerald-600 font-medium">Monthly starts ${item.amort}</span></div></div><div class="border-t border-slate-100 pt-4"><h4 class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5">Description</h4><div class="text-slate-600 text-xs sm:text-sm leading-relaxed whitespace-pre-line">${item.desc}</div></div><div class="border-t border-slate-100 pt-4"><div class="flex justify-between items-center mb-3"><h4 class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Frequently Asked Questions</h4>${window.isAdmin ? `<button onclick="openFAQModal('${id}')" class="text-xs text-[#003366] hover:underline font-semibold">+ Add FAQ</button>` : ''}</div>${faqs.length > 0 ? `<div class="space-y-2">${faqs.map(([faqId, faq], index) => `<div class="border border-slate-200 rounded-md overflow-hidden"><div class="flex items-center justify-between bg-slate-50"><button onclick="toggleFaq('${faqId}')" class="w-full text-left p-3 hover:bg-slate-100 font-semibold text-xs text-[#003366] flex justify-between items-center transition"><span>${faq.q}</span><i id="faq-icon-${faqId}" class="fa-solid fa-chevron-down text-slate-400 text-[10px] transition-transform duration-300"></i></button>${window.isAdmin ? `<div class="flex items-center gap-1 pr-2"><button onclick="reorderFaq('${id}', ${index}, -1)" class="text-slate-500 hover:text-[#003366] text-xs p-1" title="Move Up"><i class="fa-solid fa-arrow-up"></i></button><button onclick="reorderFaq('${id}', ${index}, 1)" class="text-slate-500 hover:text-[#003366] text-xs p-1" title="Move Down"><i class="fa-solid fa-arrow-down"></i></button></div>` : ''}</div><div id="faq-ans-${faqId}" class="hidden p-3 bg-white text-xs text-slate-600 border-t border-slate-100 relative">${window.isAdmin ? `<button onclick="deleteItem('listings/${id}/faqs/${faqId}')" class="absolute top-2 right-2 text-red-500 hover:text-red-700 text-xs"><i class="fa-solid fa-trash"></i></button>` : ''}<p>${faq.a}</p></div></div>`).join('')}</div>` : `<p class="text-xs text-slate-400 italic">No FAQs added for this project yet.</p>`}</div></div>`; openModal('listing-details-modal'); }
     function reorderFaq(listingId, currIdx, direction) { const item = window.allListings[listingId]; if (!item || !item.faqs) return; const faqsArr = Object.entries(item.faqs); const targetIdx = currIdx + direction; if (targetIdx < 0 || targetIdx >= faqsArr.length) return; const temp = faqsArr[currIdx]; faqsArr[currIdx] = faqsArr[targetIdx]; faqsArr[targetIdx] = temp; const newFaqsObj = {}; faqsArr.forEach(([key, val]) => { newFaqsObj[key] = val; }); window.set(window.ref(window.db, `listings/${listingId}/faqs`), newFaqsObj).then(() => { openListingDetails(listingId); }); }
     function addListingPhoto(id) { const url = prompt("Enter Image URL to add:"); if(url && window.allListings[id]) { const photos = window.allListings[id].photos || []; photos.push(url); window.set(window.ref(window.db, `listings/${id}/photos`), photos).then(() => { openListingDetails(id); }); } }
@@ -1119,7 +1124,7 @@
     function openEditBlogModal(id) { const item = window.allBlogs.find(b => b.id === id); if (!item) return; document.getElementById('edit-blog-id').value = id; document.getElementById('edit-blog-title').value = item.title || ''; document.getElementById('edit-blog-img').value = (item.images || []).join(', '); document.getElementById('edit-blog-caption').value = sanitizeBlogHtml(item.caption || ''); const editor = document.getElementById('edit-blog-caption-editor'); if (editor) editor.innerHTML = sanitizeBlogHtml(item.caption || ''); openModal('edit-blog-modal'); }
     function saveEditedBlog(e) { e.preventDefault(); syncBlogEditor('edit-blog-caption-editor', 'edit-blog-caption'); const id = document.getElementById('edit-blog-id').value; const title = document.getElementById('edit-blog-title').value.trim(); const imgRaw = document.getElementById('edit-blog-img').value; const caption = sanitizeBlogHtml(document.getElementById('edit-blog-caption').value); const images = imgRaw ? imgRaw.split(',').map(u => u.trim()).filter(u => u.length > 0) : []; const existingBlog = window.allBlogs.find(b => b.id === id); const timestamp = existingBlog ? (existingBlog.timestamp || Date.now()) : Date.now(); window.set(window.ref(window.db, `blogs/${id}`), { title, images, caption, timestamp }).then(() => { closeModal('edit-blog-modal'); e.target.reset(); const editor = document.getElementById('edit-blog-caption-editor'); if (editor) editor.innerHTML = ''; document.getElementById('edit-blog-caption').value = ''; }); }
     function changeBlogPage(dir) { window.blogPage += dir; renderBlogFeed(); document.getElementById('updates')?.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
-    function renderBlogFeed() { const container = document.getElementById('blog-container'); container.innerHTML = ''; const term = (window.globalSearchTerm || '').trim().toLowerCase(); const sourceBlogs = window.allBlogs || []; const filteredBlogs = term ? sourceBlogs.filter(post => [post.title, post.caption, ...(post.images || [])].join(' ').toLowerCase().includes(term)) : sourceBlogs; if (filteredBlogs.length === 0) { container.innerHTML = `<div class="text-center py-10 text-slate-400 text-xs border border-dashed border-slate-300 rounded-lg">${term ? 'No posts matched your keyword.' : 'No post updates available.'}</div>`; document.getElementById('blog-pagination').classList.add('hidden'); return; } document.getElementById('blog-pagination').classList.toggle('hidden', !!term); const totalPages = Math.max(1, Math.ceil(filteredBlogs.length / window.blogPostsPerPage)); if (window.blogPage > totalPages) window.blogPage = totalPages; if (window.blogPage < 1) window.blogPage = 1; document.getElementById('blog-page-info').innerText = `Page ${window.blogPage} of ${totalPages}`; document.getElementById('btn-prev-page').disabled = (window.blogPage === 1); document.getElementById('btn-next-page').disabled = (window.blogPage === totalPages); const start = (window.blogPage - 1) * window.blogPostsPerPage; const pagedItems = term ? filteredBlogs : filteredBlogs.slice(start, start + window.blogPostsPerPage); pagedItems.forEach(post => { const card = document.createElement('article'); card.className = "glass-panel bg-white rounded-xl border border-slate-200/80 overflow-hidden shadow-sm hover-lift relative card-enter"; const thumb = (post.images && post.images.length > 0) ? post.images[0] : null; const formattedDate = new Date(post.timestamp || Date.now()).toLocaleDateString('en-US', { month:'short', day:'numeric', year:'numeric' }); const authorName = window.profileData.name || 'Agent'; const authorAvatar = window.profileData.avatar || 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=200&q=80'; card.innerHTML = `${window.isAdmin ? `<div class="absolute top-3 right-3 flex gap-1.5 z-20"><button onclick="openEditBlogModal('${post.id}')" class="bg-[#003366] hover:bg-[#002244] text-white w-7 h-7 rounded-md text-xs shadow flex items-center justify-center transition active:scale-95" title="Edit Post"><i class="fa-solid fa-pen"></i></button><button onclick="deleteItem('blogs/${post.id}')" class="bg-red-600 hover:bg-red-700 text-white w-7 h-7 rounded-md text-xs shadow flex items-center justify-center transition active:scale-95" title="Delete Post"><i class="fa-solid fa-trash"></i></button></div>` : ''}<div class="p-4 sm:p-5"><div class="flex items-center justify-between gap-2 mb-2"><div class="flex items-center gap-2 text-[11px] text-slate-400 font-medium"><i class="fa-solid fa-calendar-days text-[#003366]"></i><span>${formattedDate}</span></div><button onclick="shareBlogPost('${post.id}')" class="share-btn" title="Share this post"><i class="fa-solid fa-share-nodes"></i> Share</button></div><h3 onclick="openBlogDetails('${post.id}')" class="text-base sm:text-lg font-bold text-[#003366] hover:text-[#002244] cursor-pointer transition line-clamp-2">${post.title}</h3>${thumb ? `<div class="mt-3 rounded-lg overflow-hidden bg-slate-50 border border-slate-100 cursor-pointer" onclick="openBlogDetails('${post.id}')"><img src="${thumb}" alt="${post.title}" class="blog-card-image hover:opacity-95 transition duration-300" loading="lazy"></div>` : ''}<div class="mt-4 text-slate-600 text-xs sm:text-sm leading-relaxed blog-card-excerpt">${createBlogExcerpt(post.caption || '')}</div><div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between gap-3"><div class="flex items-center gap-2 min-w-0"><img src="${authorAvatar}" alt="${authorName}" class="w-8 h-8 rounded-full object-cover border border-white shadow-sm flex-shrink-0"><div class="min-w-0"><div class="text-[10px] text-slate-400 uppercase tracking-wider">Author</div><div class="text-xs font-semibold text-[#003366] truncate">${authorName}</div></div></div><button onclick="openBlogDetails('${post.id}')" class="inline-flex items-center gap-1 text-xs font-semibold text-[#003366] hover:underline flex-shrink-0"><span>More</span> <i class="fa-solid fa-arrow-right text-[10px]"></i></button></div></div>`; container.appendChild(card); }); }
+    function renderBlogFeed() { const container = document.getElementById('blog-container'); container.innerHTML = ''; const term = (window.globalSearchTerm || '').trim().toLowerCase(); const sourceBlogs = window.allBlogs || []; const filteredBlogs = term ? sourceBlogs.filter(post => [post.title, post.caption, ...(post.images || [])].join(' ').toLowerCase().includes(term)) : sourceBlogs; if (filteredBlogs.length === 0) { container.innerHTML = `<div class="text-center py-10 text-slate-400 text-xs border border-dashed border-slate-300 rounded-lg">${term ? 'No posts matched your keyword.' : 'No post updates available.'}</div>`; document.getElementById('blog-pagination').classList.add('hidden'); return; } document.getElementById('blog-pagination').classList.toggle('hidden', !!term); const totalPages = Math.max(1, Math.ceil(filteredBlogs.length / window.blogPostsPerPage)); if (window.blogPage > totalPages) window.blogPage = totalPages; if (window.blogPage < 1) window.blogPage = 1; document.getElementById('blog-page-info').innerText = `Page ${window.blogPage} of ${totalPages}`; document.getElementById('btn-prev-page').disabled = (window.blogPage === 1); document.getElementById('btn-next-page').disabled = (window.blogPage === totalPages); const start = (window.blogPage - 1) * window.blogPostsPerPage; const pagedItems = term ? filteredBlogs : filteredBlogs.slice(start, start + window.blogPostsPerPage); pagedItems.forEach(post => { const card = document.createElement('article'); card.className = "panel-light bg-white rounded-xl border border-slate-200/80 overflow-hidden shadow-sm hover-lift relative card-enter"; const thumb = (post.images && post.images.length > 0) ? post.images[0] : null; const formattedDate = new Date(post.timestamp || Date.now()).toLocaleDateString('en-US', { month:'short', day:'numeric', year:'numeric' }); const authorName = window.profileData.name || 'Agent'; const authorAvatar = window.profileData.avatar || 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=200&q=80'; card.innerHTML = `${window.isAdmin ? `<div class="absolute top-3 right-3 flex gap-1.5 z-20"><button onclick="openEditBlogModal('${post.id}')" class="bg-[#003366] hover:bg-[#002244] text-white w-7 h-7 rounded-md text-xs shadow flex items-center justify-center transition active:scale-95" title="Edit Post"><i class="fa-solid fa-pen"></i></button><button onclick="deleteItem('blogs/${post.id}')" class="bg-red-600 hover:bg-red-700 text-white w-7 h-7 rounded-md text-xs shadow flex items-center justify-center transition active:scale-95" title="Delete Post"><i class="fa-solid fa-trash"></i></button></div>` : ''}<div class="p-4 sm:p-5"><div class="flex items-center justify-between gap-2 mb-2"><div class="flex items-center gap-2 text-[11px] text-slate-400 font-medium"><i class="fa-solid fa-calendar-days text-[#003366]"></i><span>${formattedDate}</span></div><button onclick="shareBlogPost('${post.id}')" class="share-btn" title="Share this post"><i class="fa-solid fa-share-nodes"></i> Share</button></div><h3 onclick="openBlogDetails('${post.id}')" class="text-base sm:text-lg font-bold text-[#003366] hover:text-[#002244] cursor-pointer transition line-clamp-2">${post.title}</h3>${thumb ? `<div class="mt-3 rounded-lg overflow-hidden bg-slate-50 border border-slate-100 cursor-pointer" onclick="openBlogDetails('${post.id}')"><img src="${thumb}" alt="${post.title}" class="blog-card-image hover:opacity-95 transition duration-300" loading="lazy"></div>` : ''}<div class="mt-4 text-slate-600 text-xs sm:text-sm leading-relaxed blog-card-excerpt">${createBlogExcerpt(post.caption || '')}</div><div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between gap-3"><div class="flex items-center gap-2 min-w-0"><img src="${authorAvatar}" alt="${authorName}" class="w-8 h-8 rounded-full object-cover border border-white shadow-sm flex-shrink-0"><div class="min-w-0"><div class="text-[10px] text-slate-400 uppercase tracking-wider">Author</div><div class="text-xs font-semibold text-[#003366] truncate">${authorName}</div></div></div><button onclick="openBlogDetails('${post.id}')" class="inline-flex items-center gap-1 text-xs font-semibold text-[#003366] hover:underline flex-shrink-0"><span>More</span> <i class="fa-solid fa-arrow-right text-[10px]"></i></button></div></div>`; container.appendChild(card); }); }
     function openBlogDetails(id) { const post = window.allBlogs.find(b => b.id === id); if(!post) return; const content = document.getElementById('blog-details-content'); const images = post.images || []; const formattedDate = new Date(post.timestamp || Date.now()).toLocaleDateString('en-US', { month:'long', day:'numeric', year:'numeric' }); const authorName = window.profileData.name || 'Agent'; const authorAvatar = window.profileData.avatar || 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=200&q=80'; content.innerHTML = `<div class="space-y-4"><div class="flex items-center justify-between gap-2"><div class="flex items-center gap-2 text-xs text-slate-400 font-medium"><i class="fa-solid fa-calendar-days text-[#003366]"></i><span>${formattedDate}</span></div><button onclick="shareBlogPost('${id}')" class="share-btn" title="Share this post"><i class="fa-solid fa-share-nodes"></i> Share</button></div><h2 class="text-xl sm:text-2xl font-bold text-[#003366] leading-snug">${post.title}</h2>${images.length > 0 ? `<div class="relative rounded-xl overflow-hidden bg-slate-50 border border-slate-100"><div id="blog-carousel-slides-${id}" class="w-full relative">${images.map((img, idx) => `<img src="${img}" alt="${post.title}" class="blog-slide-${id} blog-detail-image transition-opacity duration-500 ${idx === 0 ? 'opacity-100' : 'opacity-0 absolute inset-0'}">`).join('')}</div>${images.length > 1 ? `<button onclick="navigateBlogCarousel('${id}', -1, ${images.length})" class="absolute left-3 top-1/2 -translate-y-1/2 bg-slate-900/60 text-white w-8 h-8 rounded-full flex items-center justify-center hover:bg-slate-900 transition z-10"><i class="fa-solid fa-chevron-left text-xs"></i></button><button onclick="navigateBlogCarousel('${id}', 1, ${images.length})" class="absolute right-3 top-1/2 -translate-y-1/2 bg-slate-900/60 text-white w-8 h-8 rounded-full flex items-center justify-center hover:bg-slate-900 transition z-10"><i class="fa-solid fa-chevron-right text-xs"></i></button>` : ''}</div>` : ''}<div class="text-slate-700 text-xs sm:text-sm leading-relaxed space-y-3 pt-2 blog-content border-t border-slate-100">${sanitizeBlogHtml(post.caption || '')}</div><div class="pt-4 border-t border-slate-100 flex items-center gap-3"><img src="${authorAvatar}" alt="${authorName}" class="w-10 h-10 rounded-full object-cover border border-white shadow-sm"><div><div class="text-[10px] text-slate-400 uppercase tracking-wider">Posted by</div><div class="text-sm font-bold text-[#003366]">${authorName}</div></div></div></div>`; openModal('blog-details-modal'); }
     let activeBlogSlideIndex = {};
     function navigateBlogCarousel(id, dir, max) { let current = activeBlogSlideIndex[id] || 0; current = (current + dir + max) % max; activeBlogSlideIndex[id] = current; const slides = document.querySelectorAll(`.blog-slide-${id}`); slides.forEach((s, i) => { s.classList.toggle('opacity-100', i === current); s.classList.toggle('opacity-0', i !== current); s.classList.toggle('absolute', i !== current); if (i === current) { s.classList.remove('absolute','inset-0'); } else { s.classList.add('absolute','inset-0'); } }); }
@@ -1153,7 +1158,7 @@
       ];
 
       container.innerHTML = testimonials.map(t => `
-        <div class="testimonial-card glass-panel bg-white/90 rounded-xl p-5 sm:p-6 border border-slate-200/80 shadow-sm">
+        <div class="testimonial-card panel-light bg-white/90 rounded-xl p-5 sm:p-6 border border-slate-200/80 shadow-sm">
           <div class="flex items-center gap-3 mb-3">
             <img src="${t.avatar}" alt="${t.name}" class="testimonial-avatar" loading="lazy">
             <div>
@@ -1216,6 +1221,26 @@
     // ===== INIT TESTIMONIALS =====
     document.addEventListener('DOMContentLoaded', function() {
       renderTestimonials();
+    });
+
+    // ===== HANDLE DEEP LINK TO BLOG POST ON LOAD =====
+    document.addEventListener('DOMContentLoaded', function() {
+      const params = new URLSearchParams(window.location.search);
+      const postId = params.get('post');
+      if (postId) {
+        // Wait a moment for data to load then open the modal
+        const checkInterval = setInterval(() => {
+          if (window.allBlogs && window.allBlogs.length > 0) {
+            clearInterval(checkInterval);
+            const exists = window.allBlogs.some(b => b.id === postId);
+            if (exists) {
+              openBlogDetails(postId);
+            }
+          }
+        }, 300);
+        // Timeout after 10s
+        setTimeout(() => clearInterval(checkInterval), 10000);
+      }
     });
   </script>
 </body>
